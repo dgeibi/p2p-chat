@@ -18,6 +18,8 @@
   "dependencies": {
     "dateformat": "^2.0.0",
     "electron": "^1.6.10",
-    "fs-extra": "^3.0.1"
+    "fs-extra": "^3.0.1",
+    "getport": "^0.1.0",
+    "ip": "^1.1.5"
   }
 }

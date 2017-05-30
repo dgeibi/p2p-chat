@@ -46,11 +46,12 @@ app.on('activate', () => {
   }
 });
 
-ipcMain.on('setup', (event, username) => {
-  chat.setup({ username }, (err, tag) => {
-    event.sender.send('setup-reply', !err, tag);
+ipcMain.on('setup', (event, opts) => {
+  chat.setup(opts, (err, id) => {
+    const { username } = opts;
+    event.sender.send('setup-reply', !err, id);
     if (!err) {
-      win.setTitle(`${username}[${tag.slice(0, 5)}] - ${pkg.name}`);
+      win.setTitle(`${username}[${id.tag.slice(0, 5)}] - ${pkg.name}`);
     }
   });
 });

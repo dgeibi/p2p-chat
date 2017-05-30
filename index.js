@@ -17,6 +17,7 @@ const send = require('./lib/send');
 const { loadFile, loadFileInfo } = require('./lib/file');
 
 const local = {
+  debug: false,
   active: false,
 };
 const clients = {};
@@ -43,6 +44,7 @@ const handleSocket = (socket, opts = {}) => {
     socket.tag = session.tag;
     clients[session.tag] = socket;
 
+    console.log(`${session.username}[${session.tag}] login.`);
     events.emit('login', session.tag, session.username);
 
     // response id
@@ -105,6 +107,18 @@ const handleSocket = (socket, opts = {}) => {
   });
 };
 
+const defaultOpts = {
+  username: 'anonymous',
+  port: 8087,
+};
+
+const defaultDebugOpts = {
+  debug: true,
+  host: '127.0.0.1',
+  from: '127.0.0.1',
+  to: '127.0.0.10',
+};
+
 function setup(options, callback) {
   if (local.active) {
     exit((err) => {
@@ -113,18 +127,11 @@ function setup(options, callback) {
     });
     return;
   }
-  const opts = {
-    username: 'anonymous',
-    port: 8087,
-    host: '127.0.0.1',
-    from: '127.0.0.1',
-    to: '127.0.0.10',
-  };
-  Object.assign(opts, options);
+
+  const opts = Object.assign({}, defaultOpts, options.debug ? defaultDebugOpts : null, options);
   const wrongs = checkProps(opts, {
     username: { type: 'string' },
     port: { type: 'number' },
-    host: { type: 'string' },
   });
   if (wrongs.length > 0) {
     callback(wrongs[0]);
@@ -146,16 +153,31 @@ function setup(options, callback) {
     });
 
     // 2. start listening
-    server.listen(port, host, () => {
+    server.listen({ port, host }, () => {
       console.log('>> opened server on', server.address());
       console.log(`>> Hi! ${username}[${tag}]`);
 
-      if (opts.from && opts.to) {
+      if (opts.debug && opts.from && opts.to) {
         connectRange(opts.from, opts.to);
+      } else if (!opts.debug && opts.connects) {
+        opts.connects.forEach((conn) => {
+          console.log(conn);
+          connect({
+            host: conn.host,
+            port: conn.port,
+            localPort: local.port,
+            tag: local.tag,
+            username: local.username,
+          }, (e, socket) => {
+            if (!e) {
+              handleSocket(socket);
+            }
+          });
+        });
       }
       // 3. connect to other clients
       local.active = true;
-      callback(null, tag);
+      callback(null, id);
     });
   });
 }

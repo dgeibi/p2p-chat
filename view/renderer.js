@@ -1,5 +1,6 @@
-const dateFormat = require('dateformat');
+// const dateFormat = require('dateformat');
 const { ipcRenderer } = require('electron');
+const formatTag = require('./lib/formatTag');
 
 const view = document.querySelector('.view');
 const aside = document.querySelector('aside');
@@ -7,111 +8,75 @@ const textarea = document.querySelector('textarea');
 const loginBtn = document.querySelector('#login-btn');
 const logoutBtn = document.querySelector('#logout-btn');
 const fileBtn = document.querySelector('.file-btn');
-const submitBtn = document.querySelector('#submit-btn');
+const chatMsgSubmitBtn = document.querySelector('#submit-btn');
+const debugOptions = document.querySelector('#debug-options');
 
+const template = {};
 
-const local = {
+const defaultConfig = {
   msgCount: 0,
   username: '匿名',
   tag: null,
   users: null,
   login: false,
+  debug: false,
+  from: '127.0.0.1',
+  to: '127.0.0.10',
+  port: 8087,
 };
-const formatTag = tag => tag.slice(0, 5);
+
+const local = Object.assign({}, defaultConfig);
+
+function bind(object, dataKey, defaultObject = {}, key) {
+  Object.defineProperty(object, key, {
+    get() {
+      const node = document.querySelector(`[data-${dataKey}="${key}"]`);
+      if (!node) {
+        console.log(key);
+        return defaultObject[key];
+      }
+      const value = node[node.dataset.valueKey || 'value'] || defaultObject[key];
+      return value;
+    },
+    set(value) {
+      const node = document.querySelector(`[data-${dataKey}="${key}"]`);
+      node[node.dataset.valueKey || 'value'] = value;
+    },
+  });
+}
+
+const bindLocal = bind.bind(null, local, 'local', defaultConfig);
+bindLocal('from');
+bindLocal('to');
+bindLocal('host');
+bindLocal('port');
+bindLocal('debug');
+
+// const local = getConfig();
 
 const state = {
   set login(success) {
     local.login = success;
     local.msgCount = 0;
-    loginBtn.innerHTML = success ? '改名' : '登录';
+    loginBtn.innerHTML = success ? '设置' : '登录';
     logoutBtn.classList[success ? 'remove' : 'add']('hide');
     fileBtn.classList[success ? 'remove' : 'add']('hide');
-    submitBtn.classList[success ? 'remove' : 'add']('hide');
+    chatMsgSubmitBtn.classList[success ? 'remove' : 'add']('hide');
     aside.classList[success ? 'remove' : 'add']('hide');
     if (!success) state.users = [];
   },
+
   set users(users) {
     local.users = users;
     aside.innerHTML = users.map(user => `<div><input type="checkbox" id="${user.tag}" checked><label for="${user.tag}">${user.username}[${formatTag(user.tag)}]</label></div>`).join('');
   },
+
+  set debug(d) {
+    debugOptions.classList[d ? 'remove' : 'add']('hide');
+  },
 };
 
-const write = (str) => {
-  view.insertAdjacentHTML('beforeend', str);
-  setTimeout(() => {
-    view.scrollTop = view.scrollHeight;
-  }, 0);
-};
-
-const writeMonthDay = () => {
-  write(`<section class="info center">${dateFormat(new Date(), 'mm-dd')}</section>`);
-};
-
-const writeTime = () => {
-  write(`<section class="info center">${dateFormat(new Date(), 'HH:MM')}</section>`);
-};
-
-const writeMsg = (text) => {
-  write(`<section class="info">${text}</section>`);
-};
-
-const writeUserMsg = (tag, username, text) => {
-  if (local.msgCount % 5 === 0) writeTime();
-  local.msgCount += 1;
-  write(`<section><span class="info">${username}[${formatTag(tag)}]:</span> ${text}</section>`);
-};
-
-
-// 已选择的文件显示
-const filePath = document.querySelector('.file-path');
-const fileInput = document.querySelector('.file-input');
-fileInput.addEventListener('change', () => {
-  const files = Array.from(fileInput.files);
-  filePath.innerHTML = files.map(file => `<li>${file.name}</li>`).join('');
-});
-
-
-// handle text submit
-submitBtn.addEventListener('click', (e) => {
-  const tags = Array.from(aside.querySelectorAll('input[type=checkbox]'))
-    .filter(user => user.checked)
-    .map(user => user.id);
-  e.preventDefault();
-  const text = textarea.value;
-  if (text !== '') {
-    writeUserMsg(local.tag, local.username, text);
-    ipcRenderer.send('local-text', tags, text); // send-text
-  }
-  textarea.value = ''; // empty textarea
-
-  // send to main process
-  const files = Array.from(fileInput.files);
-  files.forEach((file) => {
-    ipcRenderer.send('local-file', tags, file.path);
-    writeMsg(`>> 请求发送 ${file.name}……`);
-  });
-
-  // flush filenames
-  fileInput.value = '';
-  filePath.innerHTML = '';
-});
-
-// login/change username
-const usernameInput = document.querySelector('#username');
-const usernameSubmitBtn = document.querySelector('#username-submit');
-const logout = (opts = {}) => {
-  ipcRenderer.send('logout', opts);
-};
-const login = () => {
-  local.username = usernameInput.value || local.username;
-  ipcRenderer.send('setup', local.username);
-};
-
-usernameSubmitBtn.addEventListener('click', () => {
-  if (local.login) logout({ reload: true });
-  else login();
-});
-logoutBtn.addEventListener('click', logout);
+const { writeMonthDay, writeMsg, writeUserMsg } = require('./lib/write.js')(view, local);
 
 ipcRenderer.on('logout-reply', (event, success, opts) => {
   writeMsg(`>> 登出${success ? '成功' : '失败'}`);
@@ -120,13 +85,14 @@ ipcRenderer.on('logout-reply', (event, success, opts) => {
 });
 
 // handle reply
-ipcRenderer.on('setup-reply', (event, success, tag) => {
+ipcRenderer.on('setup-reply', (event, success, id) => {
   writeMonthDay();
   writeMsg(`>> 登录${success ? '成功' : '失败'}`);
   state.login = success;
   if (success) {
-    local.tag = tag;
+    Object.assign(local, id);
     writeMsg(`>> 你好，${local.username}[${formatTag(local.tag)}].`);
+    writeMsg(`>> 您的局域网地址是${local.host || local.address}`);
   }
 });
 
@@ -171,12 +137,124 @@ ipcRenderer.on('file-write-fail', (event, message) => {
   writeMsg(`>> ${username}[${formatTag(tag)}] 发送的 ${filename} 接收失败。`);
 });
 
-// 字体大小
-const handleFontSizeChange = (e) => {
-  const target = e.target;
-  document.documentElement.style.setProperty(`--${target.id}`, `${target.value}${target.dataset.base}`);
-};
-const inputFontSize = document.querySelector('#input-font-size');
-inputFontSize.addEventListener('change', handleFontSizeChange);
-const viewFontSize = document.querySelector('#view-font-size');
-viewFontSize.addEventListener('change', handleFontSizeChange);
+// 已选择的文件显示
+const filePath = document.querySelector('.file-path');
+const fileInput = document.querySelector('.file-input');
+fileInput.addEventListener('change', function handleFilesChange() {
+  const files = Array.from(this.files);
+  filePath.innerHTML = files.map(file => `<li>${file.name}</li>`).join('');
+});
+
+// handle chat message submit
+chatMsgSubmitBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+
+  // 0. get selected tags
+  const tags = Array.from(aside.querySelectorAll('input[type=checkbox]'))
+    .filter(user => user.checked)
+    .map(user => user.id);
+
+  // 1. send text
+  const text = textarea.value;
+  if (text !== '') {
+    writeUserMsg(local.tag, local.username, text);
+    ipcRenderer.send('local-text', tags, text); // send-text
+    textarea.value = ''; // empty textarea
+  }
+
+  // 2. send files
+  const files = Array.from(fileInput.files);
+  files.forEach((file) => {
+    ipcRenderer.send('local-file', tags, file.path);
+    writeMsg(`>> 请求发送 ${file.name}……`);
+  });
+  fileInput.value = ''; // flush filenames
+  filePath.innerHTML = '';
+});
+
+// login/apply settings
+const settingsSubmitBtn = document.querySelector('#settings-submit');
+
+function logout(opts = {}) {
+  ipcRenderer.send('logout', opts);
+}
+
+function login() {
+  ipcRenderer.send('setup', {
+    username: local.username,
+    debug: local.debug,
+    host: local.host,
+    from: local.from,
+    to: local.to,
+    port: +local.port,
+    connects: (() => {
+      const items = Array.from(document.querySelectorAll('.connect-list li'));
+      return items.map((item) => {
+        const host = item.querySelector('[data-connect="host"]').value;
+        const port = parseInt(item.querySelector('[data-connect="port"]').value, 10);
+        if (host && port) return { host, port };
+        return undefined;
+      }).filter(i => !!i);
+    })(),
+  });
+}
+
+settingsSubmitBtn.addEventListener('click', () => {
+  // todo, don't logout if host, username, port not change
+  if (local.login) logout({ reload: true });
+  else login();
+});
+logoutBtn.addEventListener('click', logout);
+
+// binding settings
+function handleChange(e) {
+  const node = e.target;
+  const value = node[node.dataset.valueKey || 'value'];
+  if (node.dataset.state) state[node.dataset.state] = value;
+  if (node.dataset.local) local[node.dataset.local] = value;
+}
+document.querySelectorAll('.settings input[data-state]').forEach((input) => {
+  input.addEventListener('change', handleChange);
+});
+
+
+(() => { // 调整字体大小
+  const handleFontSizeChange = (e) => {
+    const node = e.target;
+    document.documentElement.style.setProperty(`--${node.id}`, `${node.value}${node.dataset.base}`);
+  };
+  const inputFontSize = document.querySelector('#input-font-size');
+  inputFontSize.addEventListener('change', handleFontSizeChange);
+  const viewFontSize = document.querySelector('#view-font-size');
+  viewFontSize.addEventListener('change', handleFontSizeChange);
+})();
+
+(() => { // add connect template
+  const connect = document.querySelector('#connects .connect-list li');
+  connect.querySelector('.remove').addEventListener('click', removeConnect, false);
+  template.connect = connect.cloneNode(true);
+})();
+
+function removeConnect(e) {
+  const connect = e.target.parentNode;
+  const connectList = connect.parentNode;
+  connect.remove();
+  if (connectList.children.length === 0) {
+    addConnect(connectList);
+  }
+}
+
+function addConnect(list) {
+  const e = template.connect.cloneNode(true);
+  e.querySelector('.remove').addEventListener('click', removeConnect, false);
+  list.appendChild(e);
+}
+
+// add connects
+document.querySelector('#connects .btn.add').addEventListener('click', (e) => {
+  const connectList = e.target.nextElementSibling;
+  addConnect(connectList);
+});
+
+// display setting when startup
+location.href = '#settings';

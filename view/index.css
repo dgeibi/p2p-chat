@@ -81,7 +81,7 @@ a {
   color: white;
   display: inline-block;
   border-radius: 2px;
-  padding: .5em .6em;
+  padding: .4em .5em;
   cursor: pointer;
   border: 1px solid #2e6da4;
   background: hsla(219, 50%, 55%, 1);
@@ -162,11 +162,13 @@ label {
 }
 
 .popup {
+  box-sizing: border-box;
   margin: 70px auto;
   padding: 10px;
   background: #fff;
   border-radius: 5px;
-  width: 35%;
+  max-width: 500px;
+  height: 80%;
   position: relative;
   transition: all 5s ease-in-out;
 }
@@ -187,8 +189,15 @@ label {
 }
 
 .popup-content {
-  padding-bottom: 5px;
+  box-sizing: border-box;
+  padding-bottom: 45px;
+  height: 70%;
   overflow: auto;
+}
+
+.settings label {
+  user-select: none;
+  display: inline-block;
 }
 
 .popup-header {
@@ -197,14 +206,14 @@ label {
   font-size: 1.3em;
 }
 
-#username-submit {
+#settings-submit {
   position: absolute;
   right: 10px;
   bottom: 10px;
 }
 
-#username {
-  width: 65%;
+.setting-input {
+  margin-bottom: .6em;
 }
 
 .center {
@@ -218,4 +227,22 @@ label {
 .info {
   color: hsla(23, 30%, 55%, 1);
   font-size: 0.9em;
+}
+
+ul {
+  list-style: none;
+}
+
+li {
+  margin-bottom: .4em;
+}
+
+.row {
+  position: relative;
+  margin-bottom: .4em;
+}
+
+.row input[type=text] {
+  position: absolute;
+  left: 150px;
 }
