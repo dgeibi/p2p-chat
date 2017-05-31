@@ -1,4 +1,3 @@
-// const dateFormat = require('dateformat');
 const { ipcRenderer } = require('electron');
 const formatTag = require('./lib/formatTag');
 
@@ -15,17 +14,16 @@ const template = {};
 
 const defaultConfig = {
   msgCount: 0,
-  username: '匿名',
+  username: 'anonymous',
   tag: null,
   users: null,
   login: false,
   debug: false,
-  from: '127.0.0.1',
-  to: '127.0.0.10',
   port: 8087,
 };
 
 const local = Object.assign({}, defaultConfig);
+let important = null;
 
 function bind(object, dataKey, defaultObject = {}, key) {
   Object.defineProperty(object, key, {
@@ -36,23 +34,38 @@ function bind(object, dataKey, defaultObject = {}, key) {
         return defaultObject[key];
       }
       const value = node[node.dataset.valueKey || 'value'] || defaultObject[key];
+      if (node.dataset.type === 'number') return Number(value);
       return value;
     },
     set(value) {
       const node = document.querySelector(`[data-${dataKey}="${key}"]`);
-      node[node.dataset.valueKey || 'value'] = value;
+      if (node) node[node.dataset.valueKey || 'value'] = value;
+      else console.log(key, dataKey);
     },
   });
 }
 
 const bindLocal = bind.bind(null, local, 'local', defaultConfig);
-bindLocal('from');
-bindLocal('to');
+bindLocal('username');
 bindLocal('host');
 bindLocal('port');
 bindLocal('debug');
+bindLocal('hostStart');
+bindLocal('hostEnd');
+bindLocal('portStart');
+bindLocal('portEnd');
 
-// const local = getConfig();
+Object.defineProperty(local, 'connects', {
+  get() {
+    return Array.from(document.querySelectorAll('.connect-list li')).map((item) => {
+      const host = item.querySelector('[data-connect="host"]').value;
+      const port = parseInt(item.querySelector('[data-connect="port"]').value, 10);
+      if (port) return { host, port };
+      return undefined;
+    }).filter(i => !!i);
+  },
+  set() {},
+});
 
 const state = {
   set login(success) {
@@ -78,10 +91,9 @@ const state = {
 
 const { writeMonthDay, writeMsg, writeUserMsg } = require('./lib/write.js')(view, local);
 
-ipcRenderer.on('logout-reply', (event, success, opts) => {
+ipcRenderer.on('logout-reply', (event, success) => {
   writeMsg(`>> 登出${success ? '成功' : '失败'}`);
   state.login = !success;
-  if (opts.reload) login();
 });
 
 // handle reply
@@ -91,8 +103,10 @@ ipcRenderer.on('setup-reply', (event, success, id) => {
   state.login = success;
   if (success) {
     Object.assign(local, id);
-    writeMsg(`>> 你好，${local.username}[${formatTag(local.tag)}].`);
-    writeMsg(`>> 您的局域网地址是${local.host || local.address}`);
+    const { username, host, port } = id;
+    important = { username, host, port };
+    writeMsg(`>> 你好，${username}[${formatTag(local.tag)}].`);
+    writeMsg(`>> 你的地址是${host || id.address}:${port}`);
   }
 });
 
@@ -179,31 +193,19 @@ function logout(opts = {}) {
   ipcRenderer.send('logout', opts);
 }
 
-function login() {
-  ipcRenderer.send('setup', {
-    username: local.username,
-    debug: local.debug,
-    host: local.host,
-    from: local.from,
-    to: local.to,
-    port: +local.port,
-    connects: (() => {
-      const items = Array.from(document.querySelectorAll('.connect-list li'));
-      return items.map((item) => {
-        const host = item.querySelector('[data-connect="host"]').value;
-        const port = parseInt(item.querySelector('[data-connect="port"]').value, 10);
-        if (host && port) return { host, port };
-        return undefined;
-      }).filter(i => !!i);
-    })(),
-  });
+function applySettings() {
+  const { username, host, port, debug, hostStart, hostEnd, portStart, portEnd, connects } = local;
+  const options = { username, host, port, debug, hostStart, hostEnd, portStart, portEnd, connects };
+
+  const newImportant = { username, host, port };
+  if (important === null || JSON.stringify(important) !== JSON.stringify(newImportant)) {
+    ipcRenderer.send('setup', options);
+    return;
+  }
+  ipcRenderer.send('change-setting', options);
 }
 
-settingsSubmitBtn.addEventListener('click', () => {
-  // todo, don't logout if host, username, port not change
-  if (local.login) logout({ reload: true });
-  else login();
-});
+settingsSubmitBtn.addEventListener('click', applySettings);
 logoutBtn.addEventListener('click', logout);
 
 // binding settings
@@ -211,7 +213,6 @@ function handleChange(e) {
   const node = e.target;
   const value = node[node.dataset.valueKey || 'value'];
   if (node.dataset.state) state[node.dataset.state] = value;
-  if (node.dataset.local) local[node.dataset.local] = value;
 }
 document.querySelectorAll('.settings input[data-state]').forEach((input) => {
   input.addEventListener('change', handleChange);

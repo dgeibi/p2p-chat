@@ -46,9 +46,14 @@ app.on('activate', () => {
   }
 });
 
+ipcMain.on('change-setting', (event, opts) => {
+  chat.connectServers(opts);
+});
+
 ipcMain.on('setup', (event, opts) => {
   chat.setup(opts, (err, id) => {
     const { username } = opts;
+    if (err) console.log(err);
     event.sender.send('setup-reply', !err, id);
     if (!err) {
       win.setTitle(`${username}[${id.tag.slice(0, 5)}] - ${pkg.name}`);
@@ -58,6 +63,7 @@ ipcMain.on('setup', (event, opts) => {
 
 ipcMain.on('logout', (event, opts) => {
   chat.exit((err) => {
+    if (err) console.log(err);
     event.sender.send('logout-reply', !err, opts);
   });
 });

@@ -48,18 +48,22 @@
           <h3 class="popup-header">登录/设置</h3>
           <a class="popup-close" href="#">&times;</a>
           <div class="popup-content settings">
-            <div class="row"><label for="username">用户名：</label><input type="text" data-local="username" id="username" placeholder="匿名"></div>
-            <div class="row"><label for="port">端口号：</label><input type="text" data.local="port" id="port" data-local="port" placeholder="8087"></div>
+            <div class="row"><label for="username">用户名：</label><input type="text" data-local="username" id="username" placeholder="anonymous"></div>
+            <div class="row"><label for="port">端口号：</label><input type="text" data-local="port" id="port" data-local="port" placeholder="8087" data-type="number"></div>
             <div class="row"><label for="debug">本地调试模式</label><input type="checkbox" id="debug" data-local="debug" data-state="debug" data-value-key="checked"></div>
             <!--调试选项-->
             <div id="debug-options" class="hide">
-              <div class="row"><label for="ip">本地地址：</label><input type="text" id="ip" data-local="host" placeholder="127.0.0.1"></div>
-              <div class="row"><label for="ip-start">主动连接的最小地址：</label><input type="text" id="ip-start" data-local="from" placeholder="127.0.0.1"></div>
-              <div class="row"><label for="ip-end">主动连接的最大地址：</label><input type="text" id="ip-end" data-local="to" placeholder="127.0.0.10"></div>
+              <div class="row"><label for="ip">本地地址：</label><input type="text" id="ip" data-local="host" placeholder="默认为本机IP地址"></div>
+
+              <h4>指定地址/端口范围以连接</h4>
+              <div class="row"><label for="ip-start">最小地址：</label><input type="text" id="ip-start" data-local="hostStart"></div>
+              <div class="row"><label for="ip-end">最大地址：</label><input type="text" id="ip-end" data-local="hostEnd"></div>
+              <div class="row"><label for="port-start">最小端口：</label><input type="text" id="port-start" data-local="portStart" data-type="number"></div>
+              <div class="row"><label for="port-end">最大端口：</label><input type="text" id="port-end" data-local="portEnd" data-type="number"></div>
             </div>
 
             <div id="connects">
-              <h4>添加连接的地址</h4>
+              <h4>指定单个地址/端口以连接</h4>
               <button class="btn add">添加</button>
               <ul class="connect-list">
                 <li>

@@ -1,4 +1,4 @@
-/* eslint-disable no-param-reassign */
+/* eslint-disable no-param-reassign, no-continue */
 const net = require('net');
 const fs = require('fs-extra');
 const path = require('path');
@@ -17,6 +17,7 @@ const send = require('./lib/send');
 const { loadFile, loadFileInfo } = require('./lib/file');
 
 const local = {
+  busy: false,
   debug: false,
   active: false,
 };
@@ -27,7 +28,7 @@ const getMessage = () => ({
   tag: local.tag,
 });
 
-const handleSocket = (socket, opts = {}) => {
+function handleSocket(socket, opts = {}) {
   const { reGreeting } = opts;
 
   socket.on('error', () => {
@@ -37,7 +38,7 @@ const handleSocket = (socket, opts = {}) => {
   socket.once('data', (greetingChunk) => {
     const session = parseChunks([greetingChunk]);
     if (!session || session.type !== 'greeting') return;
-    console.log(`${session.username}[${session.tag}] login.`);
+    if (clients[session.tag]) return; // 防止重复
 
     // 添加信息
     socket.username = session.username;
@@ -58,7 +59,7 @@ const handleSocket = (socket, opts = {}) => {
 
     socket.on('end', () => {
       delete clients[session.tag];
-      // console.log(`${session.username}[${session.tag}] logout.`);
+      console.log(`${session.username}[${session.tag}] logout.`);
       events.emit('logout', session.tag, session.username);
     });
 
@@ -105,21 +106,23 @@ const handleSocket = (socket, opts = {}) => {
       }
     });
   });
-};
+}
+
+function connectAndHandleSocket(options) {
+  connect(options, (e, socket) => {
+    if (!e) {
+      handleSocket(socket);
+    }
+  });
+}
 
 const defaultOpts = {
   username: 'anonymous',
   port: 8087,
 };
 
-const defaultDebugOpts = {
-  debug: true,
-  host: '127.0.0.1',
-  from: '127.0.0.1',
-  to: '127.0.0.10',
-};
-
 function setup(options, callback) {
+  if (local.busy) callback(Error('busy'));
   if (local.active) {
     exit((err) => {
       if (!err) setup(options, callback);
@@ -128,7 +131,8 @@ function setup(options, callback) {
     return;
   }
 
-  const opts = Object.assign({}, defaultOpts, options.debug ? defaultDebugOpts : null, options);
+  local.busy = true;
+  const opts = Object.assign({}, defaultOpts, options);
   const wrongs = checkProps(opts, {
     username: { type: 'string' },
     port: { type: 'number' },
@@ -146,59 +150,83 @@ function setup(options, callback) {
       handleSocket(socket, { reGreeting: true });
     });
 
-    local.server = server;
-
     server.on('error', (err) => {
       throw err;
     });
 
     // 2. start listening
     server.listen({ port, host }, () => {
+      local.server = server;
       console.log('>> opened server on', server.address());
       console.log(`>> Hi! ${username}[${tag}]`);
 
-      if (opts.debug && opts.from && opts.to) {
-        connectRange(opts.from, opts.to);
-      } else if (!opts.debug && opts.connects) {
-        opts.connects.forEach((conn) => {
-          console.log(conn);
-          connect({
-            host: conn.host,
-            port: conn.port,
-            localPort: local.port,
-            tag: local.tag,
-            username: local.username,
-          }, (e, socket) => {
-            if (!e) {
-              handleSocket(socket);
-            }
-          });
-        });
-      }
-      // 3. connect to other clients
+      // 3. connect to other servers
+      connectServers(opts);
       local.active = true;
+      local.busy = false;
       callback(null, id);
     });
   });
 }
 
-function connectRange(from, to) {
+function connectServers(opts) {
+  if (!local.server.listening) return;
+  if (opts.debug) {
+    connectRange(opts);
+  }
+
+  if (opts.connects) {
+    opts.connects.forEach((conn) => {
+      connectAndHandleSocket({
+        host: conn.host || (local.host || local.address),
+        port: conn.port,
+        localPort: local.port,
+        tag: local.tag,
+        username: local.username,
+      });
+    });
+    delete opts.connects;
+  }
+}
+
+function connectHostRange(from, to, port) {
   if (isIPLarger(from, to)) return; // 超过范围
-  if (local.host !== from) {
-    connect({
+  if (port !== local.port || from !== (local.host || local.address)) {
+    connectAndHandleSocket({
       host: from,
-      port: local.port,
+      port,
       localAddress: local.host,
       localPort: local.port,
       tag: local.tag,
       username: local.username,
-    }, (e, socket) => {
-      if (!e) {
-        handleSocket(socket);
-      }
     });
   }
-  connectRange(getNewHost(from), to);
+  connectHostRange(getNewHost(from), to, port);
+}
+
+function connectRange({ hostStart, hostEnd, portStart, portEnd }) {
+  if (!portStart) return;
+  if (portEnd && portEnd < portStart) return;
+  if (hostStart && !hostEnd) hostEnd = hostStart;
+
+  if (!portEnd) portEnd = portStart + 1;
+  else portEnd += 1;
+
+  for (let port = portStart; port < portEnd; port += 1) {
+    if (hostStart) {
+      connectHostRange(hostStart, hostEnd, port);
+    } else {
+      if (port === local.port) continue;
+      connectAndHandleSocket({
+        port,
+        host: local.host || local.address,
+        localAddress: local.host,
+        localPort: local.port,
+        tag: local.tag,
+        username: local.username,
+      });
+    }
+  }
 }
 
 function getUserInfos() {
@@ -241,6 +269,7 @@ function acceptFile(tag, checksum) {
 function exit(callback) {
   if (local.active) {
     allClients((client) => {
+      client.end();
       client.destroy();
     });
     local.server.close(() => {
@@ -261,4 +290,5 @@ module.exports = {
   sendFileToUsers,
   acceptFile,
   events,
+  connectServers,
 };
