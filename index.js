@@ -6,14 +6,13 @@ const EventEmitter = require('events');
 
 const events = new EventEmitter();
 
-const checkProps = require('./lib/utils/checkProps');
-const connect = require('./lib/connect');
 const getNewHost = require('./lib/utils/getNewHost');
 const parseChunks = require('./lib/utils/parseChunks');
 const isIPLarger = require('./lib/utils/isIPLarger');
 
 const login = require('./lib/login');
 const send = require('./lib/send');
+const connect = require('./lib/tryConnect').bind(null, handleSocket);
 const { loadFile, loadFileInfo } = require('./lib/file');
 
 const local = {
@@ -107,14 +106,6 @@ function handleSocket(socket, opts = {}) {
   });
 }
 
-function connectAndHandleSocket(options) {
-  connect(options, (e, socket) => {
-    if (!e) {
-      handleSocket(socket);
-    }
-  });
-}
-
 const defaultOpts = {
   username: 'anonymous',
   port: 8087,
@@ -132,16 +123,12 @@ function setup(options, callback) {
 
   local.busy = true;
   const opts = Object.assign({}, defaultOpts, options);
-  const wrongs = checkProps(opts, {
-    username: { type: 'string' },
-    port: { type: 'number' },
-  });
-  if (wrongs.length > 0) {
-    callback(wrongs[0]);
-  }
+  opts.port = parseInt(opts.port, 10);
+  if (isNaN(opts.port) || opts.port < 2000 || opts.port > 59999) callback(TypeError('port should be a integer (2000~59999)'));
+  if (typeof opts.username !== 'string') callback(TypeError('username should be a string'));
 
   login(opts, (error, id) => {
-    if (error) throw error;
+    if (error) callback(error);
     Object.assign(local, id);
     const { host, port, username, tag } = id;
     // 1. create server, sending data
@@ -174,7 +161,7 @@ function connectServers(opts) {
 
   if (opts.connects) {
     opts.connects.forEach((conn) => {
-      connectAndHandleSocket({
+      connect({
         host: conn.host || (local.host || local.address),
         port: conn.port,
         localPort: local.port,
@@ -189,7 +176,7 @@ function connectServers(opts) {
 function connectHostRange(from, to, port) {
   if (isIPLarger(from, to)) return; // 超过范围
   if (port !== local.port || from !== (local.host || local.address)) {
-    connectAndHandleSocket({
+    connect({
       host: from,
       port,
       localAddress: local.host,
@@ -214,7 +201,7 @@ function connectRange({ hostStart, hostEnd, portStart, portEnd }) {
       connectHostRange(hostStart, hostEnd, port);
     } else {
       if (port === local.port) continue;
-      connectAndHandleSocket({
+      connect({
         port,
         host: local.host || local.address,
         localAddress: local.host,
