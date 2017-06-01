@@ -18,6 +18,8 @@ const defaultConfig = {
   users: null,
   login: false,
   port: 8087,
+  portStart: 8087,
+  portEnd: 8090,
 };
 
 const local = Object.assign({}, defaultConfig);
