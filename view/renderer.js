@@ -8,7 +8,6 @@ const loginBtn = document.querySelector('#login-btn');
 const logoutBtn = document.querySelector('#logout-btn');
 const fileBtn = document.querySelector('.file-btn');
 const chatMsgSubmitBtn = document.querySelector('#submit-btn');
-const debugOptions = document.querySelector('#debug-options');
 
 const template = {};
 
@@ -18,7 +17,6 @@ const defaultConfig = {
   tag: null,
   users: null,
   login: false,
-  debug: false,
   port: 8087,
 };
 
@@ -49,7 +47,6 @@ const bindLocal = bind.bind(null, local, 'local', defaultConfig);
 bindLocal('username');
 bindLocal('host');
 bindLocal('port');
-bindLocal('debug');
 bindLocal('hostStart');
 bindLocal('hostEnd');
 bindLocal('portStart');
@@ -82,10 +79,6 @@ const state = {
   set users(users) {
     local.users = users;
     aside.innerHTML = users.map(user => `<div><input type="checkbox" id="${user.tag}" checked><label for="${user.tag}">${user.username}[${formatTag(user.tag)}]</label></div>`).join('');
-  },
-
-  set debug(d) {
-    debugOptions.classList[d ? 'remove' : 'add']('hide');
   },
 };
 
@@ -194,8 +187,8 @@ function logout(opts = {}) {
 }
 
 function applySettings() {
-  const { username, host, port, debug, hostStart, hostEnd, portStart, portEnd, connects } = local;
-  const options = { username, host, port, debug, hostStart, hostEnd, portStart, portEnd, connects };
+  const { username, host, port, hostStart, hostEnd, portStart, portEnd, connects } = local;
+  const options = { username, host, port, hostStart, hostEnd, portStart, portEnd, connects };
 
   const newImportant = { username, host, port };
   if (important === null || JSON.stringify(important) !== JSON.stringify(newImportant)) {

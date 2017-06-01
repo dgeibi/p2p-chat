@@ -18,7 +18,6 @@ const { loadFile, loadFileInfo } = require('./lib/file');
 
 const local = {
   busy: false,
-  debug: false,
   active: false,
 };
 const clients = {};
@@ -171,9 +170,7 @@ function setup(options, callback) {
 
 function connectServers(opts) {
   if (!local.server.listening) return;
-  if (opts.debug) {
-    connectRange(opts);
-  }
+  connectRange(opts);
 
   if (opts.connects) {
     opts.connects.forEach((conn) => {
