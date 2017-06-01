@@ -23,6 +23,10 @@ module.exports = (view, local) => {
     write(`<section class="info">${text}</section>`);
   };
 
+  const writeErrorMsg = (text) => {
+    write(`<section class="info error">${text}</section>`);
+  };
+
   const writeUserMsg = (tag, username, text) => {
     if (local.msgCount % 5 === 0) writeTime();
     local.msgCount += 1;
@@ -35,5 +39,6 @@ module.exports = (view, local) => {
     writeMsg,
     writeTime,
     writeUserMsg,
+    writeErrorMsg,
   };
 };

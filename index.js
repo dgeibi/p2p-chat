@@ -16,7 +16,6 @@ const connect = require('./lib/tryConnect').bind(null, handleSocket);
 const { loadFile, loadFileInfo } = require('./lib/file');
 
 const local = {
-  busy: false,
   active: false,
 };
 const clients = {};
@@ -112,7 +111,6 @@ const defaultOpts = {
 };
 
 function setup(options, callback) {
-  if (local.busy) callback(Error('busy'));
   if (local.active) {
     exit((err) => {
       if (!err) setup(options, callback);
@@ -121,14 +119,22 @@ function setup(options, callback) {
     return;
   }
 
-  local.busy = true;
   const opts = Object.assign({}, defaultOpts, options);
   opts.port = parseInt(opts.port, 10);
-  if (isNaN(opts.port) || opts.port < 2000 || opts.port > 59999) callback(TypeError('port should be a integer (2000~59999)'));
-  if (typeof opts.username !== 'string') callback(TypeError('username should be a string'));
+  if (isNaN(opts.port) || opts.port < 2000 || opts.port > 59999) {
+    callback(TypeError('port should be a integer (2000~59999)'));
+    return;
+  }
+  if (typeof opts.username !== 'string') {
+    callback(TypeError('username should be a string'));
+    return;
+  }
 
   login(opts, (error, id) => {
-    if (error) callback(error);
+    if (error) {
+      callback(error);
+      return;
+    }
     Object.assign(local, id);
     const { host, port, username, tag } = id;
     // 1. create server, sending data
@@ -149,7 +155,6 @@ function setup(options, callback) {
       // 3. connect to other servers
       connectServers(opts);
       local.active = true;
-      local.busy = false;
       callback(null, id);
     });
   });
@@ -259,7 +264,7 @@ function exit(callback) {
     local.server.close(() => {
       local.active = false;
       console.log(`>> Bye! ${local.username}[${local.tag}]`);
-      callback();
+      setImmediate(callback); // when reloading, why process.nextTick make the app slow
     });
   } else {
     callback();

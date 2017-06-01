@@ -84,24 +84,35 @@ const state = {
   },
 };
 
-const { writeMonthDay, writeMsg, writeUserMsg } = require('./lib/write.js')(view, local);
+const { writeMonthDay, writeMsg, writeUserMsg, writeErrorMsg } = require('./lib/write.js')(view, local);
 
-ipcRenderer.on('logout-reply', (event, success) => {
-  writeMsg(`>> 登出${success ? '成功' : '失败'}`);
-  state.login = !success;
+ipcRenderer.on('logout-reply', (event, errMsg) => {
+  const success = !errMsg;
+  if (success) {
+    writeMsg('>> 登出成功');
+    state.login = false;
+  } else {
+    writeErrorMsg('>> 登出失败');
+    writeErrorMsg(`>> ${errMsg}`);
+  }
 });
 
 // handle reply
-ipcRenderer.on('setup-reply', (event, success, id) => {
+ipcRenderer.on('setup-reply', (event, errMsg, id) => {
   writeMonthDay();
-  writeMsg(`>> 登录${success ? '成功' : '失败'}`);
+  const success = !errMsg;
   state.login = success;
   if (success) {
     Object.assign(local, id);
     const { username, host, port } = id;
-    important = { username, host, port };
+    const login = true;
+    important = { username, host, port, login };
+    writeMsg('>> 登录成功');
     writeMsg(`>> 你好，${username}[${formatTag(local.tag)}].`);
     writeMsg(`>> 你的地址是${host || id.address}:${port}`);
+  } else {
+    writeErrorMsg('>> 登录失败');
+    writeErrorMsg(`>> ${errMsg}`);
   }
 });
 
@@ -189,15 +200,16 @@ function logout(opts = {}) {
 }
 
 function applySettings() {
-  const { username, host, port, hostStart, hostEnd, portStart, portEnd, connects } = local;
+  const { username, host, port, hostStart, hostEnd, portStart, portEnd, connects, login } = local;
   const options = { username, host, port, hostStart, hostEnd, portStart, portEnd, connects };
 
-  const newImportant = { username, host, port };
-  if (important === null || JSON.stringify(important) !== JSON.stringify(newImportant)) {
+  const newImportant = { username, host, port, login };
+  const keys = ['username', 'host', 'port', 'login'];
+  if (important === null || keys.some(key => newImportant[key] !== important[key])) {
     ipcRenderer.send('setup', options);
-    return;
+  } else {
+    ipcRenderer.send('change-setting', options);
   }
-  ipcRenderer.send('change-setting', options);
 }
 
 settingsSubmitBtn.addEventListener('click', applySettings);

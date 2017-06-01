@@ -229,6 +229,10 @@ label {
   font-size: 0.9em;
 }
 
+.info.error {
+  color: red;
+}
+
 ul {
   list-style: none;
 }

@@ -52,19 +52,25 @@ ipcMain.on('change-setting', (event, opts) => {
 
 ipcMain.on('setup', (event, opts) => {
   chat.setup(opts, (err, id) => {
-    const { username } = opts;
-    if (err) console.log(err);
-    event.sender.send('setup-reply', !err, id);
-    if (!err) {
+    if (err) {
+      console.log(err);
+      event.sender.send('setup-reply', err.message, id);
+    } else {
+      const { username } = opts;
+      event.sender.send('setup-reply', null, id);
       win.setTitle(`${username}[${id.tag.slice(0, 5)}] - ${pkg.name}`);
     }
   });
 });
 
-ipcMain.on('logout', (event, opts) => {
+ipcMain.on('logout', (event) => {
   chat.exit((err) => {
-    if (err) console.log(err);
-    event.sender.send('logout-reply', !err, opts);
+    if (err) {
+      console.log(err);
+      event.sender.send('logout-reply', err.message);
+    } else {
+      event.sender.send('logout-reply', null);
+    }
   });
 });
 
