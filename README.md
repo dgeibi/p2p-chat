@@ -28,6 +28,12 @@ $ cnpm install
 $ npm start
 ```
 
+## 生成安装包
+
+```
+$ npm dist
+```
+
 ## LICENSE
 
 [MIT](LICENSE)
