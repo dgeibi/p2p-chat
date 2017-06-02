@@ -67,4 +67,5 @@ backToFront('text');
 backToFront('fileinfo');
 backToFront('file-receiced');
 backToFront('file-write-fail');
-backToFront('file-accepted');
+backToFront('file-sent');
+backToFront('file-send-fail');

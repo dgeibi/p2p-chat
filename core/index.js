@@ -3,15 +3,19 @@ const net = require('net');
 const fs = require('fs-extra');
 const path = require('path');
 const EventEmitter = require('events');
+const { EOL } = require('os');
 
 const events = new EventEmitter();
 
+const getChecksum = require('./lib/utils/getChecksum');
 const getNewHost = require('./lib/utils/getNewHost');
 const parseChunks = require('./lib/utils/parseChunks');
 const isIPLarger = require('./lib/utils/isIPLarger');
 
 const login = require('./lib/login');
 const send = require('./lib/send');
+const sendFile = require('./lib/sendFile');
+
 const connect = require('./lib/tryConnect').bind(null, handleSocket);
 const { loadFile, loadFileInfo } = require('./lib/file');
 
@@ -20,18 +24,63 @@ const local = {
 };
 const clients = {};
 
+// 已经确认接收的文件
+const fileAccepted = {};
+
 const getMessage = () => ({
+  host: local.host,
+  port: local.port,
   username: local.username,
   tag: local.tag,
 });
+
+function handleFileSocket(socket, message, firstChunk) {
+  const fileChunkCaches = [firstChunk];
+  socket.on('data', (chunk) => {
+    fileChunkCaches.push(chunk);
+  });
+  socket.on('end', () => {
+    console.log('end');
+    const data = Buffer.concat(fileChunkCaches);
+    const { filename, username, tag } = message;
+    const realChecksum = getChecksum(data);
+    // 检查checksum
+    if (!fileAccepted[realChecksum] || realChecksum !== message.checksum) return;
+
+    const filepath = path.resolve('download', local.username, filename);
+    fs.outputFile(filepath, data, (err) => {
+      if (err) {
+        console.log(`${filename} 写入失败`);
+        events.emit('file-write-fail', { tag, username, filename });
+      } else {
+        events.emit('file-receiced', { tag, username, filename, filepath });
+      }
+    });
+    fileAccepted[realChecksum] = false;
+  });
+}
 
 function handleSocket(socket, opts = {}) {
   const { reGreeting } = opts;
 
   socket.on('error', () => {
     if (socket.tag) delete clients[socket.tag];
-  }).once('data', (greetingChunk) => {
-    const session = parseChunks([greetingChunk]);
+  }).once('data', (firstChunk) => {
+    // 对发送文件的socket特殊处理
+    const eolPos = firstChunk.indexOf(EOL);
+    if (eolPos > 0) {
+      const message = parseChunks([firstChunk.slice(0, eolPos)]);
+      if (!message) return; // 无效的报文
+      const chunk = firstChunk.slice(eolPos + 1);
+      // 已经登录, 报文类型是 fileinfo, 已经确认接收
+      if (clients[message.tag] && message.type === 'fileinfo' && fileAccepted[message.checksum]) {
+        handleFileSocket(socket, message, chunk);
+        return;
+      }
+    }
+
+    const session = parseChunks([firstChunk]);
+
     // 不符合预期的报文，断开连接
     if (!session || session.type !== 'greeting' || clients[session.tag]) {
       socket.end();
@@ -69,21 +118,8 @@ function handleSocket(socket, opts = {}) {
       caches.splice(0, caches.length); // 清空缓存
 
       // 处理报文
-      const { tag, type, data, filename, checksum, text, username } = message;
+      const { tag, type, checksum, text, username } = message;
       switch (type) {
-        case 'file': {
-          // receive and write file
-          const filepath = path.resolve('download', local.username, filename);
-          fs.outputFile(filepath, data, (err) => {
-            if (err) {
-              console.log(`${filename} 写入失败`);
-              events.emit('file-write-fail', { tag, username, filename });
-            } else {
-              events.emit('file-receiced', { tag, username, filename, filepath });
-            }
-          });
-          break;
-        }
         case 'fileinfo': {
           events.emit('fileinfo', message);
           break;
@@ -93,10 +129,21 @@ function handleSocket(socket, opts = {}) {
           break;
         }
         case 'file-accepted': {
-          // emit file
-          const fileMsg = loadFile(checksum);
-          send(clients[tag], fileMsg);
-          events.emit('file-accepted', tag, username, loadFile(checksum).filename, checksum);
+          const file = loadFile(checksum);
+          sendFile(
+            file.data,
+            {
+              port: message.port,
+              host: message.host,
+            },
+            (e) => {
+              if (e) {
+                console.error(e);
+                events.emit('file-send-fail', tag, username, file.filename, checksum, e.message);
+              } else {
+                events.emit('file-sent', tag, username, file.filename, checksum);
+              }
+            });
           break;
         }
         default:
@@ -170,7 +217,7 @@ function connectServers(opts) {
       connect({
         host: conn.host || (local.host || local.address),
         port: conn.port,
-        localPort: local.port,
+        localAddress: local.host,
         tag: local.tag,
         username: local.username,
       });
@@ -186,7 +233,6 @@ function connectHostRange(from, to, port) {
       host: from,
       port,
       localAddress: local.host,
-      localPort: local.port,
       tag: local.tag,
       username: local.username,
     });
@@ -211,7 +257,6 @@ function connectRange({ hostStart, hostEnd, portStart, portEnd }) {
         port,
         host: local.host || local.address,
         localAddress: local.host,
-        localPort: local.port,
         tag: local.tag,
         username: local.username,
       });
@@ -253,6 +298,7 @@ function acceptFile(tag, checksum) {
   const message = getMessage();
   message.type = 'file-accepted';
   message.checksum = checksum;
+  fileAccepted[checksum] = true;
   send(clients[tag], message);
 }
 

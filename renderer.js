@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const { ipcRenderer } = require('electron');
 const formatTag = require('./view/formatTag');
 
@@ -92,7 +93,7 @@ ipcRenderer.on('logout-reply', (event, errMsg) => {
     writeMsg('>> 登出成功');
     state.login = false;
   } else {
-    writeErrorMsg('>> 登出失败');
+    writeErrorMsg('>> 登出失败！');
     writeErrorMsg(`>> ${errMsg}`);
   }
 });
@@ -148,13 +149,23 @@ ipcRenderer.on('file-receiced', (event, message) => {
   writeMsg(`文件在 ${filepath}。`);
 });
 
-ipcRenderer.on('file-accepted', (event, tag, username, filename) => {
-  writeMsg(`>> ${username}[${formatTag(tag)}] 同意接收 ${filename}`);
+ipcRenderer.on('file-sent', (event, tag, username, filename) => {
+  writeMsg(`>> ${filename} 已发送给 ${username}[${formatTag(tag)}]`);
+});
+
+ipcRenderer.on('file-send-fail', (event, tag, username, filename, checksum, errMsg) => {
+  writeErrorMsg(`>> ${filename} 发送给 ${username}[${formatTag(tag)}] 时出错`);
+  writeErrorMsg(`>> ${errMsg}`);
 });
 
 ipcRenderer.on('file-write-fail', (event, message) => {
   const { tag, username, filename } = message;
   writeMsg(`>> ${username}[${formatTag(tag)}] 发送的 ${filename} 接收失败。`);
+});
+
+ipcRenderer.on('bg-err', (event, errMsg) => {
+  writeErrorMsg('>> 后台出错了！');
+  writeErrorMsg(`>> ${errMsg}`);
 });
 
 // 已选择的文件显示

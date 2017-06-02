@@ -74,6 +74,10 @@ sub.on('message', (m) => {
   win.webContents.send(key, ...args);
 });
 
+sub.on('error', (err) => {
+  win.webContents.send('bg-err', err.message);
+});
+
 emitter.on('setup-reply', (errMsg, id) => {
   if (!errMsg) {
     const { username } = id;

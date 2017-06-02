@@ -1,11 +1,13 @@
 const fs = require('fs');
 const path = require('path');
 const getChecksum = require('./utils/getChecksum');
+const { EOL } = require('os');
 
-const fileMessageCaches = {};
+
+const filesCaches = {};
 
 function loadFile(checksum) {
-  return fileMessageCaches[checksum];
+  return filesCaches[checksum];
 }
 
 function loadFileInfo(filepath, message) {
@@ -14,19 +16,17 @@ function loadFileInfo(filepath, message) {
   const filename = path.basename(filepath);
   const checksum = getChecksum(data);
 
-  fileMessageCaches[checksum] = Object.assign({}, message, {
-    type: 'file',
-    data,
-    filename,
-    checksum,
-  });
-
   const fileInfoMessage = Object.assign(message, {
     type: 'fileinfo',
     filename,
     checksum,
     size: data.buffer.byteLength,
   });
+
+  // 报文和数据使用 EOL 分隔
+  filesCaches[checksum] = Object.assign({}, fileInfoMessage,
+    { data: Buffer.concat([Buffer.from(JSON.stringify(fileInfoMessage) + EOL), data]) }
+  );
   return fileInfoMessage;
 }
 
