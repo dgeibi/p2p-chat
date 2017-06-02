@@ -7,7 +7,9 @@
   "main": "index.js",
   "author": "dgeibi <png.inside@gmail.com> (blog.dgeibi.xyz)",
   "scripts": {
-    "start": "electron view"
+    "start": "electron .",
+    "package-linux": "electron-packager . --overwrite --platform=linux --arch=x64 --prune=true --out=release-builds",
+    "package-win": "electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --prune=true --out=release-builds"
   },
   "keywords": [
     "electron-app",
@@ -17,9 +19,12 @@
   ],
   "dependencies": {
     "dateformat": "^2.0.0",
-    "electron": "^1.6.10",
     "fs-extra": "^3.0.1",
     "getport": "^0.1.0",
     "ip": "^1.1.5"
+  },
+  "devDependencies": {
+    "electron-packager": "^8.7.0",
+    "electron": "^1.6.10"
   }
 }

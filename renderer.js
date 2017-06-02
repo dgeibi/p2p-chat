@@ -1,5 +1,5 @@
 const { ipcRenderer } = require('electron');
-const formatTag = require('./lib/formatTag');
+const formatTag = require('./view/formatTag');
 
 const view = document.querySelector('.view');
 const aside = document.querySelector('aside');
@@ -84,7 +84,7 @@ const state = {
   },
 };
 
-const { writeMonthDay, writeMsg, writeUserMsg, writeErrorMsg } = require('./lib/write.js')(view, local);
+const { writeMonthDay, writeMsg, writeUserMsg, writeErrorMsg } = require('./view/write.js')(view, local);
 
 ipcRenderer.on('logout-reply', (event, errMsg) => {
   const success = !errMsg;
