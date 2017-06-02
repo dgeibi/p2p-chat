@@ -48,7 +48,6 @@ process.on('message', (message) => {
   }
 });
 
-
 chat.events.on('login', (tag, username) => {
   send('people-login', chat.getUserInfos(), tag, username);
 });

@@ -9,7 +9,10 @@
   "scripts": {
     "start": "electron .",
     "dist": "build",
-    "pack": "build --dir"
+    "pack": "build --dir",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "format": "prettier-eslint --write './core/**/*.js' './view/**/*.js' './*.js'"
   },
   "keywords": [
     "electron-app",
@@ -25,7 +28,13 @@
   },
   "devDependencies": {
     "electron": "^1.6.10",
-    "electron-builder": "^18.3.5"
+    "electron-builder": "^18.3.5",
+    "eslint": "^3.18.0",
+    "eslint-config-airbnb-base": "^11.1.1",
+    "eslint-config-dgeibi": "github:dgeibi/eslint-config-dgeibi",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-no-async-without-await": "^1.2.0",
+    "prettier-eslint-cli": "^3.2.0"
   },
   "build": {
     "appId": "xyz.dgeibi.p2pchat",

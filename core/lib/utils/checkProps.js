@@ -1,4 +1,11 @@
-const TYPEOFS = ['symbol', 'undefined', 'boolean', 'number', 'string', 'function'];
+const TYPEOFS = [
+  'symbol',
+  'undefined',
+  'boolean',
+  'number',
+  'string',
+  'function',
+];
 
 function addTypeWrong(key, value, type, wrongs) {
   // eslint-disable-next-line valid-typeof
@@ -13,13 +20,7 @@ function addClassWrong(key, value, constructor, wrongs) {
   }
 }
 
-function checkProp({
-  object,
-  key,
-  type,
-  Instance,
-  wrongs = [],
-}) {
+function checkProp({ object, key, type, Instance, wrongs = [] }) {
   const value = object[key];
   if (Array.isArray(type)) {
     type.forEach((str) => {

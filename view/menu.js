@@ -34,17 +34,16 @@ const template = [
   },
   {
     role: 'window',
-    submenu: [
-      { role: 'minimize' },
-      { role: 'close' },
-    ],
+    submenu: [{ role: 'minimize' }, { role: 'close' }],
   },
   {
     role: 'help',
     submenu: [
       {
         label: 'Learn More',
-        click() { electron.shell.openExternal('https://electron.atom.io'); },
+        click() {
+          electron.shell.openExternal('https://electron.atom.io');
+        },
       },
     ],
   },
@@ -71,10 +70,7 @@ if (process.platform === 'darwin') {
     { type: 'separator' },
     {
       label: 'Speech',
-      submenu: [
-        { role: 'startspeaking' },
-        { role: 'stopspeaking' },
-      ],
+      submenu: [{ role: 'startspeaking' }, { role: 'stopspeaking' }],
     }
   );
 

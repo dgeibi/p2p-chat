@@ -1,7 +1,5 @@
 function parseBuffer(key, value) {
-  return value && value.type === 'Buffer'
-    ? Buffer.from(value.data)
-    : value;
+  return value && value.type === 'Buffer' ? Buffer.from(value.data) : value;
 }
 
 function parseJSON(data) {
