@@ -71,7 +71,7 @@ function handleSocket(socket, opts = {}) {
     if (eolPos > 0) {
       const message = parseChunks([firstChunk.slice(0, eolPos)]);
       if (!message) return; // 无效的报文
-      const chunk = firstChunk.slice(eolPos + 1);
+      const chunk = firstChunk.slice(eolPos + EOL.length);
       // 已经登录, 报文类型是 fileinfo, 已经确认接收
       if (clients[message.tag] && message.type === 'fileinfo' && fileAccepted[message.checksum]) {
         handleFileSocket(socket, message, chunk);
