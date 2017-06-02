@@ -10,7 +10,7 @@ require('./view/menu.js');
 const pkg = require('./package.json');
 
 const emitter = new EventEmitter();
-const sub = cp.fork('./sub.js');
+const sub = cp.fork(`${__dirname}/sub.js`);
 
 let win;
 
