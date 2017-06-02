@@ -3,10 +3,14 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const url = require('url');
-const chat = require('./core');
-const pkg = require('./package.json');
+const cp = require('child_process');
+const EventEmitter = require('events');
 
 require('./view/menu.js');
+const pkg = require('./package.json');
+
+const emitter = new EventEmitter();
+const sub = cp.fork('./sub.js');
 
 let win;
 
@@ -30,6 +34,7 @@ function createWindow() {
 
   win.on('closed', () => {
     win = null;
+    sub.kill();
   });
 }
 
@@ -47,64 +52,31 @@ app.on('activate', () => {
   }
 });
 
-ipcMain.on('change-setting', (event, opts) => {
-  chat.connectServers(opts);
-});
-
-ipcMain.on('setup', (event, opts) => {
-  chat.setup(opts, (err, id) => {
-    if (err) {
-      console.log(err);
-      event.sender.send('setup-reply', err.message, id);
-    } else {
-      const { username } = opts;
-      event.sender.send('setup-reply', null, id);
-      win.setTitle(`${username}[${id.tag.slice(0, 5)}] - ${pkg.name}`);
-    }
-  });
-});
-
-ipcMain.on('logout', (event) => {
-  chat.exit((err) => {
-    if (err) {
-      console.log(err);
-      event.sender.send('logout-reply', err.message);
-    } else {
-      event.sender.send('logout-reply', null);
-    }
-  });
-});
-
-ipcMain.on('local-text', (event, tags, text) => {
-  chat.textToUsers(tags, text);
-});
-
-ipcMain.on('local-file', (event, tags, filepath) => {
-  chat.sendFileToUsers(tags, filepath);
-});
-
-ipcMain.on('accept-file', (event, tag, checksum) => {
-  console.log(tag, checksum);
-  chat.acceptFile(tag, checksum);
-});
-
-chat.events.on('login', (tag, username) => {
-  win.webContents.send('people-login', chat.getUserInfos(), tag, username);
-});
-
-chat.events.on('logout', (tag, username) => {
-  win.webContents.send('people-logout', chat.getUserInfos(), tag, username);
-});
-
-const bypass = (backEvent, frontEvent = backEvent) => {
-  chat.events.on(backEvent, (...args) => {
-    win.webContents.send(frontEvent, ...args);
+const frontToBack = (key) => {
+  ipcMain.on(key, (event, ...args) => {
+    sub.send({
+      key,
+      args,
+    });
   });
 };
 
-// bypass events;
-bypass('text');
-bypass('fileinfo');
-bypass('file-receiced');
-bypass('file-write-fail');
-bypass('file-accepted');
+frontToBack('local-file');
+frontToBack('change-setting');
+frontToBack('setup');
+frontToBack('logout');
+frontToBack('local-text');
+frontToBack('accept-file');
+
+sub.on('message', (m) => {
+  const { key, args } = m;
+  emitter.emit(key, ...args);
+  win.webContents.send(key, ...args);
+});
+
+emitter.on('setup-reply', (errMsg, id) => {
+  if (!errMsg) {
+    const { username } = id;
+    win.setTitle(`${username}[${id.tag.slice(0, 5)}] - ${pkg.name}`);
+  }
+});
