@@ -1,0 +1,6 @@
+{
+  "extends": "dgeibi",
+  "rules": {
+    "no-console": "off"
+  }
+}

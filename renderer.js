@@ -1,3 +1,4 @@
+/* eslint-env browser */
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { ipcRenderer } = require('electron');
 const formatTag = require('./view/formatTag');

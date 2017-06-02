@@ -46,7 +46,9 @@ function handleFileSocket(socket, message, firstChunk) {
     const { filename, username, tag } = message;
     const realChecksum = getChecksum(data);
     // 检查checksum
-    if (!fileAccepted[realChecksum] || realChecksum !== message.checksum) { return; }
+    if (!fileAccepted[realChecksum] || realChecksum !== message.checksum) {
+      return;
+    }
 
     const filepath = path.resolve('download', local.username, filename);
     fs.outputFile(filepath, data, (err) => {
