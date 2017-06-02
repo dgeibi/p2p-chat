@@ -1,15 +1,13 @@
 const net = require('net');
 const send = require('./send');
 
-module.exports = function connect(options, callback) {
-  const socket = net.connect(options, () => {
-    send(socket, {
-      type: 'greeting',
-      tag: options.tag,
-      username: options.username,
+module.exports = function connect(connectOpts, message, callback) {
+  const socket = net
+    .connect(connectOpts, () => {
+      send(socket, message);
+      callback(null, socket);
+    })
+    .on('error', (e) => {
+      callback(e);
     });
-    callback(null, socket);
-  }).on('error', (e) => {
-    callback(e);
-  });
 };

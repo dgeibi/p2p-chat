@@ -28,7 +28,8 @@ const clients = {};
 const fileAccepted = {};
 
 const getMessage = () => ({
-  host: local.host,
+  type: 'greeting',
+  host: local.host || local.address,
   port: local.port,
   username: local.username,
   tag: local.tag,
@@ -45,7 +46,7 @@ function handleFileSocket(socket, message, firstChunk) {
     const { filename, username, tag } = message;
     const realChecksum = getChecksum(data);
     // 检查checksum
-    if (!fileAccepted[realChecksum] || realChecksum !== message.checksum) return;
+    if (!fileAccepted[realChecksum] || realChecksum !== message.checksum) { return; }
 
     const filepath = path.resolve('download', local.username, filename);
     fs.outputFile(filepath, data, (err) => {
@@ -63,94 +64,112 @@ function handleFileSocket(socket, message, firstChunk) {
 function handleSocket(socket, opts = {}) {
   const { reGreeting } = opts;
 
-  socket.on('error', () => {
-    if (socket.tag) delete clients[socket.tag];
-  }).once('data', (firstChunk) => {
-    // 对发送文件的socket特殊处理
-    const eolPos = firstChunk.indexOf(EOL);
-    if (eolPos > 0) {
-      const message = parseChunks([firstChunk.slice(0, eolPos)]);
-      if (!message) return; // 无效的报文
-      const chunk = firstChunk.slice(eolPos + EOL.length);
-      // 已经登录, 报文类型是 fileinfo, 已经确认接收
-      if (clients[message.tag] && message.type === 'fileinfo' && fileAccepted[message.checksum]) {
-        handleFileSocket(socket, message, chunk);
+  socket
+    .on('error', () => {
+      if (socket.tag) delete clients[socket.tag];
+    })
+    .once('data', (firstChunk) => {
+      // 对发送文件的socket特殊处理
+      console.log(firstChunk.toString());
+      const eolPos = firstChunk.indexOf(EOL);
+      if (eolPos > 0) {
+        const message = parseChunks([firstChunk.slice(0, eolPos)]);
+        if (!message) return; // 无效的报文
+        const chunk = firstChunk.slice(eolPos + EOL.length);
+        // 已经登录, 报文类型是 fileinfo, 已经确认接收
+        if (
+          clients[message.tag] &&
+          message.type === 'fileinfo' &&
+          fileAccepted[message.checksum]
+        ) {
+          handleFileSocket(socket, message, chunk);
+          return;
+        }
+      }
+
+      const session = parseChunks([firstChunk]);
+      console.log(session);
+      // 不符合预期的报文，断开连接
+      if (!session || session.type !== 'greeting' || clients[session.tag]) {
+        socket.end();
         return;
       }
-    }
 
-    const session = parseChunks([firstChunk]);
+      // 添加信息
+      socket.username = session.username;
+      socket.tag = session.tag;
+      clients[session.tag] = socket;
 
-    // 不符合预期的报文，断开连接
-    if (!session || session.type !== 'greeting' || clients[session.tag]) {
-      socket.end();
-      return;
-    }
+      console.log(`${session.username}[${session.tag}] login.`);
+      events.emit('login', session.tag, session.username);
 
-    // 添加信息
-    socket.username = session.username;
-    socket.tag = session.tag;
-    clients[session.tag] = socket;
-
-    console.log(`${session.username}[${session.tag}] login.`);
-    events.emit('login', session.tag, session.username);
-
-    // response id
-    if (reGreeting) {
-      send(socket, {
-        type: 'greeting',
-        tag: local.tag,
-        username: local.username,
-      });
-    }
-
-    socket.on('end', () => {
-      delete clients[session.tag];
-      console.log(`${session.username}[${session.tag}] logout.`);
-      events.emit('logout', session.tag, session.username);
-    });
-
-    const caches = [];
-    socket.on('data', (chunk) => {
-      caches.push(chunk); // 缓存
-      const message = parseChunks(caches); // 尝试取出报文
-      if (!message) return; // 无法取出
-      caches.splice(0, caches.length); // 清空缓存
-
-      // 处理报文
-      const { tag, type, checksum, text, username } = message;
-      switch (type) {
-        case 'fileinfo': {
-          events.emit('fileinfo', message);
-          break;
-        }
-        case 'text': {
-          events.emit('text', tag, username, text);
-          break;
-        }
-        case 'file-accepted': {
-          const file = loadFile(checksum);
-          sendFile(
-            file.data,
-            {
-              port: message.port,
-              host: message.host,
-            },
-            (e) => {
-              if (e) {
-                console.error(e);
-                events.emit('file-send-fail', tag, username, file.filename, checksum, e.message);
-              } else {
-                events.emit('file-sent', tag, username, file.filename, checksum);
-              }
-            });
-          break;
-        }
-        default:
-          break;
+      // response id
+      if (reGreeting) {
+        const msg = getMessage();
+        send(socket, msg);
       }
+
+      socket.on('end', () => {
+        delete clients[session.tag];
+        console.log(`${session.username}[${session.tag}] logout.`);
+        events.emit('logout', session.tag, session.username);
+      });
+
+      const caches = [];
+      socket.on('data', (chunk) => {
+        caches.push(chunk); // 缓存
+        const message = parseChunks(caches); // 尝试取出报文
+        if (!message) return; // 无法取出
+        caches.splice(0, caches.length); // 清空缓存
+
+        // 处理报文
+        const { tag, type, checksum, text, username } = message;
+        switch (type) {
+          case 'fileinfo': {
+            events.emit('fileinfo', message);
+            break;
+          }
+          case 'text': {
+            events.emit('text', tag, username, text);
+            break;
+          }
+          case 'file-accepted': {
+            const file = loadFile(checksum);
+            sendFile(
+              file.data,
+              {
+                port: message.port,
+                host: message.host,
+              },
+              (e) => {
+                if (e) {
+                  console.error(e);
+                  events.emit(
+                    'file-send-fail',
+                    tag,
+                    username,
+                    file.filename,
+                    checksum,
+                    e.message
+                  );
+                } else {
+                  events.emit(
+                    'file-sent',
+                    tag,
+                    username,
+                    file.filename,
+                    checksum
+                  );
+                }
+              }
+            );
+            break;
+          }
+          default:
+            break;
+        }
+      });
     });
-  });
 }
 
 const defaultOpts = {
@@ -214,12 +233,9 @@ function connectServers(opts) {
 
   if (opts.connects) {
     opts.connects.forEach((conn) => {
-      connect({
+      connect(getMessage(), {
         host: conn.host || (local.host || local.address),
         port: conn.port,
-        localAddress: local.host,
-        tag: local.tag,
-        username: local.username,
       });
     });
     delete opts.connects;
@@ -229,12 +245,9 @@ function connectServers(opts) {
 function connectHostRange(from, to, port) {
   if (isIPLarger(from, to)) return; // 超过范围
   if (port !== local.port || from !== (local.host || local.address)) {
-    connect({
+    connect(getMessage(), {
       host: from,
       port,
-      localAddress: local.host,
-      tag: local.tag,
-      username: local.username,
     });
   }
   connectHostRange(getNewHost(from), to, port);
@@ -253,12 +266,9 @@ function connectRange({ hostStart, hostEnd, portStart, portEnd }) {
       connectHostRange(hostStart, hostEnd, port);
     } else {
       if (port === local.port) continue;
-      connect({
+      connect(getMessage(), {
         port,
         host: local.host || local.address,
-        localAddress: local.host,
-        tag: local.tag,
-        username: local.username,
       });
     }
   }
