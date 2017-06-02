@@ -30,12 +30,13 @@ function handleSocket(socket, opts = {}) {
 
   socket.on('error', () => {
     if (socket.tag) delete clients[socket.tag];
-  });
-
-  socket.once('data', (greetingChunk) => {
+  }).once('data', (greetingChunk) => {
     const session = parseChunks([greetingChunk]);
-    if (!session || session.type !== 'greeting') return;
-    if (clients[session.tag]) return; // 防止重复
+    // 不符合预期的报文，断开连接
+    if (!session || session.type !== 'greeting' || clients[session.tag]) {
+      socket.end();
+      return;
+    }
 
     // 添加信息
     socket.username = session.username;
