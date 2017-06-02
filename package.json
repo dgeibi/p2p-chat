@@ -8,6 +8,7 @@
   "author": "dgeibi <png.inside@gmail.com> (blog.dgeibi.xyz)",
   "scripts": {
     "start": "electron .",
+    "dist": "build",
     "package-linux": "electron-packager . --overwrite --platform=linux --arch=x64 --prune=true --out=release-builds",
     "package-win": "electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --prune=true --out=release-builds"
   },
@@ -24,7 +25,24 @@
     "ip": "^1.1.5"
   },
   "devDependencies": {
-    "electron-packager": "^8.7.0",
-    "electron": "^1.6.10"
+    "electron": "^1.6.10",
+    "electron-builder": "^18.3.5",
+    "electron-packager": "^8.7.0"
+  },
+  "build": {
+    "appId": "xyz.dgeibi.p2pchat",
+    "mac": {
+      "category": "public.app-category.social-networking"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "linux": {
+      "target": "AppImage"
+    }
   }
 }
