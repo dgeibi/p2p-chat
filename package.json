@@ -25,7 +25,7 @@
     "fs-extra": "^3.0.1",
     "getport": "^0.1.0",
     "ip": "^1.1.5",
-    "logger": "github:dgeibi/logger"
+    "logger": "github:dgeibi/logger#684f9cc"
   },
   "devDependencies": {
     "electron": "^1.6.10",
