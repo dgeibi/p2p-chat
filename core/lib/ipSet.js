@@ -48,12 +48,4 @@ function ipSet() {
   };
 }
 
-// const ips = ipSet();
-// ips.add('sss', 1111);
-// ips.add('sss', 1111);
-// ips.add('ssx', 1111);
-// ips.forEach((host, port) => {
-//   console.log(host, port);
-// });
-
 module.exports = ipSet;
