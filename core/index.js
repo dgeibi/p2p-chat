@@ -7,6 +7,8 @@ const { EOL } = require('os');
 
 const events = new EventEmitter();
 
+const logger = require('logger');
+
 const getChecksum = require('./lib/utils/getChecksum');
 const getNewHost = require('./lib/utils/getNewHost');
 const parseChunks = require('./lib/utils/parseChunks');
@@ -41,7 +43,6 @@ function handleFileSocket(socket, message, firstChunk) {
     fileChunkCaches.push(chunk);
   });
   socket.on('end', () => {
-    console.log('end');
     const data = Buffer.concat(fileChunkCaches);
     const { filename, username, tag } = message;
     const realChecksum = getChecksum(data);
@@ -53,7 +54,7 @@ function handleFileSocket(socket, message, firstChunk) {
     const filepath = path.resolve('download', local.username, filename);
     fs.outputFile(filepath, data, (err) => {
       if (err) {
-        console.log(`${filename} 写入失败`);
+        logger.error(`${filename} write fail, ${err.message}`);
         events.emit('file-write-fail', { tag, username, filename });
       } else {
         events.emit('file-receiced', { tag, username, filename, filepath });
@@ -72,7 +73,6 @@ function handleSocket(socket, opts = {}) {
     })
     .once('data', (firstChunk) => {
       // 对发送文件的socket特殊处理
-      console.log(firstChunk.toString());
       const eolPos = firstChunk.indexOf(EOL);
       if (eolPos > 0) {
         const message = parseChunks([firstChunk.slice(0, eolPos)]);
@@ -90,7 +90,6 @@ function handleSocket(socket, opts = {}) {
       }
 
       const session = parseChunks([firstChunk]);
-      console.log(session);
       // 不符合预期的报文，断开连接
       if (!session || session.type !== 'greeting' || clients[session.tag]) {
         socket.end();
@@ -102,7 +101,7 @@ function handleSocket(socket, opts = {}) {
       socket.tag = session.tag;
       clients[session.tag] = socket;
 
-      console.log(`${session.username}[${session.tag}] login.`);
+      logger.verbose(`${session.username}[${session.tag}] login.`);
       events.emit('login', session.tag, session.username);
 
       // response id
@@ -113,7 +112,7 @@ function handleSocket(socket, opts = {}) {
 
       socket.on('end', () => {
         delete clients[session.tag];
-        console.log(`${session.username}[${session.tag}] logout.`);
+        logger.verbose(`${session.username}[${session.tag}] logout.`);
         events.emit('logout', session.tag, session.username);
       });
 
@@ -145,7 +144,7 @@ function handleSocket(socket, opts = {}) {
               },
               (e) => {
                 if (e) {
-                  console.error(e);
+                  logger.err('file-send-fail', file.filename, e.message);
                   events.emit(
                     'file-send-fail',
                     tag,
@@ -218,8 +217,8 @@ function setup(options, callback) {
     // 2. start listening
     server.listen({ port, host }, () => {
       local.server = server;
-      console.log('>> opened server on', server.address());
-      console.log(`>> Hi! ${username}[${tag}]`);
+      logger.verbose('>> opened server on', server.address());
+      logger.verbose(`>> Hi! ${username}[${tag}]`);
 
       // 3. connect to other servers
       connectServers(opts);
@@ -322,7 +321,7 @@ function exit(callback) {
     });
     local.server.close(() => {
       local.active = false;
-      console.log(`>> Bye! ${local.username}[${local.tag}]`);
+      logger.verbose(`>> Bye! ${local.username}[${local.tag}]`);
       setImmediate(callback); // when reloading, why process.nextTick make the app slow
     });
   } else {

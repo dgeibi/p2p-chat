@@ -1,4 +1,5 @@
 /* eslint-env browser */
+/* eslint-disable no-console */
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { ipcRenderer } = require('electron');
 const formatTag = require('./view/formatTag');
@@ -32,7 +33,7 @@ function bind(object, dataKey, defaultObject = {}, key) {
     get() {
       const node = document.querySelector(`[data-${dataKey}="${key}"]`);
       if (!node) {
-        console.log(key);
+        console.log(`get ${dataKey}: ${key} fail`);
         return defaultObject[key];
       }
       const value =
@@ -43,7 +44,7 @@ function bind(object, dataKey, defaultObject = {}, key) {
     set(value) {
       const node = document.querySelector(`[data-${dataKey}="${key}"]`);
       if (node) node[node.dataset.valueKey || 'value'] = value;
-      else console.log(key, dataKey);
+      else console.log(`set ${dataKey}: ${key} fail`);
     },
   });
 }
@@ -156,7 +157,6 @@ ipcRenderer.on('fileinfo', (event, message) => {
   writeMsg(`<a data-checksum="${checksum}" href="#">确认接收${filename}</a>`);
   const link = document.querySelector(`[data-checksum="${checksum}"]`);
   link.addEventListener('click', () => {
-    console.log('clicked');
     ipcRenderer.send('accept-file', tag, checksum);
     link.remove();
   });

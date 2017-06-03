@@ -1,4 +1,5 @@
 const chat = require('./core');
+const logger = require('logger');
 
 const send = (key, ...args) => {
   process.send({
@@ -19,14 +20,14 @@ process.on('message', (message) => {
     case 'setup': {
       const [opts] = args;
       chat.setup(opts, (err, id) => {
-        if (err) console.log(err);
+        if (err) logger.err(err, 'setup fail');
         send('setup-reply', err ? err.message : null, id);
       });
       break;
     }
     case 'logout': {
       chat.exit((err) => {
-        if (err) console.log(err);
+        if (err) logger.err(err, 'exit fail');
         send('logout-reply', err ? err.message : null);
       });
       break;

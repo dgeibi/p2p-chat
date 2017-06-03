@@ -1,6 +1,6 @@
 {
   "name": "p2p-chat-demo",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
   "private": true,
   "description": "a p2p chat app",
@@ -24,7 +24,8 @@
     "dateformat": "^2.0.0",
     "fs-extra": "^3.0.1",
     "getport": "^0.1.0",
-    "ip": "^1.1.5"
+    "ip": "^1.1.5",
+    "logger": "github:dgeibi/logger"
   },
   "devDependencies": {
     "electron": "^1.6.10",

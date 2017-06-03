@@ -1,6 +1,3 @@
 {
-  "extends": "dgeibi",
-  "rules": {
-    "no-console": "off"
-  }
+  "extends": "dgeibi"
 }
