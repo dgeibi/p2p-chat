@@ -295,6 +295,3 @@ document.querySelector('#connects .btn.add').addEventListener('click', (e) => {
   const connectList = e.target.nextElementSibling;
   addConnect(connectList);
 });
-
-// display setting when startup
-location.href = '#settings';

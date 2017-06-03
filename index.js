@@ -31,6 +31,7 @@ function createWindow() {
       pathname: path.join(__dirname, 'index.html'),
       protocol: 'file:',
       slashes: true,
+      hash: 'settings',
     })
   );
 
