@@ -7,8 +7,8 @@ function login(opts, callback) {
     if (!e) {
       const id = Object.assign({}, opts);
       id.port = port;
-      id.address = ip.address(); // lan ip address
-      id.tag = getTag(port, opts.host || id.address, opts.username);
+      id.address = opts.host || ip.address(); // lan ip address
+      id.tag = getTag(port, id.address, opts.username);
       callback(null, id);
     } else {
       callback(e);

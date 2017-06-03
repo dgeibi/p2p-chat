@@ -14,11 +14,11 @@ const getNewHost = require('./lib/utils/getNewHost');
 const parseChunks = require('./lib/utils/parseChunks');
 const isIPLarger = require('./lib/utils/isIPLarger');
 
+const ipSet = require('./lib/ipSet');
 const login = require('./lib/login');
 const send = require('./lib/send');
 const sendFile = require('./lib/sendFile');
 
-const connect = require('./lib/tryConnect').bind(null, handleSocket);
 const { loadFile, loadFileInfo } = require('./lib/file');
 
 const local = {
@@ -31,7 +31,7 @@ const fileAccepted = {};
 
 const getMessage = () => ({
   type: 'greeting',
-  host: local.host || local.address,
+  host: local.address,
   port: local.port,
   username: local.username,
   tag: local.tag,
@@ -68,7 +68,7 @@ function handleSocket(socket, opts = {}) {
 
   socket
     .on('error', () => {
-      if (socket.tag && socket.localTag === local.tag) delete local.clients[socket.tag];
+      if (socket.info && socket.info.localTag === local.tag) delete local.clients[socket.info.tag];
     })
     .once('data', (firstChunk) => {
       if (local.clients === null) {
@@ -83,7 +83,11 @@ function handleSocket(socket, opts = {}) {
         if (!message) return; // 无效的报文
         const chunk = firstChunk.slice(eolPos + EOL.length);
         // 已经登录, 报文类型是 fileinfo, 已经确认接收
-        if (local.clients[message.tag] && message.type === 'fileinfo' && fileAccepted[message.checksum]) {
+        if (
+          local.clients[message.tag] &&
+          message.type === 'fileinfo' &&
+          fileAccepted[message.checksum]
+        ) {
           handleFileSocket(socket, message, chunk);
           return;
         }
@@ -99,9 +103,10 @@ function handleSocket(socket, opts = {}) {
       }
 
       // 添加信息
-      socket.username = session.username;
-      socket.tag = session.tag;
-      socket.localTag = local.tag;
+      const info = Object.assign({}, session);
+      info.localTag = local.tag;
+      socket.info = info;
+
       local.clients[session.tag] = socket;
       logger.verbose(`${session.username}[${session.tag}] login.`);
       events.emit('login', session.tag, session.username);
@@ -113,7 +118,7 @@ function handleSocket(socket, opts = {}) {
       }
 
       socket.on('end', () => {
-        if (socket.localTag === local.tag) {
+        if (socket.info.localTag === local.tag) {
           delete local.clients[session.tag];
           logger.verbose(`${session.username}[${session.tag}] logout.`);
           events.emit('logout', session.tag, session.username);
@@ -171,9 +176,19 @@ const defaultOpts = {
 
 function setup(options, callback) {
   if (local.active) {
+    const ipset = ipSet();
+    // 保存用户地址
+    allClients((client) => {
+      const { host, port } = client.info;
+      ipset.add(host, port);
+    });
+    options.ipset = ipset;
     exit((err) => {
-      if (!err) setup(options, callback);
-      else callback(err);
+      if (!err) {
+        setup(options, callback);
+      } else {
+        callback(err);
+      }
     });
     return;
   }
@@ -223,31 +238,43 @@ function setup(options, callback) {
 
 function connectServers(opts) {
   if (!local.server.listening) return;
+  if (!opts.ipset) opts.ipset = ipSet();
   connectRange(opts);
-
   if (opts.connects) {
     opts.connects.forEach((conn) => {
-      connect(getMessage(), {
-        host: conn.host || (local.host || local.address),
-        port: conn.port,
-      });
+      const host = conn.host || local.address;
+      const port = conn.port;
+      opts.ipset.add(host, port);
     });
     delete opts.connects;
   }
+  opts.ipset.forEach((host, port) => {
+    if (!(port === local.port && host === local.address)) {
+      const socket = net
+        .connect(
+        {
+          host,
+          port,
+        },
+          () => {
+            send(socket, getMessage());
+            handleSocket(socket);
+          }
+        )
+        .on('error', (e) => {
+          logger.warn(e.message);
+        });
+    }
+  });
 }
 
-function connectHostRange(from, to, port) {
+function connectHostRange(from, to, port, ipset) {
   if (isIPLarger(from, to)) return; // 超过范围
-  if (port !== local.port || from !== (local.host || local.address)) {
-    connect(getMessage(), {
-      host: from,
-      port,
-    });
-  }
-  connectHostRange(getNewHost(from), to, port);
+  ipset.add(from, port);
+  connectHostRange(getNewHost(from), to, port, ipset);
 }
 
-function connectRange({ hostStart, hostEnd, portStart, portEnd }) {
+function connectRange({ hostStart, hostEnd, portStart, portEnd, ipset }) {
   if (!portStart) return;
   if (portEnd && portEnd < portStart) return;
   if (hostStart && !hostEnd) hostEnd = hostStart;
@@ -255,15 +282,14 @@ function connectRange({ hostStart, hostEnd, portStart, portEnd }) {
   if (!portEnd) portEnd = portStart + 1;
   else portEnd += 1;
 
-  for (let port = portStart; port < portEnd; port += 1) {
-    if (hostStart) {
-      connectHostRange(hostStart, hostEnd, port);
-    } else {
-      if (port === local.port) continue;
-      connect(getMessage(), {
-        port,
-        host: local.host || local.address,
-      });
+  if (hostStart) {
+    for (let port = portStart; port < portEnd; port += 1) {
+      connectHostRange(hostStart, hostEnd, port, ipset);
+    }
+  } else {
+    const host = local.address;
+    for (let port = portStart; port < portEnd; port += 1) {
+      ipset.add(host, port);
     }
   }
 }
@@ -271,7 +297,7 @@ function connectRange({ hostStart, hostEnd, portStart, portEnd }) {
 function getUserInfos() {
   return Object.keys(local.clients).map(tag => ({
     tag,
-    username: local.clients[tag].username,
+    username: local.clients[tag].info.username,
   }));
 }
 

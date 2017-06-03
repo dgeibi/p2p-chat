@@ -257,7 +257,6 @@ function handleChange(e) {
 document.querySelectorAll('.settings input[data-state]').forEach((input) => {
   input.addEventListener('change', handleChange);
 })
-
 ;(() => {
   // 调整字体大小
   const handleFontSizeChange = (e) => {
@@ -269,7 +268,6 @@ document.querySelectorAll('.settings input[data-state]').forEach((input) => {
   const viewFontSize = document.querySelector('#view-font-size');
   viewFontSize.addEventListener('change', handleFontSizeChange);
 })()
-
 ;(() => {
   // add connect template
   const connect = document.querySelector('#connects .connect-list li');
