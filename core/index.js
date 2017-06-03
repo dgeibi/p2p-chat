@@ -23,8 +23,8 @@ const { loadFile, loadFileInfo } = require('./lib/file');
 
 const local = {
   active: false,
+  clients: null,
 };
-const clients = {};
 
 // 已经确认接收的文件
 const fileAccepted = {};
@@ -63,15 +63,19 @@ function handleFileSocket(socket, message, firstChunk) {
     fileAccepted[realChecksum] = false;
   });
 }
-
 function handleSocket(socket, opts = {}) {
   const { reGreeting } = opts;
 
   socket
     .on('error', () => {
-      if (socket.tag) delete clients[socket.tag];
+      if (socket.tag && socket.localTag === local.tag) delete local.clients[socket.tag];
     })
     .once('data', (firstChunk) => {
+      if (local.clients === null) {
+        socket.end();
+        return;
+      }
+
       // 对发送文件的socket特殊处理
       const eolPos = firstChunk.indexOf(EOL);
       if (eolPos > 0) {
@@ -79,15 +83,17 @@ function handleSocket(socket, opts = {}) {
         if (!message) return; // 无效的报文
         const chunk = firstChunk.slice(eolPos + EOL.length);
         // 已经登录, 报文类型是 fileinfo, 已经确认接收
-        if (clients[message.tag] && message.type === 'fileinfo' && fileAccepted[message.checksum]) {
+        if (local.clients[message.tag] && message.type === 'fileinfo' && fileAccepted[message.checksum]) {
           handleFileSocket(socket, message, chunk);
           return;
         }
+        socket.end();
+        return;
       }
 
       const session = parseChunks([firstChunk]);
-      // 不符合预期的报文，断开连接
-      if (!session || session.type !== 'greeting' || clients[session.tag]) {
+      // 不符合预期的报文，或者重复连接 -> 断开连接
+      if (session === null || session.type !== 'greeting' || local.clients[session.tag]) {
         socket.end();
         return;
       }
@@ -95,8 +101,8 @@ function handleSocket(socket, opts = {}) {
       // 添加信息
       socket.username = session.username;
       socket.tag = session.tag;
-      clients[session.tag] = socket;
-
+      socket.localTag = local.tag;
+      local.clients[session.tag] = socket;
       logger.verbose(`${session.username}[${session.tag}] login.`);
       events.emit('login', session.tag, session.username);
 
@@ -107,9 +113,11 @@ function handleSocket(socket, opts = {}) {
       }
 
       socket.on('end', () => {
-        delete clients[session.tag];
-        logger.verbose(`${session.username}[${session.tag}] logout.`);
-        events.emit('logout', session.tag, session.username);
+        if (socket.localTag === local.tag) {
+          delete local.clients[session.tag];
+          logger.verbose(`${session.username}[${session.tag}] logout.`);
+          events.emit('logout', session.tag, session.username);
+        }
       });
 
       const caches = [];
@@ -187,6 +195,8 @@ function setup(options, callback) {
       return;
     }
     Object.assign(local, id);
+    local.clients = {};
+
     const { host, port, username, tag } = id;
     // 1. create server, sending data
     const server = net.createServer((socket) => {
@@ -259,9 +269,9 @@ function connectRange({ hostStart, hostEnd, portStart, portEnd }) {
 }
 
 function getUserInfos() {
-  return Object.keys(clients).map(tag => ({
+  return Object.keys(local.clients).map(tag => ({
     tag,
-    username: clients[tag].username,
+    username: local.clients[tag].username,
   }));
 }
 
@@ -270,7 +280,7 @@ function textToUsers(tags, text) {
     const message = getMessage();
     message.type = 'text';
     message.text = text;
-    send(clients[tag], message);
+    send(local.clients[tag], message);
   });
 }
 
@@ -278,13 +288,13 @@ function sendFileToUsers(tags, filepath) {
   tags.forEach((tag) => {
     const message = getMessage();
     loadFileInfo(filepath, message);
-    send(clients[tag], message);
+    send(local.clients[tag], message);
   });
 }
 
 function allClients(fn) {
-  Object.keys(clients).forEach((tag) => {
-    fn(clients[tag]);
+  Object.keys(local.clients).forEach((tag) => {
+    fn(local.clients[tag]);
   });
 }
 
@@ -293,7 +303,7 @@ function acceptFile(tag, checksum) {
   message.type = 'file-accepted';
   message.checksum = checksum;
   fileAccepted[checksum] = true;
-  send(clients[tag], message);
+  send(local.clients[tag], message);
 }
 
 function exit(callback) {
