@@ -36,8 +36,7 @@ function bind(object, dataKey, defaultObject = {}, key) {
         console.log(`get ${dataKey}: ${key} fail`);
         return defaultObject[key];
       }
-      const value =
-        node[node.dataset.valueKey || 'value'] || defaultObject[key];
+      const value = node[node.dataset.valueKey || 'value'] || defaultObject[key];
       if (node.dataset.type === 'number') return Number(value);
       return value;
     },
@@ -63,10 +62,7 @@ Object.defineProperty(local, 'connects', {
     return Array.from(document.querySelectorAll('.connect-list li'))
       .map((item) => {
         const host = item.querySelector('[data-connect="host"]').value;
-        const port = parseInt(
-          item.querySelector('[data-connect="port"]').value,
-          10
-        );
+        const port = parseInt(item.querySelector('[data-connect="port"]').value, 10);
         if (port) return { host, port };
         return undefined;
       })
@@ -100,12 +96,10 @@ const state = {
   },
 };
 
-const {
-  writeMonthDay,
-  writeMsg,
-  writeUserMsg,
-  writeErrorMsg,
-} = require('./view/write.js')(view, local);
+const { writeMonthDay, writeMsg, writeUserMsg, writeErrorMsg } = require('./view/write.js')(
+  view,
+  local
+);
 
 ipcRenderer.on('logout-reply', (event, errMsg) => {
   const success = !errMsg;
@@ -172,13 +166,10 @@ ipcRenderer.on('file-sent', (event, tag, username, filename) => {
   writeMsg(`>> ${filename} 已发送给 ${username}[${formatTag(tag)}]`);
 });
 
-ipcRenderer.on(
-  'file-send-fail',
-  (event, tag, username, filename, checksum, errMsg) => {
-    writeErrorMsg(`>> ${filename} 发送给 ${username}[${formatTag(tag)}] 时出错`);
-    writeErrorMsg(`>> ${errMsg}`);
-  }
-);
+ipcRenderer.on('file-send-fail', (event, tag, username, filename, checksum, errMsg) => {
+  writeErrorMsg(`>> ${filename} 发送给 ${username}[${formatTag(tag)}] 时出错`);
+  writeErrorMsg(`>> ${errMsg}`);
+});
 
 ipcRenderer.on('file-write-fail', (event, message) => {
   const { tag, username, filename } = message;
@@ -233,17 +224,7 @@ function logout(opts = {}) {
 }
 
 function applySettings() {
-  const {
-    username,
-    host,
-    port,
-    hostStart,
-    hostEnd,
-    portStart,
-    portEnd,
-    connects,
-    login,
-  } = local;
+  const { username, host, port, hostStart, hostEnd, portStart, portEnd, connects, login } = local;
   const options = {
     username,
     host,
@@ -257,10 +238,7 @@ function applySettings() {
 
   const newImportant = { username, host, port, login };
   const keys = ['username', 'host', 'port', 'login'];
-  if (
-    important === null ||
-    keys.some(key => newImportant[key] !== important[key])
-  ) {
+  if (important === null || keys.some(key => newImportant[key] !== important[key])) {
     ipcRenderer.send('setup', options);
   } else {
     ipcRenderer.send('change-setting', options);
@@ -278,29 +256,24 @@ function handleChange(e) {
 }
 document.querySelectorAll('.settings input[data-state]').forEach((input) => {
   input.addEventListener('change', handleChange);
-});
+})
 
-(() => {
+;(() => {
   // 调整字体大小
   const handleFontSizeChange = (e) => {
     const node = e.target;
-    document.documentElement.style.setProperty(
-      `--${node.id}`,
-      `${node.value}${node.dataset.base}`
-    );
+    document.documentElement.style.setProperty(`--${node.id}`, `${node.value}${node.dataset.base}`);
   };
   const inputFontSize = document.querySelector('#input-font-size');
   inputFontSize.addEventListener('change', handleFontSizeChange);
   const viewFontSize = document.querySelector('#view-font-size');
   viewFontSize.addEventListener('change', handleFontSizeChange);
-})();
+})()
 
-(() => {
+;(() => {
   // add connect template
   const connect = document.querySelector('#connects .connect-list li');
-  connect
-    .querySelector('.remove')
-    .addEventListener('click', removeConnect, false);
+  connect.querySelector('.remove').addEventListener('click', removeConnect, false);
   template.connect = connect.cloneNode(true);
 })();
 

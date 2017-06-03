@@ -79,11 +79,7 @@ function handleSocket(socket, opts = {}) {
         if (!message) return; // 无效的报文
         const chunk = firstChunk.slice(eolPos + EOL.length);
         // 已经登录, 报文类型是 fileinfo, 已经确认接收
-        if (
-          clients[message.tag] &&
-          message.type === 'fileinfo' &&
-          fileAccepted[message.checksum]
-        ) {
+        if (clients[message.tag] && message.type === 'fileinfo' && fileAccepted[message.checksum]) {
           handleFileSocket(socket, message, chunk);
           return;
         }
@@ -145,22 +141,9 @@ function handleSocket(socket, opts = {}) {
               (e) => {
                 if (e) {
                   logger.err('file-send-fail', file.filename, e.message);
-                  events.emit(
-                    'file-send-fail',
-                    tag,
-                    username,
-                    file.filename,
-                    checksum,
-                    e.message
-                  );
+                  events.emit('file-send-fail', tag, username, file.filename, checksum, e.message);
                 } else {
-                  events.emit(
-                    'file-sent',
-                    tag,
-                    username,
-                    file.filename,
-                    checksum
-                  );
+                  events.emit('file-sent', tag, username, file.filename, checksum);
                 }
               }
             );

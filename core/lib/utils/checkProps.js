@@ -1,11 +1,4 @@
-const TYPEOFS = [
-  'symbol',
-  'undefined',
-  'boolean',
-  'number',
-  'string',
-  'function',
-];
+const TYPEOFS = ['symbol', 'undefined', 'boolean', 'number', 'string', 'function'];
 
 function addTypeWrong(key, value, type, wrongs) {
   // eslint-disable-next-line valid-typeof

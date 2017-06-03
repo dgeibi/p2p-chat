@@ -12,21 +12,11 @@ module.exports = (view, local) => {
   };
 
   const writeMonthDay = () => {
-    write(
-      `<section class="info center">${dateFormat(
-        new Date(),
-        'mm-dd'
-      )}</section>`
-    );
+    write(`<section class="info center">${dateFormat(new Date(), 'mm-dd')}</section>`);
   };
 
   const writeTime = () => {
-    write(
-      `<section class="info center">${dateFormat(
-        new Date(),
-        'HH:MM'
-      )}</section>`
-    );
+    write(`<section class="info center">${dateFormat(new Date(), 'HH:MM')}</section>`);
   };
 
   const writeMsg = (text) => {
@@ -40,11 +30,7 @@ module.exports = (view, local) => {
   const writeUserMsg = (tag, username, text) => {
     if (local.msgCount % 5 === 0) writeTime();
     local.msgCount += 1;
-    write(
-      `<section><span class="info">${username}[${formatTag(
-        tag
-      )}]:</span> ${text}</section>`
-    );
+    write(`<section><span class="info">${username}[${formatTag(tag)}]:</span> ${text}</section>`);
   };
 
   return {

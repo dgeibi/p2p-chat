@@ -35,7 +35,7 @@
     "eslint-config-dgeibi": "github:dgeibi/eslint-config-dgeibi",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-no-async-without-await": "^1.2.0",
-    "prettier-eslint-cli": "^3.2.0"
+    "prettier-eslint-cli": "^4.0.2"
   },
   "build": {
     "appId": "xyz.dgeibi.p2pchat",
