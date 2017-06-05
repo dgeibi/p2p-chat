@@ -69,6 +69,7 @@ $ npm run dist
 ├── renderer.js // 界面渲染，与 index.js 通过 ipc 联系
 ├── sub.js // Electron 的子程序，调用 core 目录的程序，与 index.js 通过 ipc 联系
 └── view // 前端的一些东西
+    ├── bind.js
     ├── formatTag.js
     ├── index.css // 页面样式
     ├── menu.js

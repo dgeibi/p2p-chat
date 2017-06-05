@@ -3,6 +3,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { ipcRenderer } = require('electron');
 const formatTag = require('./view/formatTag');
+const bind = require('./view/bind');
 
 const view = document.querySelector('.view');
 const aside = document.querySelector('aside');
@@ -27,26 +28,6 @@ const defaultConfig = {
 
 const local = Object.assign({}, defaultConfig);
 let important = null;
-
-function bind(object, dataKey, defaultObject = {}, key) {
-  Object.defineProperty(object, key, {
-    get() {
-      const node = document.querySelector(`[data-${dataKey}="${key}"]`);
-      if (!node) {
-        console.log(`get ${dataKey}: ${key} fail`);
-        return defaultObject[key];
-      }
-      const value = node[node.dataset.valueKey || 'value'] || defaultObject[key];
-      if (node.dataset.type === 'number') return Number(value);
-      return value;
-    },
-    set(value) {
-      const node = document.querySelector(`[data-${dataKey}="${key}"]`);
-      if (node) node[node.dataset.valueKey || 'value'] = value;
-      else console.log(`set ${dataKey}: ${key} fail`);
-    },
-  });
-}
 
 const bindLocal = bind.bind(null, local, 'local', defaultConfig);
 bindLocal('username');
