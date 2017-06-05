@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const getChecksum = require('./utils/getChecksum');
-const { EOL } = require('os');
 
 const filesCaches = {};
 
@@ -24,7 +23,7 @@ function loadFileInfo(filepath, message) {
 
   // 报文和数据使用 EOL 分隔
   filesCaches[checksum] = Object.assign({}, fileInfoMessage, {
-    data: Buffer.concat([Buffer.from(JSON.stringify(fileInfoMessage) + EOL), data]),
+    data: Buffer.concat([Buffer.from(`${JSON.stringify(fileInfoMessage)}\n`), data]),
   });
   return fileInfoMessage;
 }
