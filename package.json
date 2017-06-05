@@ -42,6 +42,9 @@
     "mac": {
       "category": "public.app-category.social-networking"
     },
+    "win": {
+      "target": "portable"
+    },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
