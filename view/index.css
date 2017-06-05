@@ -85,6 +85,7 @@ a {
   cursor: pointer;
   border: 1px solid #2e6da4;
   background: hsla(219, 50%, 55%, 1);
+  user-select: none;
 }
 
 .btn:hover {
@@ -93,6 +94,7 @@ a {
 
 .top-bar {
   padding: 10px;
+  user-select: none;
 }
 
 .top-bar > *:not(:last-child) {
@@ -159,6 +161,10 @@ label {
   z-index: 99;
   visibility: visible;
   opacity: 1;
+}
+
+.select-none {
+  user-select: none;
 }
 
 .popup {
@@ -248,5 +254,5 @@ li {
 
 .row input[type=text] {
   position: absolute;
-  left: 150px;
+  left: 80px;
 }
