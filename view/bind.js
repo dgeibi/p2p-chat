@@ -16,6 +16,7 @@ function bind(object, dataKey, defaultObject = {}, key) {
         return defaultObject[key];
       }
       const value = node[node.dataset.valueKey || 'value'] || defaultObject[key];
+      if (node.dataset.type === 'integer') return Math.trunc(value);
       if (node.dataset.type === 'number') return Number(value);
       return value;
     },

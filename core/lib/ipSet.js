@@ -3,7 +3,7 @@ function ipSet() {
 
   function add(host, port) {
     if (typeof host !== 'string') throw TypeError('host should be a string');
-    const portnum = parseInt(port, 10);
+    const portnum = Math.trunc(port);
     if (isNaN(portnum)) {
       throw TypeError('port should be a integer');
     }

@@ -43,7 +43,7 @@ Object.defineProperty(local, 'connects', {
     return Array.from(document.querySelectorAll('.connect-list li'))
       .map((item) => {
         const host = item.querySelector('[data-connect="host"]').value;
-        const port = parseInt(item.querySelector('[data-connect="port"]').value, 10);
+        const port = Math.trunc(item.querySelector('[data-connect="port"]').value);
         if (port) return { host, port };
         return undefined;
       })

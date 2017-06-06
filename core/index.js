@@ -196,7 +196,7 @@ function setup(options, callback) {
   }
 
   const opts = Object.assign({}, defaultOpts, options);
-  opts.port = parseInt(opts.port, 10);
+  opts.port = Math.trunc(opts.port);
   if (isNaN(opts.port) || opts.port < 2000 || opts.port > 59999) {
     callback(TypeError('port should be a integer (2000~59999)'));
     return;
