@@ -21,10 +21,12 @@ function loadFileInfo(filepath, message) {
     size: data.buffer.byteLength,
   });
 
-  filesCaches[checksum] = Object.assign({}, fileInfoMessage, {
-    type: 'file',
+  filesCaches[checksum] = [
+    Object.assign({}, fileInfoMessage, {
+      type: 'file',
+    }),
     data,
-  });
+  ];
   return fileInfoMessage;
 }
 

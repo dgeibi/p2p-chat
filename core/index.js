@@ -36,16 +36,16 @@ const getMessage = () => ({
 });
 
 function handleFile(message) {
-  const { tag, checksum, username, data, filename } = message;
+  const { tag, checksum, username, body, filename } = message;
 
-  const realChecksum = getChecksum(data);
+  const realChecksum = getChecksum(body);
   // 检查checksum
   if (!fileAccepted[realChecksum] || realChecksum !== checksum) {
     return;
   }
 
   const filepath = path.resolve('Downloads', local.username, filename);
-  fs.outputFile(filepath, data, (err) => {
+  fs.outputFile(filepath, body, (err) => {
     if (err) {
       logger.error(`${filename} write fail, ${err.message}`);
       events.emit('file-write-fail', { tag, username, filename });
@@ -124,10 +124,10 @@ function handleSocket(rsocket, opts = {}) {
             },
             (e) => {
               if (e) {
-                logger.err('file-send-fail', file.filename, e.message);
-                events.emit('file-send-fail', tag, username, file.filename, checksum, e.message);
+                logger.err('file-send-fail', file[0].filename, e.message);
+                events.emit('file-send-fail', tag, username, file[0].filename, checksum, e.message);
               } else {
-                events.emit('file-sent', tag, username, file.filename, checksum);
+                events.emit('file-sent', tag, username, file[0].filename, checksum);
               }
             }
           );
