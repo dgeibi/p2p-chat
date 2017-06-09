@@ -26,7 +26,8 @@
     "fs-extra": "^3.0.1",
     "getport": "^0.1.0",
     "ip": "^1.1.5",
-    "logger": "github:dgeibi/logger#684f9cc"
+    "logger": "github:dgeibi/logger#684f9cc",
+    "stream-splicer": "^2.0.0"
   },
   "devDependencies": {
     "electron": "^1.6.10",

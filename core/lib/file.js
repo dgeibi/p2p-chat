@@ -21,9 +21,9 @@ function loadFileInfo(filepath, message) {
     size: data.buffer.byteLength,
   });
 
-  // 报文和数据使用 EOL 分隔
   filesCaches[checksum] = Object.assign({}, fileInfoMessage, {
-    data: Buffer.concat([Buffer.from(`${JSON.stringify(fileInfoMessage)}\n`), data]),
+    type: 'file',
+    data,
   });
   return fileInfoMessage;
 }
