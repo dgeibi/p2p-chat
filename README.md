@@ -52,16 +52,13 @@ $ npm run dist
 │       ├── file.js // fileinfo 报文生成、文件缓存
 │       ├── getTag.js // 生成 tag
 │       ├── ipSet.js // ipset 集合
-│       ├── isValidMessage.js
 │       ├── login.js // 获取 IP 地址、可用端口号，生成 tag
 │       ├── sendFile.js // 使用短连接发送文件
-│       ├── send.js // 包装 socket.write，方便发送报文
 │       └── utils // 包含一些工具类程序
-│           ├── bufferFrom.js
-│           ├── checkProps.js
 │           ├── getChecksum.js // 获取 md5 校验和
 │           ├── getNewHost.js
 │           ├── isIPLarger.js
+│           ├── jsonStream.js // 包装 socket 流，处理缓存
 │           ├── parseChunks.js // 解析 buffer 数组到对象
 │           └── parseJSON.js
 ├── index.html // 界面描述

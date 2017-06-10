@@ -18,12 +18,12 @@ function loadFileInfo(filepath, message) {
     type: 'fileinfo',
     filename,
     checksum,
-    size: data.buffer.byteLength,
+    size: data.byteLength,
   });
 
-  // 报文和数据使用 EOL 分隔
   filesCaches[checksum] = Object.assign({}, fileInfoMessage, {
-    data: Buffer.concat([Buffer.from(`${JSON.stringify(fileInfoMessage)}\n`), data]),
+    type: 'file',
+    body: data,
   });
   return fileInfoMessage;
 }
