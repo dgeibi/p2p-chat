@@ -6,10 +6,12 @@ const serialize = () =>
   new Transform({
     writableObjectMode: true,
     transform(chunk, encoding, callback) {
-      const [header, body] = Array.isArray(chunk) ? chunk : [chunk, null];
-      header.size = Buffer.isBuffer(body) ? body.byteLength : 0;
+      const header = Object.assign({}, chunk);
+      const body = header.body;
+      delete header.body;
+      header.bodyLength = Buffer.isBuffer(body) ? body.byteLength : 0;
       const bufList = [Buffer.from(`${JSON.stringify(header)}\n`)];
-      if (header.size > 0) bufList.push(body);
+      if (header.bodyLength > 0) bufList.push(body);
       const buffer = Buffer.concat(bufList);
       callback(null, buffer);
     },
@@ -33,15 +35,14 @@ const parse = () => {
           this.msg = parseChunks(this.headerCaches);
           if (this.msg) {
             this.headerCaches = [];
-
             const second = chunk.slice(idx + 1);
-            if (this.msg.size > second.byteLength) {
-              this.bodyLeft = this.msg.size;
+            if (this.msg.bodyLength > second.byteLength) {
+              this.bodyLeft = this.msg.bodyLength;
               this.bodyCaches.push(second);
               this.bodyLeft -= second.byteLength;
             } else {
-              this.bodyCaches.push(second.slice(0, this.msg.size));
-              this.headerCaches.push(second.slice(this.msg.size));
+              this.bodyCaches.push(second.slice(0, this.msg.bodyLength));
+              this.headerCaches.push(second.slice(this.msg.bodyLength));
               toSubmit = true;
             }
           }

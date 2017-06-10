@@ -124,10 +124,10 @@ function handleSocket(rsocket, opts = {}) {
             },
             (e) => {
               if (e) {
-                logger.err('file-send-fail', file[0].filename, e.message);
-                events.emit('file-send-fail', tag, username, file[0].filename, checksum, e.message);
+                logger.err('file-send-fail', file.filename, e.message);
+                events.emit('file-send-fail', tag, username, file.filename, checksum, e.message);
               } else {
-                events.emit('file-sent', tag, username, file[0].filename, checksum);
+                events.emit('file-sent', tag, username, file.filename, checksum);
               }
             }
           );

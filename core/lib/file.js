@@ -18,15 +18,13 @@ function loadFileInfo(filepath, message) {
     type: 'fileinfo',
     filename,
     checksum,
-    size: data.buffer.byteLength,
+    size: data.byteLength,
   });
 
-  filesCaches[checksum] = [
-    Object.assign({}, fileInfoMessage, {
-      type: 'file',
-    }),
-    data,
-  ];
+  filesCaches[checksum] = Object.assign({}, fileInfoMessage, {
+    type: 'file',
+    body: data,
+  });
   return fileInfoMessage;
 }
 
