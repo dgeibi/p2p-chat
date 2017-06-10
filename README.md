@@ -42,6 +42,7 @@ $ npm run dist
 - "fs-extra": 简化输出文件的操作
 - "getport": 获取可用的端口
 - "ip": 获取本地IP地址
+- "stream-splicer": 组装 streams
 
 ## 源文件说明
 
