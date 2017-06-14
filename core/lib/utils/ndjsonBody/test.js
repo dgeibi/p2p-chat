@@ -15,7 +15,7 @@ const s = Parse();
 
 s.on('data', (msg) => {
   const body = msg.body.toString();
-  assert(body === expects[count]);
+  assert(body === expects[count], `body should be ${expects[count]}`);
   count += 1;
 });
 

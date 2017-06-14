@@ -29,61 +29,61 @@ function Parse(options) {
   }
   const opts = Object.assign({}, options, { readableObjectMode: true });
   Transform.call(this, opts);
-  this.headCaches = [];
-  this.bodyCaches = [];
+  this._headCaches = [];
+  this._bodyCaches = [];
+  this._bodyLeft = 0;
 }
 util.inherits(Parse, Transform);
 
 Parse.prototype._submitMsg = function _submitMsg() {
-  if (this.msg) this.msg.body = Buffer.concat(this.bodyCaches);
-  else this.emit('error', Error('message not found'));
-  this.push(this.msg);
-  this.msg = null;
-  this.bodyCaches = [];
-  this.bodyLeft = 0;
+  if (!this._msg) {
+    this.emit('error', Error('message not found'));
+    return;
+  }
+  this._msg.body = Buffer.concat(this._bodyCaches);
+  this.push(this._msg);
+  this._msg = null;
+  this._bodyCaches = [];
+  this._bodyLeft = 0;
 };
 
-Parse.prototype._submitWithLeft = function _submitWithLeft(buffer) {
-  this.bodyCaches.push(buffer.slice(0, this.bodyLeft));
-  const left = buffer.slice(this.bodyLeft);
-  process.nextTick(() => this._transform(left));
-  this._submitMsg();
-};
-
-Parse.prototype._handleNotLeft = function _handleNotLeft(buffer) {
-  this.bodyCaches.push(buffer);
-  this.bodyLeft -= buffer.byteLength;
-  if (this.bodyLeft === 0) this._submitMsg();
+Parse.prototype._handleBodyStart = function _handleBodyStart(buffer) {
+  if (buffer.byteLength > this._bodyLeft) {
+    // has head start
+    this._bodyCaches.push(buffer.slice(0, this._bodyLeft));
+    const left = buffer.slice(this._bodyLeft);
+    this._bodyLeft = 0;
+    this._submitMsg();
+    this._transform(left);
+  } else {
+    // cache the whole buffer
+    this._bodyCaches.push(buffer);
+    this._bodyLeft -= buffer.byteLength;
+    if (this._bodyLeft === 0) this._submitMsg();
+  }
 };
 
 Parse.prototype._transform = function _transform(chunk, encoding, callback) {
-  if (!this.bodyLeft || this.bodyLeft < 0) {
+  if (this._bodyLeft <= 0) {
     // receive head first
     const idx = chunk.indexOf('\n');
     if (idx >= 0) {
-      // find head
+      // find a part of head ending with \n
       const first = chunk.slice(0, idx);
-      this.headCaches.push(first);
-      this.msg = parseChunks(this.headCaches);
-      if (this.msg) {
-        this.headCaches = [];
+      this._headCaches.push(first);
+      this._msg = parseChunks(this._headCaches);
+      if (this._msg) {
+        this._headCaches = []; // empty cache
         const second = chunk.slice(idx + 1);
-        this.bodyLeft = this.msg.bodyLength;
-        if (this.msg.bodyLength > second.byteLength) {
-          this._handleNotLeft(second);
-        } else {
-          this._submitWithLeft(second);
-        }
+        this._bodyLeft = this._msg.bodyLength;
+        this._handleBodyStart(second);
       }
     } else {
       // cannot find \n, cache head
-      this.headCaches.push(chunk);
+      this._headCaches.push(chunk);
     }
-  } else if (chunk.byteLength > this.bodyLeft) {
-    this._submitWithLeft(chunk);
   } else {
-    // receive part of body
-    this._handleNotLeft(chunk);
+    this._handleBodyStart(chunk);
   }
 
   if (callback) callback();
