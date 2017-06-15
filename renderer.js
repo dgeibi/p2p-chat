@@ -1,7 +1,7 @@
 /* eslint-env browser */
 /* eslint-disable no-console */
 // eslint-disable-next-line import/no-extraneous-dependencies
-const { ipcRenderer } = require('electron');
+const { ipcRenderer, shell } = require('electron');
 const formatTag = require('./view/formatTag');
 const bind = require('./view/bind');
 
@@ -140,7 +140,11 @@ ipcRenderer.on('fileinfo', (event, message) => {
 ipcRenderer.on('file-receiced', (event, message) => {
   const { tag, username, filename, filepath } = message;
   writeMsg(`>> 已收到 ${username}[${formatTag(tag)}] 发送的 ${filename}`);
-  writeMsg(`文件在 ${filepath}。`);
+  const now = performance.now();
+  writeMsg(`文件在 <a href="#" data-file-open="${now}">${filepath}</a>`);
+  document.querySelector(`[data-file-open="${now}"]`).addEventListener('click', () => {
+    shell.openItem(filepath);
+  });
 });
 
 ipcRenderer.on('file-sent', (event, tag, username, filename) => {
