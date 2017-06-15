@@ -1,7 +1,8 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const electron = require('electron');
 
-const { app, Menu } = electron;
+const { app, Menu, dialog } = electron;
+const pkg = require('../package.json');
 
 const template = [
   {
@@ -42,7 +43,18 @@ const template = [
       {
         label: 'Learn More',
         click() {
-          electron.shell.openExternal('https://electron.atom.io');
+          electron.shell.openExternal('https://github.com/dgeibi/p2p-chat-demo');
+        },
+      },
+      {
+        label: 'About',
+        click() {
+          dialog.showMessageBox({
+            type: 'info',
+            title: pkg.name,
+            message: `Version v${pkg.version}\nNode ${process.version}\nBy dgeibi`,
+            buttons: ['OK'],
+          });
         },
       },
     ],
