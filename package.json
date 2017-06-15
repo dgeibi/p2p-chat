@@ -1,6 +1,6 @@
 {
   "name": "p2p-chat-demo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "private": true,
   "description": "a p2p chat app",
