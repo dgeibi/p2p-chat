@@ -14,8 +14,15 @@ util.inherits(Serialize, Transform);
 
 Serialize.prototype._transform = function _transform(chunk, encoding, callback) {
   const head = Object.assign({}, chunk);
-  const body = head.body;
+  let body = head.body;
   delete head.body;
+  if (body && !Buffer.isBuffer(body)) {
+    try {
+      body = Buffer.from(body);
+    } catch (err) {
+      this.emit('error', err);
+    }
+  }
   head.bodyLength = Buffer.isBuffer(body) ? body.byteLength : 0;
   const bufList = [Buffer.from(`${JSON.stringify(head)}\n`)];
   if (head.bodyLength > 0) bufList.push(body);
@@ -35,16 +42,24 @@ function Parse(options) {
 }
 util.inherits(Parse, Transform);
 
-Parse.prototype._submitMsg = function _submitMsg() {
+Parse.prototype._submitMsgWithBody = function _submitMsgWithBody() {
   if (!this._msg) {
     this.emit('error', Error('message not found'));
     return;
   }
   this._msg.body = Buffer.concat(this._bodyCaches);
-  this.push(this._msg);
-  this._msg = null;
+  this._submitMsg();
   this._bodyCaches = [];
   this._bodyLeft = 0;
+};
+
+Parse.prototype._submitMsg = function _submitMsg() {
+  if (!this._msg) {
+    this.emit('error', Error('message not found'));
+    return;
+  }
+  this.push(this._msg);
+  this._msg = null;
 };
 
 Parse.prototype._handleBodyStart = function _handleBodyStart(buffer) {
@@ -53,13 +68,13 @@ Parse.prototype._handleBodyStart = function _handleBodyStart(buffer) {
     this._bodyCaches.push(buffer.slice(0, this._bodyLeft));
     const left = buffer.slice(this._bodyLeft);
     this._bodyLeft = 0;
-    this._submitMsg();
+    this._submitMsgWithBody();
     this._transform(left);
   } else {
     // cache the whole buffer
     this._bodyCaches.push(buffer);
     this._bodyLeft -= buffer.byteLength;
-    if (this._bodyLeft === 0) this._submitMsg();
+    if (this._bodyLeft === 0) this._submitMsgWithBody();
   }
 };
 
@@ -72,11 +87,22 @@ Parse.prototype._transform = function _transform(chunk, encoding, callback) {
       const first = chunk.slice(0, idx);
       this._headCaches.push(first);
       this._msg = parseChunks(this._headCaches);
+      this._headCaches = []; // empty cache
       if (this._msg) {
-        this._headCaches = []; // empty cache
-        const second = chunk.slice(idx + 1);
-        this._bodyLeft = this._msg.bodyLength;
-        this._handleBodyStart(second);
+        if (idx + 1 !== chunk.byteLength) {
+          const second = chunk.slice(idx + 1);
+          this._bodyLeft = this._msg.bodyLength || 0;
+          if (this._bodyLeft === 0) {
+            this._submitMsg();
+            this._transform(second);
+          } else {
+            this._handleBodyStart(second);
+          }
+        } else {
+          this._submitMsg();
+        }
+      } else {
+        this.emit('error', Error('fail to parse chunks'));
       }
     } else {
       // cannot find \n, cache head

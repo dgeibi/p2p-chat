@@ -1,0 +1,12 @@
+{
+  "name": "ndjson-body",
+  "version": "1.0.0",
+  "private": true,
+  "description": "streaming newline delimited json with body parser + serializer",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "author": "dgeibi",
+  "license": "MIT"
+}
