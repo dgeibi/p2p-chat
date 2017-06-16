@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { ipcRenderer, shell } = require('electron');
+const path = require('path');
 const formatTag = require('./view/formatTag');
 const bind = require('./view/bind');
 
@@ -49,7 +50,7 @@ Object.defineProperty(local, 'connects', {
       })
       .filter(i => !!i);
   },
-  set() {},
+  set() { },
 });
 
 const state = {
@@ -68,10 +69,10 @@ const state = {
     local.users = users;
     aside.innerHTML = users
       .map(
-        user =>
-          `<div><input type="checkbox" id="${user.tag}" checked><label for="${user.tag}">${user.username}[${formatTag(
-            user.tag
-          )}]</label></div>`
+      user =>
+        `<div><input type="checkbox" id="${user.tag}" checked><label for="${user.tag}">${user.username}[${formatTag(
+          user.tag
+        )}]</label></div>`
       )
       .join('');
   },
@@ -139,11 +140,14 @@ ipcRenderer.on('fileinfo', (event, message) => {
 
 ipcRenderer.on('file-receiced', (event, message) => {
   const { tag, username, filename, filepath } = message;
-  writeMsg(`>> 已收到 ${username}[${formatTag(tag)}] 发送的 ${filename}`);
   const now = performance.now();
-  writeMsg(`文件在 <a href="#" data-file-open="${now}">${filepath}</a>`);
+  writeMsg(`>> 已收到 ${username}[${formatTag(tag)}] 发送的 ${filename}`);
+  writeMsg(`<a href="#" data-file-open="${now}">打开文件</a> <a href="#" data-file-opendir="${now}">打开文件所在目录</a>`);
   document.querySelector(`[data-file-open="${now}"]`).addEventListener('click', () => {
     shell.openItem(filepath);
+  });
+  document.querySelector(`[data-file-opendir="${now}"]`).addEventListener('click', () => {
+    shell.openItem(path.dirname(filepath));
   });
 });
 
