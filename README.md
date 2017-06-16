@@ -2,7 +2,7 @@
 
 一个基于 [dgeibi/p2p-chat](https://github.com/dgeibi/p2p-chat) 的局域网P2P聊天工具
 
-下载：https://pan.baidu.com/s/1dFCHGL7
+下载：https://github.com/dgeibi/p2p-chat-demo/releases
 
 ## 开发
 
