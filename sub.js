@@ -49,16 +49,16 @@ process.on('message', (message) => {
   }
 });
 
-chat.events.on('login', (tag, username) => {
+chat.on('login', (tag, username) => {
   send('people-login', chat.getUserInfos(), tag, username);
 });
 
-chat.events.on('logout', (tag, username) => {
+chat.on('logout', (tag, username) => {
   send('people-logout', chat.getUserInfos(), tag, username);
 });
 
 const backToFront = (key) => {
-  chat.events.on(key, (...args) => {
+  chat.on(key, (...args) => {
     send(key, ...args);
   });
 };
