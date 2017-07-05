@@ -41,20 +41,6 @@ function createWindow() {
   });
 }
 
-app.on('ready', createWindow);
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-
-app.on('activate', () => {
-  if (win === null) {
-    createWindow();
-  }
-});
-
 const frontToBack = (key) => {
   ipcMain.on(key, (event, ...args) => {
     sub.send({
@@ -85,5 +71,19 @@ emitter.on('setup-reply', (errMsg, id) => {
   if (!errMsg) {
     const { username } = id;
     win.setTitle(`${username}[${id.tag.slice(0, 5)}] - ${pkg.name}`);
+  }
+});
+
+app.on('ready', createWindow);
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
+
+app.on('activate', () => {
+  if (win === null) {
+    createWindow();
   }
 });
