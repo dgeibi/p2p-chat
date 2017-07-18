@@ -69,3 +69,6 @@ backToFront('file-receiced');
 backToFront('file-write-fail');
 backToFront('file-sent');
 backToFront('file-send-fail');
+backToFront('file-process-start');
+backToFront('file-processing');
+backToFront('file-process-done');

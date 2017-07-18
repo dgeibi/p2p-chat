@@ -50,7 +50,7 @@ Object.defineProperty(local, 'connects', {
       })
       .filter(i => !!i);
   },
-  set() { },
+  set() {},
 });
 
 const state = {
@@ -69,19 +69,16 @@ const state = {
     local.users = users;
     aside.innerHTML = users
       .map(
-      user =>
-        `<div><input type="checkbox" id="${user.tag}" checked><label for="${user.tag}">${user.username}[${formatTag(
-          user.tag
-        )}]</label></div>`
+        user =>
+          `<div><input type="checkbox" id="${user.tag}" checked><label for="${user.tag}">${user.username}[${formatTag(
+            user.tag
+          )}]</label></div>`
       )
       .join('');
   },
 };
 
-const { writeMonthDay, writeMsg, writeUserMsg, writeErrorMsg } = require('./view/write.js')(
-  view,
-  local
-);
+const { writeMonthDay, writeMsg, writeUserMsg, writeErrorMsg } = require('./view/write.js')(view);
 
 ipcRenderer.on('logout-reply', (event, errMsg) => {
   const success = !errMsg;
@@ -128,10 +125,13 @@ ipcRenderer.on('text', (event, tag, username, text) => {
 });
 
 ipcRenderer.on('fileinfo', (event, message) => {
-  const { username, tag, filename, checksum, size } = message;
+  const { username, tag, filename, id, size } = message;
   writeMsg(`>> ${username}[${formatTag(tag)}] 想发给你 ${filename}(${size} 字节)`);
-  writeMsg(`<a data-checksum="${checksum}" href="#">确认接收${filename}</a>`);
-  const link = document.querySelector(`[data-checksum="${checksum}"]`);
+  writeMsg(`<section data-file-accept-id="${id}">
+    <a href="#" class="accept">确认接收${filename}</a>
+  </section>`);
+  const link = document.querySelector(`[data-file-accept-id="${id}"] > .accept`);
+  const checksum = id.split('.')[0];
   link.addEventListener('click', () => {
     ipcRenderer.send('accept-file', tag, checksum);
     link.remove();
@@ -139,14 +139,19 @@ ipcRenderer.on('fileinfo', (event, message) => {
 });
 
 ipcRenderer.on('file-receiced', (event, message) => {
-  const { tag, username, filename, filepath } = message;
-  const now = performance.now();
-  writeMsg(`>> 已收到 ${username}[${formatTag(tag)}] 发送的 ${filename}`);
-  writeMsg(`<a href="#" data-file-open="${now}">打开文件</a> <a href="#" data-file-opendir="${now}">打开文件所在目录</a>`);
-  document.querySelector(`[data-file-open="${now}"]`).addEventListener('click', () => {
+  const { tag, username, filename, filepath, id } = message;
+  const fileSection = document.querySelector(`[data-file-id="${id}"]`);
+  fileSection.innerHTML = `
+    <section>>> 已收到 ${username}[${formatTag(tag)}] 发送的 ${filename}</section>
+    <section>
+      <a href="#" class="open-file">打开文件</a>
+      <a href="#" class="open-dir">打开文件所在目录</a>
+    </section>
+  `;
+  fileSection.querySelector('.open-file').addEventListener('click', () => {
     shell.openItem(filepath);
   });
-  document.querySelector(`[data-file-opendir="${now}"]`).addEventListener('click', () => {
+  fileSection.querySelector('.open-dir').addEventListener('click', () => {
     shell.openItem(path.dirname(filepath));
   });
 });
@@ -155,19 +160,38 @@ ipcRenderer.on('file-sent', (event, tag, username, filename) => {
   writeMsg(`>> ${filename} 已发送给 ${username}[${formatTag(tag)}]`);
 });
 
-ipcRenderer.on('file-send-fail', (event, tag, username, filename, checksum, errMsg) => {
+ipcRenderer.on('file-send-fail', (event, tag, username, filename, id, errMsg) => {
   writeErrorMsg(`>> ${filename} 发送给 ${username}[${formatTag(tag)}] 时出错`);
   writeErrorMsg(`>> ${errMsg}`);
 });
 
 ipcRenderer.on('file-write-fail', (event, message) => {
-  const { tag, username, filename } = message;
-  writeMsg(`>> ${username}[${formatTag(tag)}] 发送的 ${filename} 接收失败。`);
+  const { tag, username, filename, id } = message;
+  const fileSection = document.querySelector(`[data-file-id="${id}"]`);
+  writeMsg(`>> ${username}[${formatTag(tag)}] 发送的 ${filename} 接收失败。`, fileSection);
 });
 
 ipcRenderer.on('bg-err', (event, errMsg) => {
   writeErrorMsg('>> 后台出错了！');
   writeErrorMsg(`>> ${errMsg}`);
+});
+
+ipcRenderer.on('file-process-start', (event, id) => {
+  writeMsg(`<div data-file-id="${id}" class="file-state">
+    <div class="percent-bar"><div class="percent-bar-inner"></div></div>
+    <span class="speed"></span> KB/s
+  </div>`);
+});
+
+ipcRenderer.on('file-processing', (event, id, percent, speed) => {
+  const fileSection = document.querySelector(`[data-file-id="${id}"]`);
+  fileSection.querySelector('.percent-bar-inner').style.width = `${(percent * 100).toFixed(3)}%`;
+  fileSection.querySelector('.speed').textContent = speed;
+});
+
+ipcRenderer.on('file-process-done', (event, id) => {
+  const fileSection = document.querySelector(`[data-file-id="${id}"]`);
+  fileSection.querySelector('.percent-bar-inner').style.width = '100%';
 });
 
 // 已选择的文件显示

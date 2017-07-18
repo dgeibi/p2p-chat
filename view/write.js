@@ -3,9 +3,10 @@
 const dateFormat = require('dateformat');
 const formatTag = require('./formatTag');
 
-module.exports = (view, local) => {
-  const write = (str) => {
-    view.insertAdjacentHTML('beforeend', str);
+module.exports = (view) => {
+  const write = (str, node) => {
+    (node || view).insertAdjacentHTML('beforeend', str);
+    if (node) return;
     setTimeout(() => {
       view.scrollTop = view.scrollHeight;
     }, 0);
@@ -15,12 +16,8 @@ module.exports = (view, local) => {
     write(`<section class="info center">${dateFormat(new Date(), 'mm-dd')}</section>`);
   };
 
-  const writeTime = () => {
-    write(`<section class="info center">${dateFormat(new Date(), 'HH:MM')}</section>`);
-  };
-
-  const writeMsg = (text) => {
-    write(`<section class="info">${text}</section>`);
+  const writeMsg = (text, node) => {
+    write(`<section class="info">${text}</section>`, node);
   };
 
   const writeErrorMsg = (text) => {
@@ -28,16 +25,17 @@ module.exports = (view, local) => {
   };
 
   const writeUserMsg = (tag, username, text) => {
-    if (local.msgCount % 5 === 0) writeTime();
-    local.msgCount += 1;
-    write(`<section><span class="info">${username}[${formatTag(tag)}]:</span> ${text}</section>`);
+    write(
+      `<section><span class="info">${dateFormat(new Date(), 'HH:MM')} - ${username}[${formatTag(
+        tag
+      )}] :</span> ${text}</section>`
+    );
   };
 
   return {
     write,
     writeMonthDay,
     writeMsg,
-    writeTime,
     writeUserMsg,
     writeErrorMsg,
   };
