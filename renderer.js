@@ -179,7 +179,7 @@ ipcRenderer.on('bg-err', (event, errMsg) => {
 ipcRenderer.on('file-process-start', (event, id) => {
   writeMsg(`<div data-file-id="${id}" class="file-state">
     <div class="percent-bar"><div class="percent-bar-inner"></div></div>
-    <span class="speed"></span> KB/s
+    <span class="speed"></span>
   </div>`);
 });
 
