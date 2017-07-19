@@ -192,6 +192,7 @@ ipcRenderer.on('file-processing', (event, id, percent, speed) => {
 ipcRenderer.on('file-process-done', (event, id) => {
   const fileSection = document.querySelector(`[data-file-id="${id}"]`);
   fileSection.querySelector('.percent-bar-inner').style.width = '100%';
+  fileSection.querySelector('.speed').textContent = '正在写入文件并校验，请稍等...';
 });
 
 // 已选择的文件显示
