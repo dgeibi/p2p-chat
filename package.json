@@ -24,7 +24,7 @@
   "dependencies": {
     "dateformat": "^2.0.0",
     "logger": "github:dgeibi/logger#305933c",
-    "p2p-chat": "github:dgeibi/p2p-chat#73720e3"
+    "p2p-chat": "github:dgeibi/p2p-chat#v1.2.2"
   },
   "devDependencies": {
     "electron": "^1.6.10",
