@@ -3,16 +3,42 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const url = require('url');
-const cp = require('child_process');
+const { fork } = require('child_process');
 const EventEmitter = require('events');
+const logger = require('logger');
 
 require('./view/menu.js');
 const pkg = require('./package.json');
 
-const emitter = new EventEmitter();
-const sub = cp.fork(`${__dirname}/sub.js`, ['--color']);
-
+const workerProxy = new EventEmitter();
+const limit = 4;
+let crashTime = 0;
 let win;
+let worker;
+
+function createWorker() {
+  worker = fork(`${__dirname}/worker.js`, ['--color']);
+  logger.debug(`new chat worker ${worker.pid}`);
+  worker.on('message', (m) => {
+    const { key, args } = m;
+    if (key) {
+      workerProxy.emit(key, ...args);
+      win.webContents.send(key, ...args);
+    }
+  });
+
+  worker.on('error', (err) => {
+    win.webContents.send('bg-err', err.message);
+    logger.error(err);
+    if (crashTime < limit) createWorker();
+    crashTime += 1;
+  });
+
+  worker.on('exit', () => {
+    logger.debug(`chat worker ${worker.pid} exits`);
+  });
+}
+createWorker();
 
 function createWindow() {
   win = new BrowserWindow({
@@ -37,13 +63,12 @@ function createWindow() {
 
   win.on('closed', () => {
     win = null;
-    sub.kill();
   });
 }
 
 const frontToBack = (key) => {
   ipcMain.on(key, (event, ...args) => {
-    sub.send({
+    worker.send({
       key,
       args,
     });
@@ -57,21 +82,15 @@ frontToBack('logout');
 frontToBack('local-text');
 frontToBack('accept-file');
 
-sub.on('message', (m) => {
-  const { key, args } = m;
-  emitter.emit(key, ...args);
-  win.webContents.send(key, ...args);
-});
-
-sub.on('error', (err) => {
-  win.webContents.send('bg-err', err.message);
-});
-
-emitter.on('setup-reply', (errMsg, id) => {
+workerProxy.on('setup-reply', (errMsg, id) => {
   if (!errMsg) {
     const { username } = id;
     win.setTitle(`${username}[${id.tag.slice(0, 5)}] - ${pkg.name}`);
   }
+});
+
+process.on('exit', () => {
+  worker.kill();
 });
 
 app.on('ready', createWindow);

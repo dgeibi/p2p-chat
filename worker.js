@@ -8,6 +8,18 @@ const send = (key, ...args) => {
   });
 };
 
+process.on('uncaughtException', (err) => {
+  logger.err(err);
+
+  chat.exit(() => {
+    process.exit(1);
+  });
+
+  setTimeout(() => {
+    process.exit(1);
+  }, 5000);
+});
+
 // front to back
 process.on('message', (message) => {
   const { key, args } = message;
