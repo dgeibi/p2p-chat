@@ -12,26 +12,31 @@ const pkg = require('./package.json');
 
 const workerProxy = new EventEmitter();
 const limit = 4;
-let crashTime = 0;
+let restart = 0;
 let win;
 let worker;
 
 function createWorker() {
+  if (restart > limit) return;
+  restart += 1;
+
   worker = fork(`${__dirname}/worker.js`, ['--color']);
   logger.debug(`new chat worker ${worker.pid}`);
   worker.on('message', (m) => {
-    const { key, args } = m;
+    const { key, args, act, errMsg } = m;
     if (key) {
       workerProxy.emit(key, ...args);
       win.webContents.send(key, ...args);
+    } else if (act === 'suicide') {
+      win.webContents.send('bg-err', errMsg);
+      createWorker();
     }
   });
 
   worker.on('error', (err) => {
     win.webContents.send('bg-err', err.message);
     logger.error(err);
-    if (crashTime < limit) createWorker();
-    crashTime += 1;
+    createWorker();
   });
 
   worker.on('exit', () => {

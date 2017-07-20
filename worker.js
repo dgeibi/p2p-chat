@@ -10,6 +10,7 @@ const send = (key, ...args) => {
 
 process.on('uncaughtException', (err) => {
   logger.err(err);
+  process.send({ act: 'suicide', errMsg: err.message });
 
   chat.exit(() => {
     process.exit(1);
