@@ -3,6 +3,8 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { ipcRenderer, shell } = require('electron');
 const path = require('path');
+const escapeHTML = require('escape-html');
+
 const formatTag = require('./view/formatTag');
 const bind = require('./view/bind');
 
@@ -70,9 +72,10 @@ const state = {
     aside.innerHTML = users
       .map(
         user =>
-          `<div><input type="checkbox" id="${user.tag}" checked><label for="${user.tag}">${user.username}[${formatTag(
-            user.tag
-          )}]</label></div>`
+          `<div>
+          <input type="checkbox" id="${user.tag}" checked>
+          <label for="${user.tag}">${escapeHTML(user.username)}[${formatTag(user.tag)}]</label>
+        </div>`
       )
       .join('');
   },
@@ -102,7 +105,7 @@ ipcRenderer.on('setup-reply', (event, errMsg, id) => {
     const login = true;
     important = { username, host, port, login };
     writeMsg('>> 登录成功');
-    writeMsg(`>> 你好，${username}[${formatTag(local.tag)}].`);
+    writeMsg(`>> 你好，${escapeHTML(username)}[${formatTag(local.tag)}].`);
     writeMsg(`>> 你的地址是${host || id.address}:${port}`);
   } else {
     writeErrorMsg('>> 登录失败');
@@ -111,12 +114,12 @@ ipcRenderer.on('setup-reply', (event, errMsg, id) => {
 });
 
 ipcRenderer.on('people-login', (event, users, tag, username) => {
-  writeMsg(`>> ${username}[${formatTag(tag)}] 已上线`);
+  writeMsg(`>> ${escapeHTML(username)}[${formatTag(tag)}] 已上线`);
   state.users = users;
 });
 
 ipcRenderer.on('people-logout', (event, users, tag, username) => {
-  writeMsg(`>> ${username}[${formatTag(tag)}] 已下线`);
+  writeMsg(`>> ${escapeHTML(username)}[${formatTag(tag)}] 已下线`);
   state.users = users;
 });
 
@@ -126,9 +129,9 @@ ipcRenderer.on('text', (event, tag, username, text) => {
 
 ipcRenderer.on('fileinfo', (event, message) => {
   const { username, tag, filename, id, size } = message;
-  writeMsg(`>> ${username}[${formatTag(tag)}] 想发给你 ${filename}(${size} 字节)`);
+  writeMsg(`>> ${username}[${formatTag(tag)}] 想发给你 ${filename}(${size} 字节)`, null, true);
   writeMsg(`<section data-file-accept-id="${id}">
-    <a href="#" class="accept">确认接收${filename}</a>
+    <a href="#" class="accept">确认接收${escapeHTML(filename)}</a>
   </section>`);
   const link = document.querySelector(`[data-file-accept-id="${id}"] > .accept`);
   const checksum = id.split('.')[0];
@@ -142,7 +145,7 @@ ipcRenderer.on('file-receiced', (event, message) => {
   const { tag, username, filename, filepath, id } = message;
   const fileSection = document.querySelector(`[data-file-id="${id}"]`);
   fileSection.innerHTML = `
-    <section>>> 已收到 ${username}[${formatTag(tag)}] 发送的 ${filename}</section>
+    <section>>> 已收到 ${escapeHTML(username)}[${formatTag(tag)}] 发送的 ${escapeHTML(filename)}</section>
     <section>
       <a href="#" class="open-file">打开文件</a>
       <a href="#" class="open-dir">打开文件所在目录</a>
@@ -157,7 +160,7 @@ ipcRenderer.on('file-receiced', (event, message) => {
 });
 
 ipcRenderer.on('file-sent', (event, tag, username, filename) => {
-  writeMsg(`>> ${filename} 已发送给 ${username}[${formatTag(tag)}]`);
+  writeMsg(`>> ${filename} 已发送给 ${username}[${formatTag(tag)}]`, null, true);
 });
 
 ipcRenderer.on('file-send-fail', (event, tag, username, filename, id, errMsg) => {
@@ -168,7 +171,7 @@ ipcRenderer.on('file-send-fail', (event, tag, username, filename, id, errMsg) =>
 ipcRenderer.on('file-write-fail', (event, message) => {
   const { tag, username, filename, id } = message;
   const fileSection = document.querySelector(`[data-file-id="${id}"]`);
-  writeMsg(`>> ${username}[${formatTag(tag)}] 发送的 ${filename} 接收失败。`, fileSection);
+  writeMsg(`>> ${username}[${formatTag(tag)}] 发送的 ${filename} 接收失败。`, fileSection, true);
 });
 
 ipcRenderer.on('bg-err', (event, errMsg) => {
@@ -200,7 +203,7 @@ const filePath = document.querySelector('.file-path');
 const fileInput = document.querySelector('.file-input');
 fileInput.addEventListener('change', function handleFilesChange() {
   const files = Array.from(this.files);
-  filePath.innerHTML = files.map(file => `<li>${file.name}</li>`).join('');
+  filePath.innerHTML = files.map(file => `<li>${escapeHTML(file.name)}</li>`).join('');
 });
 
 // handle chat message submit
@@ -224,7 +227,7 @@ chatMsgSubmitBtn.addEventListener('click', (e) => {
   const files = Array.from(fileInput.files);
   files.forEach((file) => {
     ipcRenderer.send('local-file', tags, file.path);
-    writeMsg(`>> 请求发送 ${file.name}……`);
+    writeMsg(`>> 请求发送 ${escapeHTML(file.name)}……`);
   });
   fileInput.value = ''; // flush filenames
   filePath.innerHTML = '';

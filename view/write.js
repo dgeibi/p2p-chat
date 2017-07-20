@@ -2,6 +2,7 @@
 
 const dateFormat = require('dateformat');
 const formatTag = require('./formatTag');
+const escapeHTML = require('escape-html');
 
 module.exports = (view) => {
   const write = (str, node) => {
@@ -16,19 +17,19 @@ module.exports = (view) => {
     write(`<section class="info center">${dateFormat(new Date(), 'mm-dd')}</section>`);
   };
 
-  const writeMsg = (text, node) => {
-    write(`<section class="info">${text}</section>`, node);
+  const writeMsg = (text, node, escape = false) => {
+    write(`<section class="info">${escape ? escapeHTML(text) : text}</section>`, node);
   };
 
   const writeErrorMsg = (text) => {
-    write(`<section class="info error">${text}</section>`);
+    write(`<section class="info error">${escapeHTML(text)}</section>`);
   };
 
   const writeUserMsg = (tag, username, text) => {
     write(
-      `<section><span class="info">${dateFormat(new Date(), 'HH:MM')} - ${username}[${formatTag(
-        tag
-      )}] :</span> ${text}</section>`
+      `<section><span class="info">${dateFormat(new Date(), 'HH:MM')} - ${escapeHTML(
+        username
+      )}[${formatTag(tag)}] :</span>${escapeHTML(text)}</section>`
     );
   };
 
