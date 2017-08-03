@@ -8,7 +8,7 @@
 
 使用 [npm](https://nodejs.org/en/download/current/) 安装依赖
 
-``` sh
+```
 $ npm install
 ```
 
