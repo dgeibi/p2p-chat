@@ -1,4 +1,4 @@
-const chat = require('p2p-chat');
+const chat = require('./chat');
 const logger = require('logger');
 
 const send = (key, ...args) => {

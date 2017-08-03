@@ -1,0 +1,31 @@
+{
+  "name": "p2p-chat",
+  "version": "1.2.3",
+  "license": "MIT",
+  "private": true,
+  "description": "a p2p chat app",
+  "main": "index.js",
+  "author": "dgeibi <png.inside@gmail.com> (blog.dgeibi.xyz)",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "format": "prettier-eslint --write './lib/**/*.js' './*.js'"
+  },
+  "keywords": [
+    "p2p",
+    "socket"
+  ],
+  "dependencies": {
+    "fs-extra": "^4.0.0",
+    "ip": "^1.1.5",
+    "logger": "github:dgeibi/logger#305933c"
+  },
+  "devDependencies": {
+    "eslint": "^4.2.0",
+    "eslint-config-airbnb-base": "^11.1.1",
+    "eslint-config-dgeibi": "github:dgeibi/eslint-config-dgeibi#fc0e50d",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-no-async-without-await": "^1.2.0",
+    "prettier-eslint-cli": "^4.1.1"
+  }
+}
