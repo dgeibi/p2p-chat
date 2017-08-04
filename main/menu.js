@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 const electron = require('electron');
 
 const { app, Menu, dialog } = electron;

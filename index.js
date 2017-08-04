@@ -1,5 +1,4 @@
 /* eslint-disable no-param-reassign */
-// eslint-disable-next-line import/no-extraneous-dependencies
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const url = require('url');
@@ -7,20 +6,22 @@ const { fork } = require('child_process');
 const EventEmitter = require('events');
 const logger = require('logger');
 
-require('./view/menu.js');
+const tick = require('./main/count')();
+require('./main/menu.js');
 const pkg = require('./package.json');
 
 const workerProxy = new EventEmitter();
-const limit = 4;
-let restart = 0;
 let win;
 let worker;
 
-function createWorker() {
-  if (restart > limit) return;
-  restart += 1;
+// Keep a reference for dev mode
+const dev = process.argv.indexOf('--devServer') !== -1;
+const port = dev ? process.argv[process.argv.indexOf('--port') + 1] : null;
 
-  worker = fork(`${__dirname}/worker.js`, ['--color']);
+function createWorker() {
+  if (!tick()) return;
+
+  worker = fork(`${__dirname}/main/worker.js`, ['--color']);
   logger.debug(`new chat worker ${worker.pid}`);
   worker.on('message', (m) => {
     const { key, args, act, errMsg } = m;
@@ -57,14 +58,26 @@ function createWindow() {
     },
   });
 
-  win.loadURL(
-    url.format({
-      pathname: path.join(__dirname, 'index.html'),
-      protocol: 'file:',
+  const urlObj = Object.assign(
+    {
       slashes: true,
       hash: 'settings',
-    })
+    },
+    dev
+      ? {
+        protocol: 'http:',
+        host: `localhost:${port}`,
+        pathname: 'index.html',
+      }
+      : {
+        pathname: path.join(__dirname, 'index.html'),
+        protocol: 'file:',
+      }
   );
+
+  const indexPath = url.format(urlObj);
+
+  win.loadURL(indexPath);
 
   win.on('closed', () => {
     win = null;

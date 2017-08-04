@@ -1,9 +1,9 @@
 /* eslint-env browser */
-/* eslint-disable no-console */
-// eslint-disable-next-line import/no-extraneous-dependencies
 const { ipcRenderer, shell } = require('electron');
 const path = require('path');
 const escapeHTML = require('escape-html');
+
+require('./view/index.css');
 
 const formatTag = require('./view/formatTag');
 const bind = require('./view/bind');

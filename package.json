@@ -1,18 +1,20 @@
 {
   "name": "p2p-chat",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "license": "MIT",
   "private": true,
   "description": "a p2p chat app",
   "main": "index.js",
   "author": "dgeibi <png.inside@gmail.com> (blog.dgeibi.xyz)",
   "scripts": {
-    "start": "electron .",
+    "start": "webpack-dev-server",
+    "start:local": "electron .",
     "dist": "build",
     "dist:wl": "build -wl",
-    "pack": "build --dir",
-    "format": "prettier-eslint --write './view/**/*.js' './*.js'",
-    "prepare": "npm run chat",
+    "webpack": "webpack --env.production",
+    "format": "prettier-eslint --write '**/*.js'",
+    "lint": "eslint .",
+    "prepare": "run-p chat webpack",
     "chat": "cd chat && npm install --production"
   },
   "keywords": [
@@ -22,11 +24,16 @@
     "socket"
   ],
   "dependencies": {
+    "logger": "github:dgeibi/logger#305933c",
     "dateformat": "^2.0.0",
-    "escape-html": "^1.0.3",
-    "logger": "github:dgeibi/logger#305933c"
+    "escape-html": "^1.0.3"
   },
   "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "css-loader": "^0.28.4",
     "electron": "^1.6.10",
     "electron-builder": "^18.3.5",
     "eslint": "^4.3.0",
@@ -34,10 +41,25 @@
     "eslint-config-dgeibi": "github:dgeibi/eslint-config-dgeibi#fc0e50d",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-no-async-without-await": "^1.2.0",
-    "prettier-eslint-cli": "^4.1.1"
+    "html-webpack-plugin": "^2.30.1",
+    "npm-run-all": "^4.0.2",
+    "prettier-eslint-cli": "^4.1.1",
+    "style-loader": "^0.18.2",
+    "webpack": "^3.4.1",
+    "webpack-dev-server": "^2.6.1",
+    "webpack-node-externals": "^1.6.0",
+    "wtf-webpack-config": "0.0.1"
   },
   "build": {
     "appId": "xyz.dgeibi.p2pchat",
+    "files": [
+      "!LICENSE",
+      "!webpack-config/**",
+      "!webpack.config.js",
+      "!package-lock.json",
+      "!app/**",
+      "!chat/node_modules/logger/**"
+    ],
     "mac": {
       "category": "public.app-category.social-networking"
     },
@@ -51,5 +73,26 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
     }
+  },
+  "eslintConfig": {
+    "extends": "dgeibi",
+    "rules": {
+      "import/no-extraneous-dependencies": "off"
+    }
+  },
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "node": 7
+          },
+          "modules": false,
+          "useBuiltIns": true
+        }
+      ],
+      "stage-0"
+    ]
   }
 }
