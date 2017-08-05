@@ -1,18 +1,18 @@
-const path = require('path');
-const Config = require('wtf-webpack-config');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const nodeExternals = require('webpack-node-externals');
-const babel = require('wtf-webpack-config/rules/js/babel');
-const devServer = require('./webpack-config/devServer');
-const pkg = require('./package.json');
+const path = require('path')
+const Config = require('wtf-webpack-config')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const nodeExternals = require('webpack-node-externals')
+const babel = require('wtf-webpack-config/rules/js/babel')
+const devServer = require('./webpack-config/devServer')
+const pkg = require('./package.json')
 
-const PUBLIC_PATH = 'assets/';
-const SRC_DIR = path.resolve(__dirname, 'app');
-const OUTPUT_DIR = path.resolve(__dirname, PUBLIC_PATH);
-const defaultInclude = [SRC_DIR];
+const PUBLIC_PATH = 'assets/'
+const SRC_DIR = path.resolve(__dirname, 'app')
+const OUTPUT_DIR = path.resolve(__dirname, PUBLIC_PATH)
+const defaultInclude = [SRC_DIR]
 
 module.exports = (env = {}) => {
-  const isProduction = env.production === true;
+  const isProduction = env.production === true
 
   const config = new Config({
     entry: `${SRC_DIR}/index.js`,
@@ -36,7 +36,7 @@ module.exports = (env = {}) => {
         whitelist: ['jquery', 'webpack/hot/dev-server', 'webpack/hot/emitter', /^lodash/],
       }),
     ],
-  });
+  })
 
   config
     .use(devServer(), !isProduction)
@@ -54,7 +54,7 @@ module.exports = (env = {}) => {
       title: pkg.name,
       template: 'app/index.ejs',
       filename: '../index.html',
-    });
+    })
 
-  return config.toConfig();
-};
+  return config.toConfig()
+}

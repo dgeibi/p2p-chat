@@ -1,11 +1,11 @@
-const fs = require('fs');
-const path = require('path');
-const net = require('net');
+const fs = require('fs')
+const path = require('path')
+const net = require('net')
 
-const md5 = require('./utils/md5');
-const enhanceSocket = require('./enhanceSocket');
+const md5 = require('./utils/md5')
+const enhanceSocket = require('./enhanceSocket')
 
-const messages = {};
+const messages = {}
 
 /**
  * Get `fileinfo` message
@@ -16,29 +16,33 @@ const messages = {};
 function getInfoMsg(filepath, message, callback) {
   fs.stat(filepath, (err, stats) => {
     if (err || !stats.isFile()) {
-      callback(Error(`${filepath} is not a file`));
-      return;
+      callback(Error(`${filepath} is not a file`))
+      return
     }
-    const size = stats.size;
+    const size = stats.size
+    if (size === 0) {
+      callback(Error(`${filepath} is empty file`))
+      return
+    }
     md5.file(filepath, false, (md5Error, checksum) => {
       if (md5Error) {
-        callback(md5Error);
-        return;
+        callback(md5Error)
+        return
       }
-      const filename = path.basename(filepath);
+      const filename = path.basename(filepath)
       const fileInfoMessage = Object.assign(message, {
         type: 'fileinfo',
         filename,
         checksum,
         size,
-      });
+      })
       messages[checksum] = Object.assign({}, message, {
         filepath,
         type: 'file',
-      });
-      callback(null, fileInfoMessage);
-    });
-  });
+      })
+      callback(null, fileInfoMessage)
+    })
+  })
 }
 
 /**
@@ -48,36 +52,36 @@ function getInfoMsg(filepath, message, callback) {
  * @param {function(?Error, ?string)} callback
  */
 function send(checksum, options, callback) {
-  const fileMsg = Object.assign({}, messages[checksum]);
+  const fileMsg = Object.assign({}, messages[checksum])
   if (!fileMsg) {
-    callback(Error(`file not loaded from ${checksum}`));
-    return;
+    callback(Error(`file not loaded from ${checksum}`))
+    return
   }
-  const { filepath, filename } = fileMsg;
+  const { filepath, filename } = fileMsg
   fs.stat(filepath, (err) => {
     if (err) {
-      callback(Error(`fail to read file ${filepath}`), filename);
-      return;
+      callback(Error(`fail to read file ${filepath}`), filename)
+      return
     }
-    delete fileMsg.filepath;
+    delete fileMsg.filepath
     const socket = net
       .connect(options, () => {
-        enhanceSocket({ socket });
-        fileMsg.bodyLength = fileMsg.size;
-        socket.send(fileMsg);
-        const readStream = fs.createReadStream(filepath);
-        readStream.pipe(socket);
+        enhanceSocket({ socket })
+        fileMsg.bodyLength = fileMsg.size
+        socket.send(fileMsg)
+        const readStream = fs.createReadStream(filepath)
+        readStream.pipe(socket)
         readStream.on('end', () => {
-          socket.end();
-        });
+          socket.end()
+        })
       })
       .on('error', (e) => {
-        callback(e, filename);
-      });
-  });
+        callback(e, filename)
+      })
+  })
 }
 
 module.exports = {
   getInfoMsg,
   send,
-};
+}

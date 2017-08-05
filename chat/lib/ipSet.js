@@ -2,7 +2,7 @@
  * IP-Port set
  */
 function ipSet() {
-  let store = {};
+  let store = {}
 
   /**
    * add address to ipset
@@ -10,13 +10,13 @@ function ipSet() {
    * @param {number} port
    */
   function add(host, port) {
-    if (typeof host !== 'string') throw TypeError('host should be a string');
-    const portnum = Math.trunc(port);
+    if (typeof host !== 'string') throw TypeError('host should be a string')
+    const portnum = Math.trunc(port)
     if (isNaN(portnum)) {
-      throw TypeError('port should be a integer');
+      throw TypeError('port should be a integer')
     }
-    if (store[host] === undefined) store[host] = {};
-    store[host][portnum] = true;
+    if (store[host] === undefined) store[host] = {}
+    store[host][portnum] = true
   }
 
   /**
@@ -25,8 +25,8 @@ function ipSet() {
    * @param {number} port
    */
   function remove(host, port) {
-    if (store[host] === undefined) return;
-    store[host][port] = false;
+    if (store[host] === undefined) return
+    store[host][port] = false
   }
 
   /**
@@ -35,16 +35,16 @@ function ipSet() {
    * @param {number} port
    */
   function has(host, port) {
-    if (store[host] === undefined) return false;
-    if (store[host][port]) return true;
-    return false;
+    if (store[host] === undefined) return false
+    if (store[host][port]) return true
+    return false
   }
 
   /**
    * reset ipset
    */
   function reset() {
-    store = {};
+    store = {}
   }
 
   /**
@@ -53,15 +53,15 @@ function ipSet() {
    */
   function forEach(fn) {
     Object.keys(store).forEach((host) => {
-      const portStore = store[host];
+      const portStore = store[host]
       Object.keys(portStore).forEach((portStr) => {
-        const port = +portStr;
-        const exists = portStore[portStr];
+        const port = +portStr
+        const exists = portStore[portStr]
         if (exists) {
-          fn(host, port);
+          fn(host, port)
         }
-      });
-    });
+      })
+    })
   }
 
   return {
@@ -70,7 +70,7 @@ function ipSet() {
     has,
     reset,
     forEach,
-  };
+  }
 }
 
-module.exports = ipSet;
+module.exports = ipSet

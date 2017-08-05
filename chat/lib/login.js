@@ -1,6 +1,6 @@
-const getTag = require('./getTag');
-const getPort = require('./utils/get-port');
-const ip = require('ip');
+const getTag = require('./getTag')
+const getPort = require('./utils/get-port')
+const ip = require('ip')
 
 /**
  * get tag, address, port
@@ -10,15 +10,15 @@ const ip = require('ip');
 function login(opts, callback) {
   getPort({ start: opts.port }, (e, port) => {
     if (!e) {
-      const id = Object.assign({}, opts);
-      id.port = port;
-      id.address = opts.host || ip.address(); // lan ip address
-      id.tag = getTag(port, id.address, opts.username);
-      callback(null, id);
+      const id = Object.assign({}, opts)
+      id.port = port
+      id.address = opts.host || ip.address() // lan ip address
+      id.tag = getTag(port, id.address, opts.username)
+      callback(null, id)
     } else {
-      callback(e);
+      callback(e)
     }
-  });
+  })
 }
 
-module.exports = login;
+module.exports = login

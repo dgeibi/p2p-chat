@@ -1,5 +1,5 @@
-const fs = require('fs');
-const crypto = require('crypto');
+const fs = require('fs')
+const crypto = require('crypto')
 
 /**
  * Get md5sum of file
@@ -9,16 +9,16 @@ const crypto = require('crypto');
  */
 const file = (filepath, strict, callback) => {
   if (strict) {
-    let stats;
+    let stats
     try {
-      stats = fs.statSync(filepath);
+      stats = fs.statSync(filepath)
     } catch (err) {
-      callback(err);
-      return;
+      callback(err)
+      return
     }
     if (!stats.isFile()) {
-      callback(Error(`${filepath} is not a file`));
-      return;
+      callback(Error(`${filepath} is not a file`))
+      return
     }
   }
 
@@ -26,18 +26,18 @@ const file = (filepath, strict, callback) => {
     .createReadStream(filepath)
     .pipe(crypto.createHash('md5').setEncoding('hex'))
     .on('finish', function finished() {
-      callback(null, this.read());
-    });
-};
+      callback(null, this.read())
+    })
+}
 
 /**
  * Get md5 checksum of data
  * @param {(string|Buffer)} data
  * @returns {string}
  */
-const dataSync = data => crypto.createHash('md5').update(data).digest('hex');
+const dataSync = data => crypto.createHash('md5').update(data).digest('hex')
 
 module.exports = {
   dataSync,
   file,
-};
+}

@@ -1,9 +1,9 @@
-const { spawn } = require('child_process');
-const webpack = require('webpack');
-const logger = require('logger');
+const { spawn } = require('child_process')
+const webpack = require('webpack')
+const logger = require('logger')
 
 module.exports = options => (config) => {
-  config.plugin(new webpack.HotModuleReplacementPlugin());
+  config.plugin(new webpack.HotModuleReplacementPlugin())
   // eslint-disable-next-line no-param-reassign
   config.config.devServer = Object.assign(
     config.config.devServer,
@@ -21,9 +21,9 @@ module.exports = options => (config) => {
           stdio: 'inherit',
         })
           .on('close', () => process.exit(0))
-          .on('error', spawnError => logger.error(spawnError));
+          .on('error', spawnError => logger.error(spawnError))
       },
     },
     options
-  );
-};
+  )
+}

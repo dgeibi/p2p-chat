@@ -1,4 +1,4 @@
-const md5 = require('./utils/md5');
+const md5 = require('./utils/md5')
 
 /**
  * Get tag according to port, host, username
@@ -8,5 +8,5 @@ const md5 = require('./utils/md5');
  * @returns {string}
  */
 module.exports = function getTag(port, host, username) {
-  return md5.dataSync(host + port + username);
-};
+  return md5.dataSync(host + port + username)
+}

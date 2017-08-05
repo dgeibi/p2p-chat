@@ -1,7 +1,7 @@
-const electron = require('electron');
+const electron = require('electron')
 
-const { app, Menu, dialog } = electron;
-const pkg = require('../package.json');
+const { app, Menu, dialog } = electron
+const pkg = require('../package.json')
 
 const template = [
   {
@@ -42,7 +42,7 @@ const template = [
       {
         label: 'Learn More',
         click() {
-          electron.shell.openExternal('https://github.com/dgeibi/p2p-chat-demo');
+          electron.shell.openExternal('https://github.com/dgeibi/p2p-chat-demo')
         },
       },
       {
@@ -53,12 +53,12 @@ const template = [
             title: pkg.name,
             message: `Version v${pkg.version}\nNode ${process.version}\nBy dgeibi`,
             buttons: ['OK'],
-          });
+          })
         },
       },
     ],
   },
-];
+]
 
 if (process.platform === 'darwin') {
   template.unshift({
@@ -74,7 +74,7 @@ if (process.platform === 'darwin') {
       { type: 'separator' },
       { role: 'quit' },
     ],
-  });
+  })
 
   // Edit menu
   template[1].submenu.push(
@@ -83,7 +83,7 @@ if (process.platform === 'darwin') {
       label: 'Speech',
       submenu: [{ role: 'startspeaking' }, { role: 'stopspeaking' }],
     }
-  );
+  )
 
   // Window menu
   template[3].submenu = [
@@ -92,8 +92,8 @@ if (process.platform === 'darwin') {
     { role: 'zoom' },
     { type: 'separator' },
     { role: 'front' },
-  ];
+  ]
 }
 
-const menu = Menu.buildFromTemplate(template);
-Menu.setApplicationMenu(menu);
+const menu = Menu.buildFromTemplate(template)
+Menu.setApplicationMenu(menu)

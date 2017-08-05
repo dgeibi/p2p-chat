@@ -4,12 +4,12 @@
  * @returns {?object}
  */
 const parseChunks = (chunks) => {
-  const buffer = Buffer.concat(chunks);
+  const buffer = Buffer.concat(chunks)
   try {
-    return JSON.parse(buffer.toString());
+    return JSON.parse(buffer.toString())
   } catch (e) {
-    return null;
+    return null
   }
-};
+}
 
-module.exports = parseChunks;
+module.exports = parseChunks

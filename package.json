@@ -13,7 +13,9 @@
     "dist:wl": "build -wl",
     "webpack": "webpack --env.production",
     "format": "prettier-eslint --write '**/*.js'",
-    "lint": "eslint .",
+    "lint:js": "eslint .",
+    "lint:css": "stylelint './app/components/**/*.js'",
+    "lint": "run-p lint:*",
     "prepare": "run-p chat webpack",
     "chat": "cd chat && npm install --production"
   },
@@ -24,12 +26,20 @@
     "socket"
   ],
   "dependencies": {
-    "logger": "github:dgeibi/logger#305933c",
     "dateformat": "^2.0.0",
-    "escape-html": "^1.0.3"
+    "emotion": "^7.0.11",
+    "escape-html": "^1.0.3",
+    "history": "^4.6.3",
+    "logger": "github:dgeibi/logger#305933c",
+    "preact": "^8.2.1",
+    "preact-redux": "^2.0.2",
+    "react-router": "^4.1.2",
+    "react-router-redux": "^5.0.0-alpha.6",
+    "redux": "^3.7.2"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",
+    "babel-eslint": "^7.2.3",
     "babel-loader": "^7.1.1",
     "babel-preset-env": "^1.6.0",
     "babel-preset-stage-0": "^6.24.1",
@@ -38,13 +48,19 @@
     "electron-builder": "^18.3.5",
     "eslint": "^4.3.0",
     "eslint-config-airbnb-base": "^11.3.1",
-    "eslint-config-dgeibi": "github:dgeibi/eslint-config-dgeibi#fc0e50d",
+    "eslint-config-dgeibi": "github:dgeibi/eslint-config-dgeibi#8a01000",
+    "eslint-config-standard-preact": "^1.1.6",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-no-async-without-await": "^1.2.0",
+    "eslint-plugin-react": "github:yannickcr/eslint-plugin-react",
     "html-webpack-plugin": "^2.30.1",
     "npm-run-all": "^4.0.2",
+    "preact-render-to-string": "^3.6.3",
     "prettier-eslint-cli": "^4.1.1",
     "style-loader": "^0.18.2",
+    "stylelint": "^8.0.0",
+    "stylelint-config-standard": "^17.0.0",
+    "stylelint-processor-styled-components": "^0.2.1",
     "webpack": "^3.4.1",
     "webpack-dev-server": "^2.6.1",
     "webpack-node-externals": "^1.6.0",
@@ -75,7 +91,9 @@
     }
   },
   "eslintConfig": {
-    "extends": "dgeibi",
+    "extends": [
+      "dgeibi/preact"
+    ],
     "rules": {
       "import/no-extraneous-dependencies": "off"
     }
@@ -93,6 +111,16 @@
         }
       ],
       "stage-0"
-    ]
+    ],
+    "plugins": [
+      "emotion/babel"
+    ],
+    "env": {
+      "test": {
+        "plugins": [
+          "transform-es2015-modules-commonjs"
+        ]
+      }
+    }
   }
 }

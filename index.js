@@ -1,50 +1,50 @@
 /* eslint-disable no-param-reassign */
-const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('path');
-const url = require('url');
-const { fork } = require('child_process');
-const EventEmitter = require('events');
-const logger = require('logger');
+const { app, BrowserWindow, ipcMain } = require('electron')
+const path = require('path')
+const url = require('url')
+const { fork } = require('child_process')
+const EventEmitter = require('events')
+const logger = require('logger')
 
-const tick = require('./main/count')();
-require('./main/menu.js');
-const pkg = require('./package.json');
+const tick = require('./main/count')()
+require('./main/menu.js')
+const pkg = require('./package.json')
 
-const workerProxy = new EventEmitter();
-let win;
-let worker;
+const workerProxy = new EventEmitter()
+let win
+let worker
 
 // Keep a reference for dev mode
-const dev = process.argv.indexOf('--devServer') !== -1;
-const port = dev ? process.argv[process.argv.indexOf('--port') + 1] : null;
+const dev = process.argv.indexOf('--devServer') !== -1
+const port = dev ? process.argv[process.argv.indexOf('--port') + 1] : null
 
 function createWorker() {
-  if (!tick()) return;
+  if (!tick()) return
 
-  worker = fork(`${__dirname}/main/worker.js`, ['--color']);
-  logger.debug(`new chat worker ${worker.pid}`);
+  worker = fork(`${__dirname}/main/worker.js`, ['--color'])
+  logger.debug(`new chat worker ${worker.pid}`)
   worker.on('message', (m) => {
-    const { key, args, act, errMsg } = m;
+    const { key, args, act, errMsg } = m
     if (key) {
-      workerProxy.emit(key, ...args);
-      win.webContents.send(key, ...args);
+      workerProxy.emit(key, ...args)
+      win.webContents.send(key, ...args)
     } else if (act === 'suicide') {
-      win.webContents.send('bg-err', errMsg);
-      createWorker();
+      win.webContents.send('bg-err', { errMsg })
+      createWorker()
     }
-  });
+  })
 
   worker.on('error', (err) => {
-    win.webContents.send('bg-err', err.message);
-    logger.error(err);
-    createWorker();
-  });
+    win.webContents.send('bg-err', { errMsg: err.message })
+    logger.error(err)
+    createWorker()
+  })
 
   worker.on('exit', () => {
-    logger.debug(`chat worker ${worker.pid} exits`);
-  });
+    logger.debug(`chat worker ${worker.pid} exits`)
+  })
 }
-createWorker();
+createWorker()
 
 function createWindow() {
   win = new BrowserWindow({
@@ -56,7 +56,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegrationInWorker: true,
     },
-  });
+  })
 
   const urlObj = Object.assign(
     {
@@ -73,15 +73,15 @@ function createWindow() {
         pathname: path.join(__dirname, 'index.html'),
         protocol: 'file:',
       }
-  );
+  )
 
-  const indexPath = url.format(urlObj);
+  const indexPath = url.format(urlObj)
 
-  win.loadURL(indexPath);
+  win.loadURL(indexPath)
 
   win.on('closed', () => {
-    win = null;
-  });
+    win = null
+  })
 }
 
 const frontToBack = (key) => {
@@ -89,38 +89,38 @@ const frontToBack = (key) => {
     worker.send({
       key,
       args,
-    });
-  });
-};
+    })
+  })
+}
 
-frontToBack('local-file');
-frontToBack('change-setting');
-frontToBack('setup');
-frontToBack('logout');
-frontToBack('local-text');
-frontToBack('accept-file');
+frontToBack('local-file')
+frontToBack('change-setting')
+frontToBack('setup')
+frontToBack('logout')
+frontToBack('local-text')
+frontToBack('accept-file')
 
-workerProxy.on('setup-reply', (errMsg, id) => {
+workerProxy.on('setup-reply', ({ errMsg, id }) => {
   if (!errMsg) {
-    const { username } = id;
-    win.setTitle(`${username}[${id.tag.slice(0, 5)}] - ${pkg.name}`);
+    const { username } = id
+    win.setTitle(`${username}[${id.tag.slice(0, 5)}] - ${pkg.name}`)
   }
-});
+})
 
 process.on('exit', () => {
-  worker.kill();
-});
+  worker.kill()
+})
 
-app.on('ready', createWindow);
+app.on('ready', createWindow)
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit();
+    app.quit()
   }
-});
+})
 
 app.on('activate', () => {
   if (win === null) {
-    createWindow();
+    createWindow()
   }
-});
+})
