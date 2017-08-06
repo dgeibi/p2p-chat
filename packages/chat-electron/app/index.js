@@ -1,12 +1,12 @@
 /* eslint-env browser */
-const { ipcRenderer, shell } = require('electron')
-const path = require('path')
-const escapeHTML = require('escape-html')
+import { ipcRenderer, shell } from 'electron'
+import path from 'path'
+import escapeHTML from 'escape-html'
 
-require('./view/index.css')
-
-const formatTag = require('./view/formatTag')
-const bind = require('./view/bind')
+import './view/index.css'
+import formatTag from './view/formatTag'
+import bind from './view/bind'
+import applySettings from './actions/applySettings'
 
 const view = document.querySelector('.view')
 const aside = document.querySelector('aside')
@@ -40,6 +40,7 @@ bindLocal('hostStart')
 bindLocal('hostEnd')
 bindLocal('portStart')
 bindLocal('portEnd')
+bindLocal('channel')
 
 Object.defineProperty(local, 'connects', {
   get() {
@@ -64,29 +65,46 @@ const state = {
     fileBtn.classList[success ? 'remove' : 'add']('hide')
     chatMsgSubmitBtn.classList[success ? 'remove' : 'add']('hide')
     aside.classList[success ? 'remove' : 'add']('hide')
-    if (!success) state.users = []
+    if (!success) state.users = {}
   },
 
   get login() {
     return local.login
   },
 
-  set users(users) {
-    local.users = users
-    aside.innerHTML = users
-      .map(
-        user =>
-          `<div>
-          <input type="checkbox" id="${user.tag}" checked>
-          <label for="${user.tag}">${escapeHTML(user.username)}[${formatTag(user.tag)}]</label>
-        </div>`
-      )
-      .join('')
+  set user({ tag, username, online = true }) {
+    local.users[tag] = { tag, username, online }
+    updateUsers(local.users)
   },
 
   get user() {
     return null
   },
+
+  set users(users) {
+    local.users = users
+    updateUsers(local.users)
+  },
+
+  get users() {
+    return local.users
+  },
+
+  set channels(channels) {
+    document.querySelector('[data-local="channel"]').innerHTML = ''
+  },
+}
+
+function updateUsers(users) {
+  aside.innerHTML = Object.values(users)
+    .map(
+      user =>
+        `<div>
+          <input type="checkbox" id="${user.tag}" checked>
+          <label for="${user.tag}">${escapeHTML(user.username)}[${formatTag(user.tag)}]</label>
+        </div>`
+    )
+    .join('')
 }
 
 const { writeMonthDay, writeMsg, writeUserMsg, writeErrorMsg } = require('./view/write.js')(view)
@@ -121,14 +139,19 @@ ipcRenderer.on('setup-reply', (event, { errMsg, id }) => {
   }
 })
 
-ipcRenderer.on('people-login', (event, { users, tag, username }) => {
-  writeMsg(`>> ${escapeHTML(username)}[${formatTag(tag)}] 已上线`)
+ipcRenderer.on('before-setup', (event, { users, channels }) => {
   state.users = users
+  state.channels = channels
 })
 
-ipcRenderer.on('people-logout', (event, { users, tag, username }) => {
+ipcRenderer.on('login', (event, { tag, username }) => {
+  writeMsg(`>> ${escapeHTML(username)}[${formatTag(tag)}] 已上线`)
+  state.user = { tag, username }
+})
+
+ipcRenderer.on('logout', (event, { tag, username }) => {
   writeMsg(`>> ${escapeHTML(username)}[${formatTag(tag)}] 已下线`)
-  state.users = users
+  state.user = { tag, username, online: false }
 })
 
 ipcRenderer.on('text', (event, { tag, username, text }) => {
@@ -143,7 +166,8 @@ ipcRenderer.on('fileinfo', (event, { username, tag, filename, id, size }) => {
   const link = document.querySelector(`[data-file-accept-id="${id}"] > .accept`)
   const checksum = id.split('.')[0]
   link.addEventListener('click', () => {
-    ipcRenderer.send('accept-file', { tag, checksum })
+    const { channel } = local
+    ipcRenderer.send('accept-file', { tag, checksum, payload: { checksum, channel } })
     link.remove()
   })
 })
@@ -224,18 +248,19 @@ chatMsgSubmitBtn.addEventListener('click', (e) => {
     .filter(user => user.checked)
     .map(user => user.id)
 
+  const { channel } = local
   // 1. send text
   const text = textarea.value
   if (text !== '') {
-    writeUserMsg(local.tag, local.username, text)
-    ipcRenderer.send('local-text', { tags, text }) // send-text
+    writeUserMsg(local.tag, local.username, channel + text)
+    ipcRenderer.send('local-text', { tags, payload: { text, channel } }) // send-text
     textarea.value = '' // empty textarea
   }
 
   // 2. send files
   const files = Array.from(fileInput.files)
   files.forEach((file) => {
-    ipcRenderer.send('local-file', { tags, filepath: file.path })
+    ipcRenderer.send('local-file', { tags, filepath: file.path, payload: { channel } })
     writeMsg(`>> 请求发送 ${escapeHTML(file.name)}……`)
   })
   fileInput.value = '' // flush filenames
@@ -248,30 +273,7 @@ const settingsSubmitBtn = document.querySelector('#settings-submit')
 function logout(opts = {}) {
   ipcRenderer.send('logout', opts)
 }
-
-function applySettings() {
-  const { username, host, port, hostStart, hostEnd, portStart, portEnd, connects, login } = local
-  const options = {
-    username,
-    host,
-    port,
-    hostStart,
-    hostEnd,
-    portStart,
-    portEnd,
-    connects,
-  }
-
-  const newImportant = { username, host, port, login }
-  const keys = ['username', 'host', 'port', 'login']
-  if (important === null || keys.some(key => newImportant[key] !== important[key])) {
-    ipcRenderer.send('setup', options)
-  } else {
-    ipcRenderer.send('change-setting', options)
-  }
-}
-
-settingsSubmitBtn.addEventListener('click', applySettings)
+settingsSubmitBtn.addEventListener('click', () => applySettings({ important, local }))
 logoutBtn.addEventListener('click', logout)
 
 // binding settings

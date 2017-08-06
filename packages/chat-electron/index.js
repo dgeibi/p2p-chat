@@ -13,14 +13,13 @@ const pkg = require('./package.json')
 const workerProxy = new EventEmitter()
 let win
 let worker
-
+let settings
 // Keep a reference for dev mode
 const dev = process.argv.indexOf('--devServer') !== -1
 const port = dev ? process.argv[process.argv.indexOf('--port') + 1] : null
 
 function createWorker() {
   if (!tick()) return
-
   worker = fork(`${__dirname}/main/worker.js`, ['--color'])
   logger.debug(`new chat worker ${worker.pid}`)
   worker.on('message', (m) => {
@@ -47,6 +46,7 @@ function createWorker() {
 createWorker()
 
 function createWindow() {
+  settings = require('electron-settings') // eslint-disable-line global-require
   win = new BrowserWindow({
     minWidth: 800,
     minHeight: 600,
@@ -93,9 +93,20 @@ const frontToBack = (key) => {
   })
 }
 
+ipcMain.on('setup', (event, opts) => {
+  const users = settings.get('users')
+  const channels = settings.get('channels')
+
+  win.webContents.send('before-setup', { users, channels })
+  // @TODO: opts.payload.ipset
+  worker.send({
+    key: 'setup',
+    args: [opts],
+  })
+})
+
 frontToBack('local-file')
 frontToBack('change-setting')
-frontToBack('setup')
 frontToBack('logout')
 frontToBack('local-text')
 frontToBack('accept-file')
@@ -103,8 +114,18 @@ frontToBack('accept-file')
 workerProxy.on('setup-reply', ({ errMsg, id }) => {
   if (!errMsg) {
     const { username } = id
+    settings.set('self', id)
     win.setTitle(`${username}[${id.tag.slice(0, 5)}] - ${pkg.name}`)
   }
+})
+
+// people login
+workerProxy.on('login', ({ tag, username }) => {
+  settings.set(`users.${tag}`, { tag, username })
+})
+
+workerProxy.on('channel-create', ({ key, channel }) => {
+  settings.set(`channels.${key}`, channel)
 })
 
 process.on('exit', () => {

@@ -9,11 +9,14 @@ module.exports = emitter
 const logger = require('logger')
 
 const enhanceSocket = require('./lib/enhanceSocket')
-const md5 = require('./lib/utils/md5')
-const getNewHost = require('./lib/utils/getNewHost')
-const isIPLarger = require('./lib/utils/isIPLarger')
+const md5 = require('utils/md5')
+const getNewHost = require('utils/get-new-address')
+const isIPLarger = require('utils/is-ip-larger')
 
-const ipSet = require('./lib/ipSet')
+const each = require('utils/each')
+const pick = require('utils/pick')
+
+const ipSet = require('utils/ipset')
 const login = require('./lib/login')
 const fileModule = require('./lib/file')
 
@@ -117,14 +120,14 @@ function handleSocket(socket, opts = {}) {
       return
     }
 
-    // 添加信息
+    // 添加信息，存入 local.clients
     socket.info = Object.assign({ localTag: locals.tag }, session)
-    // 存入 local.clients
     locals.clients[tag] = socket
 
     // 已登录的提示
     logger.verbose(`${username}[${tag}] login.`)
-    emitter.emit('login', { tag, username })
+    emitter.emit('login', session)
+    // channel stuff
 
     // 服务器被连接后，回复信息
     if (reGreeting) {
@@ -137,43 +140,24 @@ function handleSocket(socket, opts = {}) {
       peopleLogout(socket)
     })
 
+    // 处理报文
     socket.on('message', (message) => {
-      // 处理报文
-      const { type, checksum, text, channel } = message
-      switch (type) {
+      switch (message.type) {
         case 'fileinfo': {
-          message.id = `${checksum}.${process.uptime()}`
+          message.id = `${message.checksum}.${process.uptime()}`
           emitter.emit('fileinfo', message)
           break
         }
         case 'text': {
-          emitter.emit('text', { tag, username, text, channel })
+          emitter.emit('text', message)
           break
         }
         case 'file-accepted': {
-          fileModule.send(
-            checksum,
-            {
-              port: message.port,
-              host: message.host,
-            },
-            (e, filename) => {
-              if (e) {
-                const errMsg = e.message
-                logger.err('file-send-fail', filename, errMsg)
-                emitter.emit('file-send-fail', {
-                  tag,
-                  username,
-                  filename,
-                  checksum,
-                  channel,
-                  errMsg,
-                })
-              } else {
-                emitter.emit('file-sent', { tag, username, filename, checksum, channel })
-              }
-            }
-          )
+          sendFile(message)
+          break
+        }
+        case 'channel-create': {
+          handleChannelCreate(message)
           break
         }
         default:
@@ -189,16 +173,24 @@ const defaultOpts = {
 }
 
 /**
+ * @typedef setupPayload
+ * @type {object}
+ * @prop {object} ipsetStore
+ * @prop {object} ipset
+ * @prop {string} hostStart
+ * @prop {string} hostEnd address from hostStart to hostEnd
+ * @prop {number} portStart
+ * @prop {number} portEnd scan from portStart to portEnd
+ * @prop {Array<{ port, host }>} connects
+ */
+
+/**
  * @typedef setupOpts
  * @type {object}
  * @prop {string} username
  * @prop {string} host local host (optional)
  * @prop {number} port local port
- * @prop {string} hostStart
- * @prop {string} hostEnd address from hostStart to hostEnd
- * @prop {number} portStart
- * @prop {number} portEnd scan from portStart to portEnd
- * @prop {Array<{ port: {number}, host:{string} }>} connects
+ * @prop {setupPayload} payload
  */
 
 /**
@@ -210,10 +202,13 @@ function setup(options, callback) {
   // 已经处于启动状态，重新启动
   if (locals.active) {
     // 保存用户地址/端口到 ipset
-    options.ipset = ipSet()
-    allClients((client) => {
+    options.payload = options.payload || {}
+    options.payload.ipset = ipSet(options.payload.ipsetStore)
+
+    // should move to electron
+    each(locals.clients, (client) => {
       const { host, port } = client.info
-      options.ipset.add(host, port)
+      options.payload.ipset.add(host, port)
     })
 
     // 退出后启动
@@ -239,6 +234,7 @@ function setup(options, callback) {
   }
 
   login(opts, (error, id) => {
+    // id has props from opts
     if (error) {
       callback(error)
       return
@@ -246,20 +242,29 @@ function setup(options, callback) {
     Object.assign(locals, id)
     locals.clients = {}
 
-    const { host, port, username, tag } = id
     // 1. create server, sending data
     const server = net.createServer((socket) => {
       handleSocket(socket, { reGreeting: true })
     })
 
+    // receive store from opt
+    // opt.users ipset -> connect，include disconnected
+    const ipset = opts.payload.ipset || ipSet()
+    opts.payload.ipset = ipset
+
+    // each(locals.users, ({ port, host }) => {
+    //   ipset.add(host, port)
+    // })
+
     // 2. start listening
+    const { host, port, username, tag } = id
     server.listen({ port, host }, () => {
       locals.server = server
       logger.verbose('>> opened server on', server.address())
       logger.verbose(`>> Hi! ${username}[${tag}]`)
 
       // 3. connect to other servers
-      connectServers(opts)
+      connectServers(opts.payload)
       locals.active = true
       callback(null, id)
     })
@@ -268,11 +273,11 @@ function setup(options, callback) {
 
 /**
  * 连接其它服务器
- * @param {setupOpts} opts
+ * @param {setupPayload} opts
  */
 function connectServers(opts) {
   if (!locals.server.listening) return
-  if (!opts.ipset) opts.ipset = ipSet()
+
   // 1. 添加指定范围内的地址/端口
   connectRange(opts)
   // 2. 添加分散的地址/端口
@@ -285,14 +290,18 @@ function connectServers(opts) {
     delete opts.connects
   }
   // 3. 连接 ipset 里的所有服务器地址
-  opts.ipset.forEach((host, port) => {
-    if (!(port === locals.port && host === locals.address)) {
-      const socket = net
-        .connect(port, host, () => {
-          handleSocket(socket, { greeting: true })
-        })
-        .on('error', () => {})
-    }
+  connect(opts.ipset)
+}
+
+function connect(ipset, excludes) {
+  ipset.remove(locals.address, locals.port)
+  ipset.forEach((host, port) => {
+    if (excludes && excludes.has(host, port)) return
+    const socket = net
+      .connect(port, host, () => {
+        handleSocket(socket, { greeting: true })
+      })
+      .on('error', () => {})
   })
 }
 
@@ -301,7 +310,7 @@ function connectServers(opts) {
  * @param {string} from
  * @param {string} to
  * @param {number} port
- * @param {ipSet} ipset
+ * @param {object} ipset
  */
 function connectHostRange(from, to, port, ipset) {
   if (isIPLarger(from, to)) return // 超过范围
@@ -339,7 +348,7 @@ function connectRange(opts) {
  * 获取好友信息
  * @returns {Array<{tag: string, username: string}>}
  */
-function getUserInfos() {
+function getOnlineUser() {
   const infos = pick(locals.clients, {
     tag: ['info', 'tag'],
     username: ['info', 'username'],
@@ -347,51 +356,30 @@ function getUserInfos() {
   return infos
 }
 
-function getValue(object, props) {
-  if (!object) return null
-  if (!Array.isArray(props)) return object[props]
-  const [first, ...rest] = props
-  if (!first) return object
-  return getValue(object[first], rest)
-}
-
-function pick(object, props, keys) {
-  if (!keys) keys = Object.keys(object)
-  return keys.reduce((obj, key) => {
-    const value = object[key]
-    if (!value) return obj
-    obj[key] = {}
-    Object.keys(props).forEach((propKey) => {
-      obj[key][propKey] = getValue(object[key], props[propKey])
-    })
-    return obj
-  }, {})
-}
-
-function getUserFullInfos(tags) {
-  return pick(
-    locals.clients,
-    {
-      tag: ['info', 'tag'],
-      host: ['info', 'host'],
-      port: ['info', 'port'],
-    },
-    tags
-  )
-}
+// function getUserFullInfos(tags) {
+//   // [in electron ]
+//   return pick(
+//     locals.clients,
+//     {
+//       tag: ['info', 'tag'],
+//       host: ['info', 'host'],
+//       port: ['info', 'port'],
+//     },
+//     tags
+//   )
+// }
 
 /**
  * 发送文本
  * @param {Array<string>} tags
  * @param {string} text
  */
-function textToUsers({ tags, text, channel }) {
-  const message = getMessage()
+function textToUsers(opts) {
+  const { tags, payload } = opts
+  const message = Object.assign(getMessage(), payload)
   message.type = 'text'
-  message.text = text
-  message.channel = channel
 
-  eachSocket(tags, (socket) => {
+  each(locals.clients, tags, (socket) => {
     socket.send(message)
   })
 }
@@ -401,38 +389,29 @@ function textToUsers({ tags, text, channel }) {
  * @param {Array<string>} tags
  * @param {string} filepath
  */
-function sendFileToUsers({ tags, filepath, channel }) {
-  fileModule.getInfoMsg(filepath, getMessage(), (err, message) => {
+function sendFileToUsers(opts) {
+  const { tags, filepath, payload } = opts
+  const msg = Object.assign(getMessage(), payload)
+
+  fileModule.getInfoMsg(filepath, msg, (err, message) => {
     if (err) {
       logger.err(err)
-      emitter.emit('file-unable-to-send', { errMsg: err.message, channel })
+      emitter.emit('file-unable-to-send', { errMsg: err.message })
       return
     }
-    message.channel = channel
-    eachSocket(tags, (socket) => {
+    each(locals.clients, tags, (socket) => {
       socket.send(message)
     })
   })
 }
 
-/**
- * 对所有的连接执行 fn
- * @param {function(object)} fn
- */
-function allClients(fn) {
-  Object.keys(locals.clients).forEach((tag) => {
-    fn(locals.clients[tag])
-  })
-}
-
 // 同意接收文件
-function acceptFile({ tag, checksum, channel }) {
+function acceptFile(opts) {
+  const { tag, checksum, payload } = opts
   const socket = locals.clients[tag]
   if (socket) {
-    const message = getMessage()
+    const message = Object.assign(getMessage(), payload)
     message.type = 'file-accepted'
-    message.checksum = checksum
-    message.channel = channel
     fileAccepted[checksum] = true
     socket.send(message)
   }
@@ -444,7 +423,7 @@ function acceptFile({ tag, checksum, channel }) {
  */
 function exit(callback) {
   if (locals.active) {
-    allClients((client) => {
+    each(locals.clients, (client) => {
       client.end()
       client.destroy()
     })
@@ -471,35 +450,71 @@ function peopleLogout(socket) {
   }
 }
 
-function createChannel({ tags, channelName }) {
-  const channel = md5.dataSync(channelName + locals.address + locals.port + Math.random())
-  const message = getMessage()
-  message.type = 'channel'
-  message.channel = channel
-  message.users = getUserFullInfos(tags)
+// function createChannel({ tags, channelName }) {
+// generate infos
+// const key = md5.dataSync(channelName + locals.address + locals.port + Math.random())
+// const channel = {
+//   key,
+//   name: channelName,
+//   users: getUserFullInfos(tags),
+// }
 
-  eachSocket(tags, (socket) => {
+// save locals and emit event
+// }
+
+function createChannel(opts) {
+  // send message
+  const { payload, tags } = opts
+  const message = Object.assign(getMessage(), payload)
+  message.type = 'channel-create'
+
+  each(locals.clients, tags, (socket) => {
     socket.send(message)
   })
 }
 
-function eachSocket(tags, callback) {
-  tags.forEach((tag) => {
-    const socket = locals.clients[tag]
-    if (socket) {
-      callback(socket)
+function sendFile({ checksum, port, host, tag, username, channel }) {
+  fileModule.send(checksum, { port, host }, (e, filename) => {
+    if (e) {
+      const errMsg = e.message
+      logger.err('file-send-fail', filename, errMsg)
+      emitter.emit('file-send-fail', {
+        tag,
+        username,
+        filename,
+        checksum,
+        channel,
+        errMsg,
+      })
+    } else {
+      emitter.emit('file-sent', { tag, username, filename, checksum, channel })
     }
   })
+}
+
+function handleChannelCreate({ tag, key, channel }) {
+  emitter.emit('channel-create', { tag, key, channel })
+  if (tag) {
+    const ipset = ipSet()
+    each(channel.users, ({ host, port }) => {
+      ipset.add(host, port)
+    })
+    each(locals.clients, ({ info: { host, port } }) => {
+      ipset.remove(host, port)
+    })
+    connect(ipset)
+  }
 }
 
 Object.assign(emitter, {
   locals,
   setup,
   exit,
-  getUserInfos,
+  getOnlineUser,
   textToUsers,
   sendFileToUsers,
   acceptFile,
   emitter,
   connectServers,
+  createChannel,
 })

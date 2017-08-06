@@ -1,5 +1,5 @@
 const getTag = require('./getTag')
-const getPort = require('./utils/get-port')
+const getPort = require('utils/get-port')
 const ip = require('ip')
 
 /**

@@ -1,0 +1,8 @@
+{
+  "extends": [
+    "dgeibi/preact"
+  ],
+  "rules": {
+    "import/no-extraneous-dependencies": "off"
+  }
+}

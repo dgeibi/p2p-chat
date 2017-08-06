@@ -1,8 +1,8 @@
 /**
  * IP-Port set
  */
-function ipSet() {
-  let store = {}
+function ipSet(initalStore) {
+  let store = initalStore || {}
 
   /**
    * add address to ipset
@@ -43,8 +43,8 @@ function ipSet() {
   /**
    * reset ipset
    */
-  function reset() {
-    store = {}
+  function reset(s) {
+    store = s || {}
   }
 
   /**
@@ -64,12 +64,17 @@ function ipSet() {
     })
   }
 
+  function getStore() {
+    return store
+  }
+
   return {
     add,
     remove,
     has,
     reset,
     forEach,
+    getStore,
   }
 }
 

@@ -9,9 +9,9 @@ function getParts(parts, zero = true) {
  * @param {string} host
  * @returns {string}
  */
-function getNewHost(host) {
+function getNewAddress(host) {
   const parts = host.split('.').map(Number)
   return getParts(parts, false).join('.')
 }
 
-module.exports = getNewHost
+module.exports = getNewAddress

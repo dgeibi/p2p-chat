@@ -1,4 +1,4 @@
-const md5 = require('./utils/md5')
+const md5 = require('utils/md5')
 
 /**
  * Get tag according to port, host, username

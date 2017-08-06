@@ -1,0 +1,31 @@
+section {
+  &:hover {
+    background: #11e;
+  }
+
+  & > input:checked {
+
+  }
+
+  & > input {
+    visibility: hidden;
+  }
+
+  & > input:checked + label {
+  }
+}
+  &:hover {
+    background: #11e;
+  }
+
+  & > input:checked {
+
+  }
+
+  & > input {
+
+  }
+
+  & > input:checked + label {
+
+  }

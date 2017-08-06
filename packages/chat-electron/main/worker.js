@@ -1,4 +1,4 @@
-const chat = require('../chat')
+const chat = require('chat')
 const logger = require('logger')
 
 const send = (key, ...args) => {
@@ -24,14 +24,13 @@ process.on('uncaughtException', (err) => {
 // front to back
 process.on('message', (message) => {
   const { key, args } = message
+  const [opts] = args
   switch (key) {
     case 'change-setting': {
-      const [opts] = args
       chat.connectServers(opts)
       break
     }
     case 'setup': {
-      const [opts] = args
       chat.setup(opts, (err, id) => {
         if (err) logger.err(err, 'setup fail')
         const errMsg = err ? err.message : null
@@ -48,31 +47,25 @@ process.on('message', (message) => {
       break
     }
     case 'local-text': {
-      const [{ text, tags }] = args
-      chat.textToUsers(tags, text)
+      chat.textToUsers(opts)
       break
     }
     case 'local-file': {
-      const [{ filepath, tags }] = args
-      chat.sendFileToUsers(tags, filepath)
+      chat.sendFileToUsers(opts)
       break
     }
     case 'accept-file': {
-      const [{ tag, checksum }] = args
-      chat.acceptFile(tag, checksum)
+      chat.acceptFile(opts)
+      break
+    }
+    case 'channel-create': {
+      // @TODO
+      chat.createChannel(opts)
       break
     }
     default:
       break
   }
-})
-
-chat.on('login', ({ tag, username }) => {
-  send('people-login', { users: chat.getUserInfos(), tag, username })
-})
-
-chat.on('logout', ({ tag, username }) => {
-  send('people-logout', { users: chat.getUserInfos(), tag, username })
 })
 
 const backToFront = (key) => {
@@ -82,6 +75,8 @@ const backToFront = (key) => {
 }
 
 backToFront('text')
+backToFront('logout')
+backToFront('login')
 backToFront('fileinfo')
 backToFront('file-receiced')
 backToFront('file-write-fail')

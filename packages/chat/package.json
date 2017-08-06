@@ -1,0 +1,20 @@
+{
+  "name": "chat",
+  "version": "1.2.3",
+  "license": "MIT",
+  "private": true,
+  "description": "a p2p chat app",
+  "main": "index.js",
+  "author": "dgeibi <png.inside@gmail.com> (blog.dgeibi.xyz)",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix ."
+  },
+  "keywords": ["p2p", "socket"],
+  "dependencies": {
+    "fs-extra": "^4.0.0",
+    "ip": "^1.1.5",
+    "logger": "github:dgeibi/logger#305933c",
+    "utils": "^1.0.0"
+  }
+}
