@@ -272,3 +272,7 @@ li {
   width: 0%;
   height: 100%;
 }
+
+.offline {
+  background: tomato;
+}

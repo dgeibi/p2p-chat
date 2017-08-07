@@ -1,4 +1,6 @@
 /* eslint-env browser */
+/* eslint-disable no-param-reassign */
+
 import { ipcRenderer, shell } from 'electron'
 import path from 'path'
 import escapeHTML from 'escape-html'
@@ -20,7 +22,7 @@ const template = {}
 
 const defaultConfig = {
   msgCount: 0,
-  username: 'anonymous',
+  username: null,
   tag: null,
   users: null,
   login: false,
@@ -41,6 +43,7 @@ bindLocal('hostEnd')
 bindLocal('portStart')
 bindLocal('portEnd')
 bindLocal('channel')
+bindLocal('thechannelinput')
 
 Object.defineProperty(local, 'connects', {
   get() {
@@ -77,10 +80,6 @@ const state = {
     updateUsers(local.users)
   },
 
-  get user() {
-    return null
-  },
-
   set users(users) {
     local.users = users
     updateUsers(local.users)
@@ -91,7 +90,18 @@ const state = {
   },
 
   set channels(channels) {
-    document.querySelector('[data-local="channel"]').innerHTML = ''
+    local.channels = channels
+    const strs = Object.values(channels).map(
+      ({ name, key }) => `<option value="${key}">${name}</option>`
+    )
+    strs.unshift('<option value="">默认</option>')
+    document.querySelector('[data-local="channel"]').innerHTML = strs.join('')
+  },
+
+  set channel(channel) {
+    const { key } = channel
+    local.channels[key] = channel
+    state.channels = local.channels
   },
 }
 
@@ -99,7 +109,7 @@ function updateUsers(users) {
   aside.innerHTML = Object.values(users)
     .map(
       user =>
-        `<div>
+        `<div ${user.online ? '' : 'class="offline"'}>
           <input type="checkbox" id="${user.tag}" checked>
           <label for="${user.tag}">${escapeHTML(user.username)}[${formatTag(user.tag)}]</label>
         </div>`
@@ -108,6 +118,22 @@ function updateUsers(users) {
 }
 
 const { writeMonthDay, writeMsg, writeUserMsg, writeErrorMsg } = require('./view/write.js')(view)
+
+document.querySelector('#create-channel').addEventListener('click', () => {
+  const tags = Array.from(aside.querySelectorAll('input[type=checkbox]'))
+    .filter(user => user.checked)
+    .map(user => user.id)
+  ipcRenderer.send('create-channel', { tags, name: local.thechannelinput })
+})
+
+document.querySelector('[data-local="channel"]').addEventListener('change', function onchange() {
+  if (this.value) {
+    const { users } = local.channels[this.value]
+    Array.from(aside.querySelectorAll('input[type=checkbox]')).forEach((node) => {
+      node.checked = !!users[node.id]
+    })
+  }
+})
 
 ipcRenderer.on('logout-reply', (event, { errMsg }) => {
   const success = !errMsg
@@ -127,12 +153,15 @@ ipcRenderer.on('setup-reply', (event, { errMsg, id }) => {
   state.login = success
   if (success) {
     Object.assign(local, id)
+
     const { username, host, port } = id
     const login = true
     important = { username, host, port, login }
     writeMsg('>> 登录成功')
     writeMsg(`>> 你好，${escapeHTML(username)}[${formatTag(local.tag)}].`)
     writeMsg(`>> 你的地址是${host || id.address}:${port}`)
+
+    // set settings
   } else {
     writeErrorMsg('>> 登录失败')
     writeErrorMsg(`>> ${errMsg}`)
@@ -154,8 +183,12 @@ ipcRenderer.on('logout', (event, { tag, username }) => {
   state.user = { tag, username, online: false }
 })
 
-ipcRenderer.on('text', (event, { tag, username, text }) => {
-  writeUserMsg(tag, username, text)
+ipcRenderer.on('text', (event, { tag, username, text, channel }) => {
+  writeUserMsg(tag, username, `${channel || ''} ${text}`)
+})
+
+ipcRenderer.on('channel-create', (events, { channel }) => {
+  state.channel = channel
 })
 
 ipcRenderer.on('fileinfo', (event, { username, tag, filename, id, size }) => {
@@ -252,7 +285,7 @@ chatMsgSubmitBtn.addEventListener('click', (e) => {
   // 1. send text
   const text = textarea.value
   if (text !== '') {
-    writeUserMsg(local.tag, local.username, channel + text)
+    writeUserMsg(local.tag, local.username, `${channel || ''} ${text}`)
     ipcRenderer.send('local-text', { tags, payload: { text, channel } }) // send-text
     textarea.value = '' // empty textarea
   }

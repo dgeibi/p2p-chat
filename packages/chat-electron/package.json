@@ -29,6 +29,7 @@
     "electron-settings": "^3.1.1",
     "emotion": "^7.0.11",
     "escape-html": "^1.0.3",
+    "fs-extra": "^4.0.1",
     "history": "^4.6.3",
     "logger": "github:dgeibi/logger#305933c",
     "preact": "^8.2.1",

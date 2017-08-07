@@ -33,7 +33,6 @@ const locals = {
 const fileAccepted = {}
 
 const getMessage = () => ({
-  type: 'greeting',
   host: locals.address,
   port: locals.port,
   username: locals.username,
@@ -97,7 +96,7 @@ function handleSocket(socket, opts = {}) {
   })
 
   // 连接服务器后，发送信息
-  if (greeting) socket.send(getMessage())
+  if (greeting) socket.send(getGreetingMsg())
 
   // 连接出错，进行下线处理
   socket.on('error', () => {
@@ -115,7 +114,8 @@ function handleSocket(socket, opts = {}) {
     }
 
     // 不符合预期的报文，或者重复连接 -> 断开连接
-    if (session.type !== 'greeting' || locals.clients[tag]) {
+    // locals.clients[tag]
+    if (session.type !== 'greeting') {
       socket.end()
       return
     }
@@ -123,16 +123,15 @@ function handleSocket(socket, opts = {}) {
     // 添加信息，存入 local.clients
     socket.info = Object.assign({ localTag: locals.tag }, session)
     locals.clients[tag] = socket
-
     // 已登录的提示
     logger.verbose(`${username}[${tag}] login.`)
     emitter.emit('login', session)
+
     // channel stuff
 
     // 服务器被连接后，回复信息
     if (reGreeting) {
-      const msg = getMessage()
-      socket.send(msg)
+      socket.send(getGreetingMsg())
     }
 
     // 连接断开后，进行一些处理
@@ -181,7 +180,7 @@ const defaultOpts = {
  * @prop {string} hostEnd address from hostStart to hostEnd
  * @prop {number} portStart
  * @prop {number} portEnd scan from portStart to portEnd
- * @prop {Array<{ port, host }>} connects
+ * @prop {Array<{ port: number, host: string }>} connects
  */
 
 /**
@@ -236,6 +235,8 @@ function setup(options, callback) {
       callback(error)
       return
     }
+    const payload = id.payload || {}
+    id.payload = undefined
     Object.assign(locals, id)
     locals.clients = {}
 
@@ -245,25 +246,25 @@ function setup(options, callback) {
     })
 
     // receive store from opt
-    if (options.payload.ipset) {
-      options.payload.ipset = options.payload.ipsetMerged
-        ? options.payload.ipset
-        : options.payload.ipset.mergeStore(options.payload.ipsetStore)
+    if (payload.ipset) {
+      payload.ipset = payload.ipsetMerged
+        ? payload.ipset
+        : payload.ipset.mergeStore(payload.ipsetStore)
     } else {
-      options.payload.ipset = IPset(options.payload.ipsetStore)
+      payload.ipset = IPset(payload.ipsetStore)
     }
 
     // 2. start listening
-    const { host, port, username, tag } = id
+    const { host, port, username, tag, address } = id
     server.listen({ port, host }, () => {
       locals.server = server
       logger.verbose('>> opened server on', server.address())
       logger.verbose(`>> Hi! ${username}[${tag}]`)
 
       // 3. connect to other servers
-      connectServers(opts.payload)
+      connectServers(payload)
       locals.active = true
-      callback(null, id)
+      callback(null, { host, port, username, tag, address })
     })
   })
 }
@@ -274,7 +275,7 @@ function setup(options, callback) {
  */
 function connectServers(opts) {
   if (!locals.server.listening) return
-
+  opts.ipset = opts.ipset || IPset()
   // 1. 添加指定范围内的地址/端口
   connectRange(opts)
   // 2. 添加分散的地址/端口
@@ -352,19 +353,6 @@ function getOnlineUser() {
   })
   return infos
 }
-
-// function getUserFullInfos(tags) {
-//   // [in electron ]
-//   return pick(
-//     locals.clients,
-//     {
-//       tag: ['info', 'tag'],
-//       host: ['info', 'host'],
-//       port: ['info', 'port'],
-//     },
-//     tags
-//   )
-// }
 
 /**
  * 发送文本
@@ -447,18 +435,6 @@ function peopleLogout(socket) {
   }
 }
 
-// function createChannel({ tags, channelName }) {
-// generate infos
-// const key = md5.dataSync(channelName + locals.address + locals.port + Math.random())
-// const channel = {
-//   key,
-//   name: channelName,
-//   users: getUserFullInfos(tags),
-// }
-
-// save locals and emit event
-// }
-
 function createChannel(opts) {
   // send message
   const { payload, tags } = opts
@@ -494,6 +470,12 @@ function handleChannelCreate({ tag, key, channel }) {
     ipset.remove(host, port)
   })
   connect(ipset)
+}
+
+function getGreetingMsg() {
+  const msg = getMessage()
+  msg.type = 'greeting'
+  return msg
 }
 
 Object.assign(emitter, {

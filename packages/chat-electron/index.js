@@ -7,19 +7,27 @@ const EventEmitter = require('events')
 const logger = require('logger')
 const tick = require('./main/count')()
 require('./main/menu.js')
+const fs = require('fs-extra')
 const pkg = require('./package.json')
 const IPset = require('utils/ipset')
 const each = require('utils/each')
 const md5 = require('utils/md5')
+const pick = require('utils/pick')
+
+const getSettingsDir = require('./main/getSettingsDir')
+const Settings = require('./main/Settings')
 
 const workerEE = new EventEmitter()
 let win
 let worker
 let settings
+let setWrap
 
 const locals = {
   users: null,
   channels: null,
+  settingsDir: null,
+  username: null,
 }
 
 // webpack-dev-server port
@@ -42,13 +50,30 @@ function getIPsetStore(users) {
 
 // renderer events
 ipcMain.on('setup', (event, opts) => {
-  const { users = {}, channels = {} } = locals
+  const oldName = locals.username
+  const newName = opts.username || 'anonymous'
+
+  locals.username = newName
+  opts.username = newName
+
+  if (!settings) {
+    setWrap = Settings(locals)
+    settings = setWrap.getSettings()
+  }
+
+  if (oldName !== null && newName !== oldName) {
+    fs.copySync(settings.file(), path.join(locals.settingsDir, newName))
+  }
+
+  setWrap.setPath()
+  setWrap.sync()
+  const { users, channels } = locals
 
   // to renderer
   event.sender.send('before-setup', { users, channels })
+  opts.payload.ipsetStore = getIPsetStore(users)
 
   // to worker
-  opts.payload.ipsetStore = getIPsetStore(users)
   worker.send({
     key: 'setup',
     args: [opts],
@@ -66,17 +91,23 @@ ipcMain.on('change-setting', (event, payload) => {
 })
 
 ipcMain.on('create-channel', (event, opts) => {
-  // @TODO: do sth with payload, app/frontend
   const { name, tags } = opts
 
   const key = md5.dataSync(name + locals.address + locals.port + Math.random())
   const channel = {
     key,
     name,
-    // users: getUserFullInfos(tags),
+    users: getUserFullInfos(tags),
   }
-  opts.payload = Object.assign(opts.payload, { channel, key })
+  opts.payload = Object.assign({}, opts.payload, { channel, key })
 
+  // store
+  settings.set(`channels.${key}`, channel)
+
+  // to renderer
+  event.sender.send('channel-create', { channel, key })
+
+  // to worker
   worker.send({
     key: 'create-channel',
     args: [opts],
@@ -88,11 +119,16 @@ bypassRendererToWorker('logout')
 bypassRendererToWorker('local-text')
 bypassRendererToWorker('accept-file')
 
+ipcMain.on('logout', () => {
+  locals.username = null
+  locals.channels = null
+  locals.users = null
+})
+
 // worker events
 workerEE.on('setup-reply', ({ errMsg, id }) => {
   if (!errMsg) {
     const { username } = id
-    settings.set('self', id)
     win.setTitle(`${username}[${id.tag.slice(0, 5)}] - ${pkg.name}`)
   }
 })
@@ -111,8 +147,8 @@ process.on('exit', () => {
 })
 
 app.on('ready', () => {
-  settings = require('./main/createSettings.js')(locals) // eslint-disable-line global-require
   createWindow()
+  locals.settingsDir = getSettingsDir()
 })
 
 app.on('window-all-closed', () => {
@@ -199,4 +235,16 @@ function bypassRendererToWorker(key) {
       args,
     })
   })
+}
+
+function getUserFullInfos(tags) {
+  return pick(
+    locals.users,
+    {
+      tag: 'tag',
+      host: 'host',
+      port: 'port',
+    },
+    tags
+  )
 }
