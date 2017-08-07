@@ -1,7 +1,7 @@
 /**
  * IP-Port set
  */
-function ipSet(initalStore) {
+function IPset(initalStore) {
   let store = initalStore || {}
 
   /**
@@ -68,6 +68,22 @@ function ipSet(initalStore) {
     return store
   }
 
+  function mergeStore(s) {
+    const ipset = IPset(s)
+    ipset.forEach((host, port) => {
+      add(host, port)
+    })
+  }
+
+  function excludeStore(s) {
+    const ipset = IPset(s)
+    ipset.forEach((host, port) => {
+      if (has(host, port)) {
+        remove(host, port)
+      }
+    })
+  }
+
   return {
     add,
     remove,
@@ -75,7 +91,9 @@ function ipSet(initalStore) {
     reset,
     forEach,
     getStore,
+    mergeStore,
+    excludeStore,
   }
 }
 
-module.exports = ipSet
+module.exports = IPset

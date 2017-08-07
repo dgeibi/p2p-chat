@@ -16,7 +16,7 @@ const isIPLarger = require('utils/is-ip-larger')
 const each = require('utils/each')
 const pick = require('utils/pick')
 
-const ipSet = require('utils/ipset')
+const IPset = require('utils/ipset')
 const login = require('./lib/login')
 const fileModule = require('./lib/file')
 
@@ -203,13 +203,10 @@ function setup(options, callback) {
   if (locals.active) {
     // 保存用户地址/端口到 ipset
     options.payload = options.payload || {}
-    options.payload.ipset = ipSet(options.payload.ipsetStore)
-
-    // should move to electron
-    each(locals.clients, (client) => {
-      const { host, port } = client.info
-      options.payload.ipset.add(host, port)
-    })
+    options.payload.ipset = options.payload.ipset
+      ? options.payload.ipset.mergeStore(options.payload.ipsetStore)
+      : IPset(options.payload.ipsetStore)
+    options.payload.ipsetMerged = true
 
     // 退出后启动
     exit((err) => {
@@ -248,13 +245,13 @@ function setup(options, callback) {
     })
 
     // receive store from opt
-    // opt.users ipset -> connect，include disconnected
-    const ipset = opts.payload.ipset || ipSet()
-    opts.payload.ipset = ipset
-
-    // each(locals.users, ({ port, host }) => {
-    //   ipset.add(host, port)
-    // })
+    if (options.payload.ipset) {
+      options.payload.ipset = options.payload.ipsetMerged
+        ? options.payload.ipset
+        : options.payload.ipset.mergeStore(options.payload.ipsetStore)
+    } else {
+      options.payload.ipset = IPset(options.payload.ipsetStore)
+    }
 
     // 2. start listening
     const { host, port, username, tag } = id
@@ -473,37 +470,30 @@ function createChannel(opts) {
   })
 }
 
-function sendFile({ checksum, port, host, tag, username, channel }) {
+function sendFile(message) {
+  const { checksum, port, host } = message
   fileModule.send(checksum, { port, host }, (e, filename) => {
+    const payload = Object.assign({}, message)
     if (e) {
-      const errMsg = e.message
-      logger.err('file-send-fail', filename, errMsg)
-      emitter.emit('file-send-fail', {
-        tag,
-        username,
-        filename,
-        checksum,
-        channel,
-        errMsg,
-      })
+      payload.errMsg = e.message
+      logger.err('file-send-fail', filename, payload.errMsg)
+      emitter.emit('file-send-fail', payload)
     } else {
-      emitter.emit('file-sent', { tag, username, filename, checksum, channel })
+      emitter.emit('file-sent', payload)
     }
   })
 }
 
 function handleChannelCreate({ tag, key, channel }) {
   emitter.emit('channel-create', { tag, key, channel })
-  if (tag) {
-    const ipset = ipSet()
-    each(channel.users, ({ host, port }) => {
-      ipset.add(host, port)
-    })
-    each(locals.clients, ({ info: { host, port } }) => {
-      ipset.remove(host, port)
-    })
-    connect(ipset)
-  }
+  const ipset = IPset()
+  each(channel.users, ({ host, port }) => {
+    ipset.add(host, port)
+  })
+  each(locals.clients, ({ info: { host, port } }) => {
+    ipset.remove(host, port)
+  })
+  connect(ipset)
 }
 
 Object.assign(emitter, {

@@ -58,8 +58,7 @@ process.on('message', (message) => {
       chat.acceptFile(opts)
       break
     }
-    case 'channel-create': {
-      // @TODO
+    case 'create-channel': {
       chat.createChannel(opts)
       break
     }
@@ -68,21 +67,22 @@ process.on('message', (message) => {
   }
 })
 
-const backToFront = (key) => {
+const bypassChatToMain = (key) => {
   chat.on(key, (...args) => {
     send(key, ...args)
   })
 }
 
-backToFront('text')
-backToFront('logout')
-backToFront('login')
-backToFront('fileinfo')
-backToFront('file-receiced')
-backToFront('file-write-fail')
-backToFront('file-sent')
-backToFront('file-send-fail')
-backToFront('file-unable-to-send')
-backToFront('file-process-start')
-backToFront('file-processing')
-backToFront('file-process-done')
+bypassChatToMain('text')
+bypassChatToMain('logout')
+bypassChatToMain('login')
+bypassChatToMain('fileinfo')
+bypassChatToMain('file-receiced')
+bypassChatToMain('file-write-fail')
+bypassChatToMain('file-sent')
+bypassChatToMain('file-send-fail')
+bypassChatToMain('file-unable-to-send')
+bypassChatToMain('file-process-start')
+bypassChatToMain('file-processing')
+bypassChatToMain('file-process-done')
+bypassChatToMain('channel-create')
