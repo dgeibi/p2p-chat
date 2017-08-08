@@ -262,7 +262,7 @@ function setup(options, callback) {
 
     // 1. create server, sending data
     const server = net.createServer((socket) => {
-      handleSocket(socket, { reGreeting: true })
+      handleSocket(socket)
     })
 
     // receive store from opt
@@ -448,7 +448,10 @@ function exit(callback) {
  */
 function peopleLogout(socket) {
   const { username, tag, localTag } = socket.info || {}
-  if (socket === locals.clients[tag] && localTag === locals.tag) {
+  if (localTag === locals.tag) {
+    if (locals.clients[tag] && locals.clients[tag].destroyed === false) {
+      locals.clients[tag].destroy()
+    }
     delete locals.clients[tag]
     logger.verbose(`${username}[${tag}] logout.`)
     emitter.emit('logout', { tag, username })

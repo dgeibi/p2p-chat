@@ -57,8 +57,3 @@ typings/
 # dotenv environment variables file
 .env
 
-/Downloads
-/release-builds
-/dist
-/assets
-/index.html
