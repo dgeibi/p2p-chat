@@ -87,7 +87,7 @@ function handleFile(socket, message) {
  * @param {{greeting: boolean, reGreeting: boolean}} opts
  */
 function handleSocket(socket, opts = {}) {
-  const { reGreeting, greeting } = opts
+  const { greeting } = opts
 
   enhanceSocket({
     socket,
@@ -105,7 +105,7 @@ function handleSocket(socket, opts = {}) {
 
   // 收到第一个报文，一个会话开始
   socket.once('message', (session) => {
-    const { tag, username } = session
+    const { tag, type } = session
 
     // 对发送文件的socket特殊处理
     if (locals.clients[tag] && session.type === 'file' && fileAccepted[session.checksum]) {
@@ -114,55 +114,75 @@ function handleSocket(socket, opts = {}) {
     }
 
     // 不符合预期的报文，或者重复连接 -> 断开连接
-    // locals.clients[tag]
-    if (session.type !== 'greeting') {
-      socket.end()
+    if ((type !== 'greeting' && type !== 'greeting-reply') || locals.clients[tag]) {
+      socket.destroy()
       return
     }
 
-    // 添加信息，存入 local.clients
-    socket.info = Object.assign({ localTag: locals.tag }, session)
-    locals.clients[tag] = socket
-    // 已登录的提示
+    // 回复信息
+    const msg = getMessage()
+    msg.type = 'greeting-reply'
+    socket.send(msg)
+
+    if (type === 'greeting') {
+      waitReply(socket, session)
+    } else {
+      bindSocket(socket, session)
+    }
+  })
+}
+
+function waitReply(socket, preSession) {
+  socket.once('message', (session) => {
+    const { type, tag } = session
+    if (type !== 'greeting-reply' || preSession.tag !== tag) {
+      socket.destroy()
+      return
+    }
+    bindSocket(socket, session)
+  })
+}
+
+function bindSocket(socket, session) {
+  const { username, tag } = session
+
+  // 添加信息，存入 local.clients
+  socket.info = Object.assign({ localTag: locals.tag }, session)
+  // 已登录的提示
+  if (!locals.clients[tag]) {
     logger.verbose(`${username}[${tag}] login.`)
     emitter.emit('login', session)
+  }
+  locals.clients[tag] = socket
 
-    // channel stuff
+  // 连接断开后，进行一些处理
+  socket.on('end', () => {
+    peopleLogout(socket)
+  })
 
-    // 服务器被连接后，回复信息
-    if (reGreeting) {
-      socket.send(getGreetingMsg())
-    }
-
-    // 连接断开后，进行一些处理
-    socket.on('end', () => {
-      peopleLogout(socket)
-    })
-
-    // 处理报文
-    socket.on('message', (message) => {
-      switch (message.type) {
-        case 'fileinfo': {
-          message.id = `${message.checksum}.${process.uptime()}`
-          emitter.emit('fileinfo', message)
-          break
-        }
-        case 'text': {
-          emitter.emit('text', message)
-          break
-        }
-        case 'file-accepted': {
-          sendFile(message)
-          break
-        }
-        case 'channel-create': {
-          handleChannelCreate(message)
-          break
-        }
-        default:
-          break
+  // 处理报文
+  socket.on('message', (message) => {
+    switch (message.type) {
+      case 'fileinfo': {
+        message.id = `${message.checksum}.${process.uptime()}`
+        emitter.emit('fileinfo', message)
+        break
       }
-    })
+      case 'text': {
+        emitter.emit('text', message)
+        break
+      }
+      case 'file-accepted': {
+        sendFile(message)
+        break
+      }
+      case 'channel-create': {
+        handleChannelCreate(message)
+        break
+      }
+      default:
+        break
+    }
   })
 }
 
@@ -428,7 +448,7 @@ function exit(callback) {
  */
 function peopleLogout(socket) {
   const { username, tag, localTag } = socket.info || {}
-  if (localTag === locals.tag) {
+  if (socket === locals.clients[tag] && localTag === locals.tag) {
     delete locals.clients[tag]
     logger.verbose(`${username}[${tag}] logout.`)
     emitter.emit('logout', { tag, username })

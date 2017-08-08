@@ -91,12 +91,12 @@ ipcMain.on('change-setting', (event, payload) => {
 })
 
 ipcMain.on('create-channel', (event, opts) => {
-  const { name, tags } = opts
-
-  const key = md5.dataSync(name + locals.address + locals.port + Math.random())
+  const { tags } = opts
+  opts.name = opts.name || 'default'
+  const key = md5.dataSync(opts.name + Math.random())
   const channel = {
     key,
-    name,
+    name: opts.name,
     users: getUserFullInfos(tags),
   }
   opts.payload = Object.assign({}, opts.payload, { channel, key })
