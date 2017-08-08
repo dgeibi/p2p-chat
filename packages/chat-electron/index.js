@@ -14,7 +14,7 @@ const each = require('utils/each')
 const md5 = require('utils/md5')
 const pick = require('utils/pick')
 
-const getSettingsDir = require('./main/getSettingsDir')
+const getDir = require('./main/getDir')
 const Settings = require('./main/Settings')
 
 const workerEE = new EventEmitter()
@@ -55,6 +55,7 @@ ipcMain.on('setup', (event, opts) => {
 
   locals.username = newName
   opts.username = newName
+  opts.downloadDir = locals.downloadDir
 
   if (!settings) {
     setWrap = Settings(locals)
@@ -94,10 +95,16 @@ ipcMain.on('create-channel', (event, opts) => {
   const { tags } = opts
   opts.name = opts.name || 'default'
   const key = md5.dataSync(opts.name + Math.random())
+  const users = getUserFullInfos(tags)
+  users[locals.tag] = {
+    tag: locals.tag,
+    host: locals.host,
+    port: locals.port,
+  }
   const channel = {
     key,
+    users,
     name: opts.name,
-    users: getUserFullInfos(tags),
   }
   opts.payload = Object.assign({}, opts.payload, { channel, key })
 
@@ -128,7 +135,10 @@ ipcMain.on('logout', () => {
 // worker events
 workerEE.on('setup-reply', ({ errMsg, id }) => {
   if (!errMsg) {
-    const { username } = id
+    const { username, address, port, host, tag } = id
+    locals.host = host || address
+    locals.port = port
+    locals.tag = tag
     win.setTitle(`${username}[${id.tag.slice(0, 5)}] - ${pkg.name}`)
   }
 })
@@ -148,7 +158,7 @@ process.on('exit', () => {
 
 app.on('ready', () => {
   createWindow()
-  locals.settingsDir = getSettingsDir()
+  Object.assign(locals, getDir())
 })
 
 app.on('window-all-closed', () => {

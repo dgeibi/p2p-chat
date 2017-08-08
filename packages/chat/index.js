@@ -27,6 +27,7 @@ const locals = {
   address: null,
   tag: null,
   username: null,
+  downloadDir: 'Downloads',
 }
 
 // 已经确认接收的文件
@@ -92,7 +93,7 @@ function handleSocket(socket, opts = {}) {
   enhanceSocket({
     socket,
     parse: true,
-    dirname: path.resolve('Downloads', locals.username),
+    dirname: path.resolve(locals.downloadDir, locals.username),
   })
 
   // 连接服务器后，发送信息

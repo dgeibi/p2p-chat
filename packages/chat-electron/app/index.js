@@ -184,7 +184,7 @@ ipcRenderer.on('logout', (event, { tag, username }) => {
 })
 
 ipcRenderer.on('text', (event, { tag, username, text, channel }) => {
-  writeUserMsg(tag, username, `${channel || ''} ${text}`)
+  writeUserMsg(tag, username, `${getChannelName(channel)} ${text}`)
 })
 
 ipcRenderer.on('channel-create', (events, { channel }) => {
@@ -285,7 +285,7 @@ chatMsgSubmitBtn.addEventListener('click', (e) => {
   // 1. send text
   const text = textarea.value
   if (text !== '') {
-    writeUserMsg(local.tag, local.username, `${channel || ''} ${text}`)
+    writeUserMsg(local.tag, local.username, `${getChannelName(channel)} ${text}`)
     ipcRenderer.send('local-text', { tags, payload: { text, channel } }) // send-text
     textarea.value = '' // empty textarea
   }
@@ -356,3 +356,9 @@ document.querySelector('#connects .btn.add').addEventListener('click', (e) => {
   const connectList = e.target.nextElementSibling
   addConnect(connectList)
 })
+
+function getChannelName(channel) {
+  if (!local.channels) return ''
+  if (!local.channels[channel]) return ''
+  return local.channels[channel].name || ''
+}
