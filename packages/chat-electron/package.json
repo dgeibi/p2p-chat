@@ -8,8 +8,8 @@
   "scripts": {
     "start": "webpack-dev-server",
     "start:local": "electron .",
-    "dist": "build",
-    "dist:wl": "build -wl",
+    "builder": "build -wl",
+    "dist": "run-s webpack builder",
     "webpack": "webpack --env.production",
     "format": "prettier-eslint --write '**/*.js'",
     "lint:js": "eslint .",
