@@ -1,7 +1,7 @@
 {
   "name": "p2p-chat",
   "version": "1.0.0",
-  "description": "",
+  "description": "a p2p chat app",
   "main": "index.js",
   "devDependencies": {
     "eslint": "^4.4.0",
@@ -15,7 +15,9 @@
     "prettier-eslint-cli": "^4.1.1"
   },
   "scripts": {
-    "install": "lerna bootstrap",
+    "prepare": "lerna bootstrap",
+    "dist": "lerna run dist",
+    "start": "lerna run start",
     "format": "prettier-eslint --write '**/*.js'",
     "lint": "eslint ."
   },
@@ -23,8 +25,8 @@
     "type": "git",
     "url": "git+https://github.com/dgeibi/p2p-chat.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "dgeibi",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/dgeibi/p2p-chat/issues"
   },
