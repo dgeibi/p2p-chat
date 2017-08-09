@@ -18,10 +18,7 @@ class Parse extends EventEmitter {
   }
 
   submitMsg() {
-    if (!this.msg) {
-      this.emit('error', Error('message not found'))
-      return
-    }
+    if (!this.msg) throw Error('message not found')
     this.socket.emit('message', this.msg)
     this.msg = null
   }
@@ -35,7 +32,7 @@ class Parse extends EventEmitter {
     }
   }
 
-  handleBodyStart(buffer) {
+  transformBody(buffer) {
     if (buffer.byteLength > this.bodyLeft) {
       // has head start
       const data = buffer.slice(0, this.bodyLeft)
@@ -78,8 +75,8 @@ class Parse extends EventEmitter {
       const now = process.uptime()
       let speed = (lastLeft - this.bodyLeft) / (now - pass)
 
-      if (speed > 1000000) speed = `${speed / 1000000} MB/s`
-      else if (speed > 1000) speed = `${speed / 1000} KB/s`
+      if (speed > 1e6) speed = `${speed / 1e6} MB/s`
+      else if (speed > 1e3) speed = `${speed / 1e3} KB/s`
       else speed = `${speed} B/s`
 
       lastLeft = this.bodyLeft
@@ -107,39 +104,35 @@ class Parse extends EventEmitter {
     if (this.bodyLeft <= 0) {
       // receive head first
       const idx = chunk.indexOf('\n')
-      if (idx >= 0) {
-        // find a part of head ending with \n
-        const first = chunk.slice(0, idx)
-        this.headCaches.push(first)
-        this.msg = parseChunks(this.headCaches)
-        this.headCaches = [] // empty cache
-        if (this.msg) {
-          this.bodyLeft = this.msg.bodyLength || 0
-          if (idx + 1 < chunk.byteLength) {
-            // has extra
-            const second = chunk.slice(idx + 1)
-            if (this.bodyLeft === 0) {
-              this.submitMsg()
-              this.transform(second)
-            } else {
-              this.processStart()
-              this.handleBodyStart(second)
-            }
-          } else if (this.bodyLeft === 0) {
-            this.submitMsg()
-          }
-        } else {
-          this.emit('error', Error('fail to parse chunks'))
-        }
-      } else {
-        // cannot find \n, cache head
-        this.headCaches.push(chunk)
-      }
+      if (idx >= 0) this.transformHead(chunk, idx)
+      else this.headCaches.push(chunk)
     } else {
-      if (this.msg && this.bodyLeft === this.msg.bodyLength) {
-        this.processStart()
-      }
-      this.handleBodyStart(chunk)
+      if (this.msg && this.bodyLeft === this.msg.bodyLength) this.processStart()
+      this.transformBody(chunk)
+    }
+  }
+
+  transformHead(chunk, index) {
+    const first = chunk.slice(0, index)
+    this.headCaches.push(first)
+    this.msg = parseChunks(this.headCaches)
+    this.headCaches = [] // empty cache
+    if (!this.msg) throw Error('fail to parse chunks')
+
+    this.bodyLeft = this.msg.bodyLength || 0
+    const notHaveBody = this.bodyLeft === 0
+
+    if (notHaveBody) this.submitMsg()
+
+    /* nothing left */
+    if (index + 1 >= chunk.byteLength) return
+
+    const left = chunk.slice(index + 1)
+    if (notHaveBody) {
+      this.transform(left)
+    } else {
+      this.processStart()
+      this.transformBody(left)
     }
   }
 }
