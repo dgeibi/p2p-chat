@@ -15,7 +15,7 @@
     "lint:js": "eslint .",
     "lint:css": "stylelint './app/components/**/*.js'",
     "lint": "run-p lint:*",
-    "prepare": "run-p webpack"
+    "postinstall": "run-p webpack"
   },
   "keywords": [
     "electron-app",

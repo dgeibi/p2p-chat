@@ -15,7 +15,7 @@
     "prettier-eslint-cli": "^4.1.1"
   },
   "scripts": {
-    "prepare": "lerna bootstrap",
+    "postinstall": "lerna bootstrap",
     "dist": "lerna run dist",
     "start": "lerna run start",
     "format": "prettier-eslint --write '**/*.js'",
