@@ -1,6 +1,6 @@
 {
   "name": "chat-electron",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "license": "MIT",
   "description": "a p2p chat app",
   "main": "index.js",
@@ -32,8 +32,9 @@
     "fs-extra": "^4.0.1",
     "history": "^4.6.3",
     "logger": "github:dgeibi/logger#305933c",
-    "preact": "^8.2.1",
-    "preact-redux": "^2.0.2",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-redux": "^5.0.6",
     "react-router": "^4.1.2",
     "react-router-redux": "^5.0.0-alpha.6",
     "redux": "^3.7.2",
@@ -44,13 +45,20 @@
     "babel-eslint": "^7.2.3",
     "babel-loader": "^7.1.1",
     "babel-preset-env": "^1.6.0",
+    "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "css-loader": "^0.28.4",
     "electron": "^1.6.10",
     "electron-builder": "^18.3.5",
+    "eslint": "^4.4.1",
+    "eslint-config-airbnb-base": "^11.3.1",
+    "eslint-config-dgeibi": "^3.0.1",
+    "eslint-config-standard-react": "^5.0.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-no-async-without-await": "^1.2.0",
+    "eslint-plugin-react": "^7.2.0",
     "html-webpack-plugin": "^2.30.1",
     "npm-run-all": "^4.0.2",
-    "preact-render-to-string": "^3.6.3",
     "prettier-eslint-cli": "^4.1.1",
     "style-loader": "^0.18.2",
     "stylelint": "^8.0.0",
@@ -97,7 +105,8 @@
           "useBuiltIns": true
         }
       ],
-      "stage-0"
+      "stage-0",
+      "react"
     ],
     "plugins": [
       "emotion/babel"
