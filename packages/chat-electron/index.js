@@ -215,7 +215,6 @@ function createWindow() {
   const urlObj = Object.assign(
     {
       slashes: true,
-      hash: 'settings',
     },
     locals.devPort
       ? {

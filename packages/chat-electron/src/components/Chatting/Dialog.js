@@ -1,4 +1,4 @@
-import { h, Component } from 'preact'
+import React, { Component } from 'react'
 import Messages from './Messages'
 
 class Dialog extends Component {

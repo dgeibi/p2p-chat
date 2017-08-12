@@ -2,14 +2,15 @@ import getConstants from '../../utils/constants'
 
 const initialState = {}
 
-const TYPES = getConstants('CHATTING', [
-  'FILE_INFO',
-  'FILE_START',
-  'FILE_PROCESSING',
-  'FILE_END',
-  'FILE_FAIL',
-  'FILE_DONE',
-])
+const TYPES = {
+  FILE_INFO: '',
+  FILE_START: '',
+  FILE_PROCESSING: '',
+  FILE_END: '',
+  FILE_FAIL: '',
+  FILE_DONE: '',
+}
+getConstants(TYPES, 'CHATTING')
 
 export default function filePanel(state = initialState, action) {
   switch (action.type) {
@@ -21,10 +22,6 @@ export default function filePanel(state = initialState, action) {
   }
 }
 
-export function init() {
-
-}
-export function test() {
-
-}
+export function init() {}
+export function test() {}
 // export function

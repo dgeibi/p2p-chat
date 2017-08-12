@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import React, { Component } from 'react'
 
 class Messages extends Component {
@@ -14,7 +12,7 @@ class Messages extends Component {
 }
 
 function mapper(msg) {
-  const { id, type, payload } = msg
+  const { type, payload } = msg
   if (payload.error) return <ErrorMessage message={payload.error} />
   switch (type) {
     case 'text':
@@ -22,7 +20,7 @@ function mapper(msg) {
     case 'file:send':
       return <FileSend {...payload} />
     default:
-      break
+      return ''
   }
 }
 

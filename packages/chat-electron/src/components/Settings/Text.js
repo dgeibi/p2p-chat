@@ -1,8 +1,8 @@
-import { h } from 'preact'
+import React, { Component } from 'react'
 
 export default props =>
   <input
-    type='text'
+    type="text"
     css={`
     &:hover {
       color: green;

@@ -1,26 +1,24 @@
-/* eslint-disable */
-import React, { Component } from 'react'
+import React from 'react'
 import { render } from 'react-dom'
 import { ipcRenderer } from 'electron'
-import { store, history } from './redux'
 import { Provider } from 'react-redux'
 import { Route, Switch } from 'react-router-dom'
 import { ConnectedRouter as Router } from 'react-router-redux'
+import Settings from './components/Settings'
+import { store, history } from './redux'
 
 render(
   <Provider store={store}>
     <Router history={history}>
-      <Frame>
-        <Switch>
-          <Route path="/detail/:id" component={Detail} />
-          <Route path="/" component={Home} />
-        </Switch>
-      </Frame>
+      <Switch>
+        <Route path="/" component={Settings} />
+      </Switch>
     </Router>
   </Provider>,
-  docuement.querySelector('#root')
+  document.querySelector('#root')
 )
 
+/*
 // global
 ipcRenderer.on('logout-reply', (event, { errMsg }) => {
   if (errMsg) {
@@ -45,6 +43,8 @@ ipcRenderer.on('before-setup', (event, { users, channels }) => {
 ipcRenderer.on('bg-err', (event, { errMsg }) => {
   store.dispatch(showErrorPage(errMsg))
 })
+
+*/
 
 /* after create: Frame aside chattinglist */
 // ipcRenderer.on('login', (event, { tag, username }) => {

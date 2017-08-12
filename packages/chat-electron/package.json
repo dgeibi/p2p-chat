@@ -25,19 +25,9 @@
   ],
   "dependencies": {
     "chat": "^1.2.3",
-    "dateformat": "^2.0.0",
     "electron-settings": "^3.1.1",
-    "emotion": "^7.0.11",
-    "escape-html": "^1.0.3",
     "fs-extra": "^4.0.1",
-    "history": "^4.6.3",
     "logger": "github:dgeibi/logger#305933c",
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1",
-    "react-redux": "^5.0.6",
-    "react-router": "^4.1.2",
-    "react-router-redux": "^5.0.0-alpha.6",
-    "redux": "^3.7.2",
     "utils": "^1.0.0"
   },
   "devDependencies": {
@@ -47,9 +37,13 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
+    "babili-webpack-plugin": "^0.1.2",
     "css-loader": "^0.28.4",
+    "dateformat": "^2.0.0",
     "electron": "^1.6.10",
     "electron-builder": "^18.3.5",
+    "emotion": "^7.0.11",
+    "escape-html": "^1.0.3",
     "eslint": "^4.4.1",
     "eslint-config-airbnb-base": "^11.3.1",
     "eslint-config-dgeibi": "^3.0.1",
@@ -57,9 +51,17 @@
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-no-async-without-await": "^1.2.0",
     "eslint-plugin-react": "^7.2.0",
+    "history": "^4.6.3",
     "html-webpack-plugin": "^2.30.1",
     "npm-run-all": "^4.0.2",
     "prettier-eslint-cli": "^4.1.1",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-redux": "^5.0.6",
+    "react-router": "^4.1.2",
+    "react-router-dom": "^4.1.2",
+    "react-router-redux": "^5.0.0-alpha.6",
+    "redux": "^3.7.2",
     "style-loader": "^0.18.2",
     "stylelint": "^8.0.0",
     "stylelint-config-standard": "^17.0.0",
@@ -67,7 +69,7 @@
     "webpack": "^3.4.1",
     "webpack-dev-server": "^2.6.1",
     "webpack-node-externals": "^1.6.0",
-    "wtf-webpack-config": "0.0.1"
+    "wtf-webpack-config": "^0.1.1"
   },
   "build": {
     "appId": "xyz.dgeibi.p2pchat",
@@ -77,7 +79,7 @@
       "!webpack.config.js",
       "!package-lock.json",
       "!app/**",
-      "!chat/node_modules/logger/**"
+      "!src/**"
     ],
     "mac": {
       "category": "public.app-category.social-networking"
