@@ -31,9 +31,12 @@
     "utils": "^1.0.0"
   },
   "devDependencies": {
+    "antd": "^2.12.6",
     "babel-core": "^6.25.0",
     "babel-eslint": "^7.2.3",
     "babel-loader": "^7.1.1",
+    "babel-plugin-import": "^1.3.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.0",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
@@ -53,6 +56,8 @@
     "eslint-plugin-react": "^7.2.0",
     "history": "^4.6.3",
     "html-webpack-plugin": "^2.30.1",
+    "less": "^2.7.2",
+    "less-loader": "^4.0.5",
     "npm-run-all": "^4.0.2",
     "prettier-eslint-cli": "^4.1.1",
     "react": "^15.6.1",
@@ -68,7 +73,6 @@
     "stylelint-processor-styled-components": "^0.2.1",
     "webpack": "^3.4.1",
     "webpack-dev-server": "^2.6.1",
-    "webpack-node-externals": "^1.6.0",
     "wtf-webpack-config": "^0.1.1"
   },
   "build": {
@@ -111,7 +115,15 @@
       "react"
     ],
     "plugins": [
-      "emotion/babel"
+      "transform-runtime",
+      "emotion/babel",
+      [
+        "import",
+        {
+          "libraryName": "antd",
+          "style": true
+        }
+      ]
     ],
     "env": {
       "test": {

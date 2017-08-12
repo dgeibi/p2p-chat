@@ -5,7 +5,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const babel = require('wtf-webpack-config/rules/js/babel')
 const babili = require('wtf-webpack-config/plugins/babili')
 const devServer = require('./webpack-config/devServer')
-const nodeExternals = require('./webpack-config/nodeExternals')
 const pkg = require('./package.json')
 
 const PUBLIC_PATH = 'assets/'
@@ -38,7 +37,6 @@ module.exports = (env = {}) => {
 
   config
     .use(devServer(), !isProduction)
-    .use(nodeExternals, !isProduction)
     .use(babili(), isProduction)
     .use(
       babel({
@@ -49,6 +47,10 @@ module.exports = (env = {}) => {
       test: /\.css$/,
       use: ['style-loader', 'css-loader'],
       include: defaultInclude,
+    })
+    .rule({
+      test: /\.less$/,
+      use: ['style-loader', 'css-loader', 'less-loader'],
     })
     .plugin(HtmlWebpackPlugin, [
       {
