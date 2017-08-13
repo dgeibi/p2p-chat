@@ -1,56 +1,56 @@
 import { Form, Input, Icon, Button, Col, Modal } from 'antd'
-import React, { Component } from 'react'
+import React from 'react'
 import ipRegex from 'ip-regex'
+import ModalBtn from './ModalBtn'
 
 const InputGroup = Input.Group
 const FormItem = Form.Item
-
-let uuid = 0
-const name = 'connects'
-const formItemLayout = {
-  wrapperCol: { span: 20, offset: 4 },
-}
 
 const CollectForm = Form.create()((props) => {
   const { visible, onCancel, onCreate, form } = props
   const { getFieldDecorator, getFieldValue } = form
 
   const remove = (k) => {
-    const keys = form.getFieldValue(name)
+    const keys = form.getFieldValue(CollectForm.formName)
     if (keys.length === 1) {
       return
     }
     form.setFieldsValue({
-      [name]: keys.filter(key => key !== k),
+      [CollectForm.formName]: keys.filter(key => key !== k),
     })
   }
 
   const add = () => {
-    uuid += 1
-    const keys = form.getFieldValue(name)
-    const nextKeys = keys.concat(uuid)
+    CollectForm.uuid += 1
+    const keys = form.getFieldValue(CollectForm.formName)
+    const nextKeys = keys.concat(CollectForm.uuid)
     form.setFieldsValue({
-      [name]: nextKeys,
+      [CollectForm.formName]: nextKeys,
     })
   }
 
-  getFieldDecorator(name, { initialValue: [] })
-  const keys = getFieldValue(name)
+  getFieldDecorator(CollectForm.formName, { initialValue: [] })
+  const keys = getFieldValue(CollectForm.formName)
+  const addonAfter = k => ({
+    addonAfter:
+      keys.length > 1
+        ? <Icon
+          className="dynamic-delete-button"
+          type="minus-circle-o"
+          disabled={keys.length === 1}
+          onClick={() => remove(k)}
+        />
+        : null,
+  })
   const formItems = keys.map(k =>
     <InputGroup key={k}>
       <Col span={12}>
-        <FormItem {...formItemLayout} required={false}>
+        <FormItem required={false}>
           {getFieldDecorator(`address-${k}`, {
             validateTrigger: ['onChange', 'onBlur'],
             rules: [
               {
-                validator(rule, value, callback) {
-                  if (!value || ipRegex({ exact: true }).test(value)) {
-                    callback()
-                  } else {
-                    callback(Error(`${value} is not a regular IP`))
-                  }
-                },
+                validator: CollectForm.addressValidator,
               },
             ],
           })(<Input placeholder="Address" />)}
@@ -63,34 +63,10 @@ const CollectForm = Form.create()((props) => {
             validateTrigger: ['onChange', 'onBlur'],
             rules: [
               {
-                type: 'integer',
-                transform(value) {
-                  return Math.floor(value)
-                },
-                validator(rule, value, callback) {
-                  if (value < 2000 || value > 59999) {
-                    callback(Error('Port should be a integer (2000~59999)'))
-                    return
-                  }
-                  callback()
-                },
+                validator: CollectForm.portValidator,
               },
             ],
-          })(
-            <Input
-              placeholder="Port"
-              addonAfter={
-                keys.length > 1
-                  ? <Icon
-                    className="dynamic-delete-button"
-                    type="minus-circle-o"
-                    disabled={keys.length === 1}
-                    onClick={() => remove(k)}
-                  />
-                  : null
-              }
-            />
-          )}
+          })(<Input placeholder="Port" {...addonAfter(k)} />)}
         </FormItem>
       </Col>
     </InputGroup>
@@ -117,51 +93,37 @@ const CollectForm = Form.create()((props) => {
   )
 })
 
-class Connect extends Component {
-  state = {
-    visible: false,
-  }
-  showModal = () => {
-    this.setState({ visible: true })
-  }
-  handleCancel = () => {
-    this.setState({ visible: false })
-  }
-  handleCreate = () => {
-    const form = this.form
-    form.validateFields((err, values) => {
-      if (err) {
-        return
-      }
-      const result = values[name].map((i) => {
-        const port = Math.floor(values[`port-${i}`])
-        const address = values[`address-${i}`]
-        return { port, address }
-      })
+CollectForm.formName = 'connects'
+CollectForm.uuid = 0
 
-      console.log('Received values of form: ', result)
-      form.resetFields()
-      this.setState({ visible: false })
-    })
+CollectForm.portValidator = (rule, value, callback) => {
+  const port = Math.floor(value)
+  if (port < 2000 || port > 59999) {
+    callback(Error('Port should be a integer (2000~59999)'))
+    return
   }
-  saveFormRef = (form) => {
-    this.form = form
-  }
-  render() {
-    return (
-      <div>
-        <Button type="primary" onClick={this.showModal}>
-          Connect
-        </Button>
-        <CollectForm
-          ref={this.saveFormRef}
-          visible={this.state.visible}
-          onCancel={this.handleCancel}
-          onCreate={this.handleCreate}
-        />
-      </div>
-    )
+  callback()
+}
+
+CollectForm.addressValidator = (rule, value, callback) => {
+  if (!value || ipRegex({ exact: true }).test(value)) {
+    callback()
+  } else {
+    callback(Error(`${value} is not a regular IP`))
   }
 }
 
-export default Connect
+CollectForm.handleCreate = (form) => {
+  form.validateFields((err, values) => {
+    if (err) return
+    const result = values[CollectForm.formName].map((i) => {
+      const port = Math.floor(values[`port-${i}`])
+      const address = values[`address-${i}`]
+      return { port, address }
+    })
+
+    console.log('Received values of form: ', result)
+  })
+}
+
+export default props => <ModalBtn component={CollectForm} {...props}>Connect</ModalBtn>
