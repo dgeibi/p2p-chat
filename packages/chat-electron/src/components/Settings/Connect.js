@@ -45,7 +45,7 @@ const CollectForm = Form.create()((props) => {
             rules: [
               {
                 validator(rule, value, callback) {
-                  if (ipRegex({ exact: true }).test(value)) {
+                  if (!value || ipRegex({ exact: true }).test(value)) {
                     callback()
                   } else {
                     callback(Error(`${value} is not a regular IP`))
@@ -69,9 +69,7 @@ const CollectForm = Form.create()((props) => {
                 },
                 validator(rule, value, callback) {
                   if (value < 2000 || value > 59999) {
-                    callback(
-                      Error('Port should be a integer (2000~59999)')
-                    )
+                    callback(Error('Port should be a integer (2000~59999)'))
                     return
                   }
                   callback()
