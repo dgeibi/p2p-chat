@@ -72,6 +72,7 @@ ipcMain.on('setup', (event, opts) => {
 
   // to renderer
   event.sender.send('before-setup', { users, channels })
+  opts.payload = opts.payload || {}
   opts.payload.ipsetStore = getIPsetStore(users)
 
   // to worker
