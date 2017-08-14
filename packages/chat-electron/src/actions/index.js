@@ -1,9 +1,24 @@
 /* enf */
 
-export const logout = (params) => {}
+export const logout = () => {}
 
-export const updateSettings = (params) => {}
+export const updateSettings = (id) => {
+  console.log(id)
+  return {
+    type: 'UPDATE_SETTINGS',
+  }
+}
 
-export const setupAside = (params) => {}
+export const setupAside = (users, channels) => {
+  console.log(users, channels)
+  return {
+    type: 'SETUP_ASIDE',
+  }
+}
 
-export const showErrorPage = (params) => {}
+export const showError = (errMsg) => {
+  console.error(errMsg)
+  return {
+    type: 'ERROR',
+  }
+}

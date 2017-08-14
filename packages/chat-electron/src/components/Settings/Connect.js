@@ -1,5 +1,6 @@
 import { Form, Input, Icon, Button, Col, Modal, message } from 'antd'
 import React from 'react'
+import { ipcRenderer } from 'electron'
 import { createModalBtn } from './ModalBtn'
 import { validAddress, validPort } from './validators'
 
@@ -100,16 +101,17 @@ export default createModalBtn(<Icon type="plus" />, (form) => {
       return
     }
 
-    const result = values.keys.map((i) => {
+    const connects = values.keys.map((i) => {
       const port = Math.floor(values[`port-${i}`])
-      const address = values[`address-${i}`]
-      return { port, address }
+      const host = values[`address-${i}`]
+      return { port, host }
     })
 
-    if (result.length <= 0) {
+    if (connects.length <= 0) {
       return
     }
 
-    console.log('Received values of form: ', result)
+    ipcRenderer.send('change-setting', { connects })
+    console.log('Received values of form: ', connects)
   })
 })(CollectForm)

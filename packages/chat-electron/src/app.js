@@ -6,6 +6,7 @@ import { Route, Switch } from 'react-router-dom'
 import { ConnectedRouter as Router } from 'react-router-redux'
 import { store, history } from './redux'
 import Frame from './layouts/Frame'
+import { setupAside, logout, showError, updateSettings } from './actions'
 
 render(
   <Provider store={store}>
@@ -20,7 +21,6 @@ render(
   document.querySelector('#root')
 )
 
-/*
 // global
 ipcRenderer.on('logout-reply', (event, { errMsg }) => {
   if (errMsg) {
@@ -43,10 +43,8 @@ ipcRenderer.on('before-setup', (event, { users, channels }) => {
 })
 
 ipcRenderer.on('bg-err', (event, { errMsg }) => {
-  store.dispatch(showErrorPage(errMsg))
+  store.dispatch(showError(errMsg))
 })
-
-*/
 
 /* after create: Frame aside chattinglist */
 // ipcRenderer.on('login', (event, { tag, username }) => {

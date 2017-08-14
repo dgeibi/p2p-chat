@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Input, Form, Modal, Icon, message } from 'antd'
+import { ipcRenderer } from 'electron'
 import { createModalBtn } from './ModalBtn'
 import { validPort } from './validators'
 
@@ -12,12 +13,12 @@ function FormItem(props) {
 }
 
 @createModalBtn(<Icon type="setting" />, (form) => {
-  form.validateFields((err, values) => {
+  form.validateFields((err, options) => {
     if (err) {
       message.error('Settings Invalid')
       return
     }
-    console.log('Received values of form: ', values)
+    ipcRenderer.send('setup', options)
   })
 })
 @Form.create()

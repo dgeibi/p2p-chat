@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { ipcRenderer } from 'electron'
 import { Input, Form, Modal, Icon, message } from 'antd'
 import { validAddress, validPort } from './validators'
 import { createModalBtn } from './ModalBtn'
@@ -11,6 +12,7 @@ const FormItem = Form.Item
       message.error('Connection Invalid')
       return
     }
+    ipcRenderer.send('change-setting', values)
     console.log('Received values of form: ', values)
   })
 })
