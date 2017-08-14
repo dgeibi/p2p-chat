@@ -24,16 +24,18 @@ export default class ModalBtn extends Component {
     this.form = form
   }
   render() {
+    const { ref, handleCreate, component, onCancel, onCreate, onClick, ...rest } = this.props
     return (
-      <span>
-        <Button onClick={this.showModal} >
-          {this.props.children}
-        </Button>
+      <span style={{
+        marginRight: 8,
+        marginBottom: 12,
+      }}>
+        <Button onClick={compose(this.showModal, onClick)} {...rest} />
         <this.props.component
-          ref={compose(this.saveFormRef, this.props.ref)}
+          ref={compose(this.saveFormRef, ref)}
           visible={this.state.visible}
-          onCancel={compose(this.handleCancel, this.props.onCancel)}
-          onCreate={compose(this.handleCreate, this.props.onCreate)}
+          onCancel={compose(this.handleCancel, onCancel)}
+          onCreate={compose(this.handleCreate, onCreate)}
         />
       </span>
     )

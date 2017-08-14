@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Col, Row } from 'antd'
 import Connect from './Connect'
 import ConnectRange from './ConnectRange'
 import Settings from './Settings'
@@ -9,7 +10,7 @@ class SettingsNav extends Component {
       <div>
         <Settings />
         <Connect />
-        <ConnectRange />
+        <ConnectRange type="dashed" />
       </div>
     )
   }

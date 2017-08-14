@@ -5,7 +5,7 @@ import { createModalBtn } from './ModalBtn'
 
 const FormItem = Form.Item
 
-@createModalBtn(<Icon type="plus-square" />, (form) => {
+@createModalBtn(<Icon type="plus" />, (form) => {
   form.validateFields((err, values) => {
     if (err) {
       message.error('Connection Invalid')
