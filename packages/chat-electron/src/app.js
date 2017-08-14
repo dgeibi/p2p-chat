@@ -4,16 +4,18 @@ import { ipcRenderer } from 'electron'
 import { Provider } from 'react-redux'
 import { Route, Switch } from 'react-router-dom'
 import { ConnectedRouter as Router } from 'react-router-redux'
-import Settings from './components/Settings'
 import { store, history } from './redux'
+import Frame from './layouts/Frame'
 
 render(
   <Provider store={store}>
-    <Router history={history}>
-      <Switch>
-        <Route path="/" component={Settings} />
-      </Switch>
-    </Router>
+    <Frame>
+      <Router history={history}>
+        <Switch>
+          <Route path="/" />
+        </Switch>
+      </Router>
+    </Frame>
   </Provider>,
   document.querySelector('#root')
 )

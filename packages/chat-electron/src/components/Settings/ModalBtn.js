@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Button } from 'antd'
+import compose from '../../utils/compose'
 
 export default class ModalBtn extends Component {
   state = {
@@ -16,9 +17,6 @@ export default class ModalBtn extends Component {
     if (this.props.handleCreate) {
       this.props.handleCreate(form)
     }
-    if (this.props.component.handleCreate) {
-      this.props.component.handleCreate(form)
-    }
     form.resetFields()
     this.setState({ visible: false })
   }
@@ -27,8 +25,8 @@ export default class ModalBtn extends Component {
   }
   render() {
     return (
-      <div>
-        <Button type="primary" onClick={this.showModal}>
+      <span>
+        <Button onClick={this.showModal} >
           {this.props.children}
         </Button>
         <this.props.component
@@ -37,16 +35,12 @@ export default class ModalBtn extends Component {
           onCancel={compose(this.handleCancel, this.props.onCancel)}
           onCreate={compose(this.handleCreate, this.props.onCreate)}
         />
-      </div>
+      </span>
     )
   }
 }
 
-function compose(...fns) {
-  return (...args) =>
-    fns.forEach((x) => {
-      if (x) {
-        x(...args)
-      }
-    })
-}
+export const createModalBtn = (children, handleCreate) => component => props =>
+  <ModalBtn component={component} handleCreate={handleCreate} {...props}>
+    {children}
+  </ModalBtn>

@@ -1,45 +1,18 @@
 import React, { Component } from 'react'
-import { Button, Input, Form } from 'antd'
 import Connect from './Connect'
+import ConnectRange from './ConnectRange'
+import Settings from './Settings'
 
-@Form.create()
-class Settings extends Component {
+class SettingsNav extends Component {
   render() {
-    const { getFieldDecorator } = this.props.form
-
     return (
       <div>
-        <Form>
-          <h3>Login/Settings</h3>
-          <FormItem label="Username">
-            {getFieldDecorator('username', {
-              initialValue: '匿名',
-              rules: [
-                {
-                  required: true,
-                  message: 'Please input your username!',
-                },
-              ],
-            })(<Input />)}
-          </FormItem>
-          <FormItem label="Port">
-            {getFieldDecorator('port', {
-              initialValue: '8087',
-            })(<Input />)}
-          </FormItem>
-        </Form>
+        <Settings />
         <Connect />
+        <ConnectRange />
       </div>
     )
   }
 }
 
-export default Settings
-
-function FormItem(props) {
-  const formItemLayout = {
-    labelCol: { span: 4 },
-    wrapperCol: { span: 14 },
-  }
-  return <Form.Item {...formItemLayout} {...props} />
-}
+export default SettingsNav
