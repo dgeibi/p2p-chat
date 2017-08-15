@@ -1,15 +1,38 @@
-import { Form, Input, Icon, Button, Col, Modal, message } from 'antd'
+import { Form, Input, Icon, Button, Col, Modal } from 'antd'
 import React from 'react'
 import { ipcRenderer } from 'electron'
-import { createModalBtn } from './ModalBtn'
+import { createModalBtn } from '../../utils/ModalBtn'
 import { validAddress, validPort } from './validators'
+import { showError } from '../../utils/message'
 
 const InputGroup = Input.Group
 const FormItem = Form.Item
 
 let uuid = 0
 
-const CollectForm = Form.create()((props) => {
+export const createBtn = createModalBtn(<Icon type="plus" />, (form) => {
+  form.validateFields((err, values) => {
+    if (err) {
+      showError('Connection Invalid')
+      return
+    }
+
+    const connects = values.keys.map((i) => {
+      const port = Math.floor(values[`port-${i}`])
+      const host = values[`address-${i}`]
+      return { port, host }
+    })
+
+    if (connects.length <= 0) {
+      return
+    }
+
+    ipcRenderer.send('change-setting', { connects })
+    console.log('Received values of form: ', connects)
+  })
+})
+
+export const Connect = (props) => {
   const { visible, onCancel, onCreate, form } = props
   const { getFieldDecorator, getFieldValue } = form
 
@@ -92,26 +115,6 @@ const CollectForm = Form.create()((props) => {
       </Form>
     </Modal>
   )
-})
+}
 
-export default createModalBtn(<Icon type="plus" />, (form) => {
-  form.validateFields((err, values) => {
-    if (err) {
-      message.error('Connection Invalid')
-      return
-    }
-
-    const connects = values.keys.map((i) => {
-      const port = Math.floor(values[`port-${i}`])
-      const host = values[`address-${i}`]
-      return { port, host }
-    })
-
-    if (connects.length <= 0) {
-      return
-    }
-
-    ipcRenderer.send('change-setting', { connects })
-    console.log('Received values of form: ', connects)
-  })
-})(CollectForm)
+export default createBtn(Connect)

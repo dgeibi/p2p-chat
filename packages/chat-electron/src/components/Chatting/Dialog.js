@@ -2,6 +2,10 @@ import React, { Component } from 'react'
 import Messages from './Messages'
 
 class Dialog extends Component {
+  componentDidMount() {
+    this.props.fetchMessage(this.props.id)
+  }
+
   render() {
     const { messages } = this.props
     return (

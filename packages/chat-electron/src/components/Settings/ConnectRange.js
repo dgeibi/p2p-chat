@@ -1,23 +1,24 @@
 import React, { Component } from 'react'
 import { ipcRenderer } from 'electron'
-import { Input, Form, Modal, Icon, message } from 'antd'
+import { Input, Form, Modal, Icon } from 'antd'
 import { validAddress, validPort } from './validators'
-import { createModalBtn } from './ModalBtn'
+import { createModalBtn } from '../../utils/ModalBtn'
+import { showError } from '../../utils/message'
 
 const FormItem = Form.Item
 
-@createModalBtn(<Icon type="plus" />, (form) => {
+export const createBtn = createModalBtn(<Icon type="plus" />, (form) => {
   form.validateFields((err, values) => {
     if (err) {
-      message.error('Connection Invalid')
+      showError('Connection Invalid')
       return
     }
     ipcRenderer.send('change-setting', values)
     console.log('Received values of form: ', values)
   })
 })
-@Form.create()
-class ConnectRange extends Component {
+
+export class ConnectRange extends Component {
   render() {
     const { visible, onCancel, onCreate } = this.props
     const { getFieldDecorator } = this.props.form
@@ -82,4 +83,4 @@ class ConnectRange extends Component {
   }
 }
 
-export default ConnectRange
+export default createBtn(ConnectRange)

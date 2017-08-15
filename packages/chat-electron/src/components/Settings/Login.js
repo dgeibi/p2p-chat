@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import { Input, Form, Modal, Icon, message } from 'antd'
+import { Input, Form, Modal, Icon } from 'antd'
 import { ipcRenderer } from 'electron'
-import { createModalBtn } from './ModalBtn'
 import { validPort } from './validators'
+import { createModalBtn } from '../../utils/ModalBtn'
+import { showError } from '../../utils/message'
 
 function FormItem(props) {
   const formItemLayout = {
@@ -12,17 +13,20 @@ function FormItem(props) {
   return <Form.Item {...formItemLayout} {...props} />
 }
 
-@createModalBtn(<Icon type="setting" />, (form) => {
+const children = <Icon type="setting" />
+const validator = (form) => {
   form.validateFields((err, options) => {
     if (err) {
-      message.error('Settings Invalid')
+      showError('Settings Invalid')
       return
     }
     ipcRenderer.send('setup', options)
   })
-})
-@Form.create()
-class Settings extends Component {
+}
+
+export const createConnectedBtn = enhancer => createModalBtn(children, validator, enhancer)
+
+export class Login extends Component {
   render() {
     const { getFieldDecorator } = this.props.form
     const { visible, onCancel, onCreate } = this.props
@@ -39,7 +43,7 @@ class Settings extends Component {
         <Form>
           <FormItem label="Username">
             {getFieldDecorator('username', {
-              initialValue: 'anonymous',
+              initialValue: this.props.username,
               rules: [
                 {
                   required: true,
@@ -50,7 +54,7 @@ class Settings extends Component {
           </FormItem>
           <FormItem label="Port">
             {getFieldDecorator('port', {
-              initialValue: '8087',
+              initialValue: this.props.port,
               rules: [
                 {
                   required: true,
@@ -66,5 +70,3 @@ class Settings extends Component {
     )
   }
 }
-
-export default Settings

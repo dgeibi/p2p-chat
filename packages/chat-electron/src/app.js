@@ -6,7 +6,9 @@ import { Route, Switch } from 'react-router-dom'
 import { ConnectedRouter as Router } from 'react-router-redux'
 import { store, history } from './redux'
 import Frame from './layouts/Frame'
-import { setupAside, logout, showError, updateSettings } from './actions'
+import { showError } from './utils/message'
+import * as LoginActions from './components/Settings/LoginRedux'
+import * as chatListActions from './components/Aside/ChatListRedux'
 
 render(
   <Provider store={store}>
@@ -24,40 +26,25 @@ render(
 // global
 ipcRenderer.on('logout-reply', (event, { errMsg }) => {
   if (errMsg) {
-    ipcRenderer.emit('bg-err', { errMsg })
-  } else {
-    store.dispatch(logout())
+    showError(errMsg)
   }
 })
 
 ipcRenderer.on('setup-reply', (event, { errMsg, id }) => {
   if (!errMsg) {
-    store.dispatch(updateSettings(id))
+    store.dispatch(LoginActions.updateSettings(id))
   } else {
-    ipcRenderer.emit('bg-err', { errMsg })
+    showError(errMsg)
   }
 })
 
 ipcRenderer.on('before-setup', (event, { users, channels }) => {
-  store.dispatch(setupAside(users, channels))
+  store.dispatch(chatListActions.setup({ users, channels }))
 })
 
 ipcRenderer.on('bg-err', (event, { errMsg }) => {
-  store.dispatch(showError(errMsg))
+  showError(errMsg)
 })
-
-/* after create: Frame aside chattinglist */
-// ipcRenderer.on('login', (event, { tag, username }) => {
-//   store.dispatch(addUser(username, tag))
-// })
-
-// ipcRenderer.on('logout', (event, { tag, username }) => {
-//   store.dispatch(removeUser(username, tag))
-// })
-
-// ipcRenderer.on('channel-create', (events, { channel }) => {
-//   store.dispatch(createChannel(channel))
-// })
 
 /*
 

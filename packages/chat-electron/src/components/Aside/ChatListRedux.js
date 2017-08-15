@@ -2,11 +2,12 @@ import { ipcRenderer } from 'electron'
 import constants from '../../utils/constants'
 
 const TYPES = {
-  SET_USERS: '',
+  SETUP: '',
   ADD_USER: '',
   CHANGE_DIALOG: '',
   REMOVE_USER: '',
   CREATE_CHANNLE: '',
+  ADD_CHANNLE: '',
 }
 constants(TYPES, 'ASIDE')
 
@@ -17,10 +18,10 @@ const initalState = {
 
 export default (state = initalState, action) => {
   switch (action.type) {
-    case TYPES.SET_USERS:
+    case TYPES.SETUP:
       return {
         ...state,
-        users: action.payload,
+        ...action.payload,
       }
     case TYPES.ADD_USER: {
       return {
@@ -41,10 +42,24 @@ export default (state = initalState, action) => {
         },
       }
     }
+    case TYPES.ADD_CHANNLE: {
+      return {
+        ...state,
+        channels: {
+          ...state.channels,
+          [action.payload.key]: action.payload,
+        },
+      }
+    }
     default:
       return state
   }
 }
+
+export const setup = ({ users, channels }) => ({
+  type: TYPES.SETUP,
+  payload: { users, channels },
+})
 
 export const addUser = (username, tag) => ({
   type: TYPES.ADD_USER,
@@ -54,13 +69,6 @@ export const addUser = (username, tag) => ({
   },
 })
 
-export const createChannel = () => {
-  ipcRenderer.send()
-  return {
-    type: TYPES.CREATE_CHANNLE,
-  }
-}
-
 export const removeUser = (username, tag) => ({
   type: TYPES.REMOVE_USER,
   payload: {
@@ -69,11 +77,19 @@ export const removeUser = (username, tag) => ({
   },
 })
 
-export const changeDialog = () => ({
-  type: TYPES.CHANGE_DIALOG,
+export const addChannel = channel => ({
+  type: TYPES.ADD_CHANNLE,
+  payload: channel,
 })
 
-export const setUsers = users => ({
-  type: TYPES.SET_USERS,
-  payload: users,
-})
+export const createChannel = ({ tags, name }) => {
+  ipcRenderer.send('create-channel', { tags, name })
+  return {
+    type: TYPES.CREATE_CHANNLE,
+  }
+}
+
+// @todo
+// export const changeDialog = (type, id) => ({
+//   type: TYPES.CHANGE_DIALOG,
+// })

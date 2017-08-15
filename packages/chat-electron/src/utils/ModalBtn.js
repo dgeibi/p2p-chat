@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-import { Button } from 'antd'
-import compose from '../../utils/compose'
+import { Button, Form } from 'antd'
+import compose from './compose'
 
 export default class ModalBtn extends Component {
   state = {
-    visible: false,
+    visible: this.props.visibleDefault || false,
   }
   showModal = () => {
     this.setState({ visible: true })
@@ -24,12 +24,23 @@ export default class ModalBtn extends Component {
     this.form = form
   }
   render() {
-    const { ref, handleCreate, component, onCancel, onCreate, onClick, ...rest } = this.props
+    const {
+      visibleDefault,
+      ref,
+      handleCreate,
+      component,
+      onCancel,
+      onCreate,
+      onClick,
+      ...rest
+    } = this.props
     return (
-      <span style={{
-        marginRight: 8,
-        marginBottom: 12,
-      }}>
+      <span
+        style={{
+          marginRight: 8,
+          marginBottom: 12,
+        }}
+      >
         <Button onClick={compose(this.showModal, onClick)} {...rest} />
         <this.props.component
           ref={compose(this.saveFormRef, ref)}
@@ -42,7 +53,11 @@ export default class ModalBtn extends Component {
   }
 }
 
-export const createModalBtn = (children, handleCreate) => component => props =>
-  <ModalBtn component={component} handleCreate={handleCreate} {...props}>
+export const createModalBtn = (children, handleCreate, enhanceComponent) => component => props =>
+  <ModalBtn
+    component={Form.create()(enhanceComponent ? enhanceComponent(component) : component)}
+    handleCreate={handleCreate}
+    {...props}
+  >
     {children}
   </ModalBtn>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import SettingNav from '../components/Settings'
+import SettingNav from '../views/Settings'
 
 class Frame extends Component {
   render() {
