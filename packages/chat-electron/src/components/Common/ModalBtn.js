@@ -1,8 +1,17 @@
 import React, { Component } from 'react'
-import { Button, Form } from 'antd'
-import compose from './compose'
+import { Button } from 'antd'
+import PropTypes from 'prop-types'
+import compose from '../../utils/compose'
 
 export default class ModalBtn extends Component {
+  static propTypes = {
+    component: PropTypes.func.isRequired,
+    componentProps: PropTypes.object,
+    handleCreate: PropTypes.func,
+  }
+  static defaultProps = {
+    componentProps: {},
+  }
   state = {
     visible: this.props.visibleDefault || false,
   }
@@ -26,14 +35,14 @@ export default class ModalBtn extends Component {
   render() {
     const {
       visibleDefault,
-      ref,
       handleCreate,
-      component,
-      onCancel,
-      onCreate,
       onClick,
-      ...rest
+      component,
+      componentProps,
+      ...btnProps
     } = this.props
+    const { ref, onCancel, onCreate, visible, ...props } = componentProps
+
     return (
       <span
         style={{
@@ -41,10 +50,11 @@ export default class ModalBtn extends Component {
           marginBottom: 12,
         }}
       >
-        <Button onClick={compose(this.showModal, onClick)} {...rest} />
+        <Button onClick={compose(this.showModal, onClick)} {...btnProps} />
         <this.props.component
-          ref={compose(this.saveFormRef, ref)}
+          {...props}
           visible={this.state.visible}
+          ref={compose(this.saveFormRef, ref)}
           onCancel={compose(this.handleCancel, onCancel)}
           onCreate={compose(this.handleCreate, onCreate)}
         />
@@ -52,12 +62,3 @@ export default class ModalBtn extends Component {
     )
   }
 }
-
-export const createModalBtn = (children, handleCreate, enhanceComponent) => component => props =>
-  <ModalBtn
-    component={Form.create()(enhanceComponent ? enhanceComponent(component) : component)}
-    handleCreate={handleCreate}
-    {...props}
-  >
-    {children}
-  </ModalBtn>

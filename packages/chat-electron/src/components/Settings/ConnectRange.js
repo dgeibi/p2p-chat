@@ -2,12 +2,12 @@ import React, { Component } from 'react'
 import { ipcRenderer } from 'electron'
 import { Input, Form, Modal, Icon } from 'antd'
 import { validAddress, validPort } from './validators'
-import { createModalBtn } from '../../utils/ModalBtn'
+import ModalBtn from '../Common/ModalBtn'
 import { showError } from '../../utils/message'
 
 const FormItem = Form.Item
 
-export const createBtn = createModalBtn(<Icon type="plus" />, (form) => {
+const handleCreate = (form) => {
   form.validateFields((err, values) => {
     if (err) {
       showError('Connection Invalid')
@@ -16,8 +16,9 @@ export const createBtn = createModalBtn(<Icon type="plus" />, (form) => {
     ipcRenderer.send('change-setting', values)
     console.log('Received values of form: ', values)
   })
-})
+}
 
+@Form.create()
 export class ConnectRange extends Component {
   render() {
     const { visible, onCancel, onCreate } = this.props
@@ -83,4 +84,7 @@ export class ConnectRange extends Component {
   }
 }
 
-export default createBtn(ConnectRange)
+export const ConnectRangeBtn = props =>
+  <ModalBtn component={ConnectRange} handleCreate={handleCreate} {...props}>
+    <Icon type="plus" />
+  </ModalBtn>

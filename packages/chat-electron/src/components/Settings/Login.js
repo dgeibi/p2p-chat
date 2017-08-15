@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Input, Form, Modal, Icon } from 'antd'
 import { ipcRenderer } from 'electron'
 import { validPort } from './validators'
-import { createModalBtn } from '../../utils/ModalBtn'
+import ModalBtn from '../Common/ModalBtn'
 import { showError } from '../../utils/message'
 
 function FormItem(props) {
@@ -13,7 +13,6 @@ function FormItem(props) {
   return <Form.Item {...formItemLayout} {...props} />
 }
 
-const children = <Icon type="setting" />
 const validator = (form) => {
   form.validateFields((err, options) => {
     if (err) {
@@ -24,8 +23,7 @@ const validator = (form) => {
   })
 }
 
-export const createConnectedBtn = enhancer => createModalBtn(children, validator, enhancer)
-
+@Form.create()
 export class Login extends Component {
   render() {
     const { getFieldDecorator } = this.props.form
@@ -70,3 +68,8 @@ export class Login extends Component {
     )
   }
 }
+
+export default props =>
+  <ModalBtn component={Login} handleCreate={validator} {...props}>
+    <Icon type="setting" />
+  </ModalBtn>
