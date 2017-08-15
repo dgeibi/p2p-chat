@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import { createConnectedBtn, Login } from '../components/Settings/Login'
-import { loginAction } from './SettingsRedux'
+import { loginActions } from './SettingsRedux'
 import ConnectBtn from '../components/Settings/Connect'
 import ConnectRangeBtn from '../components/Settings/ConnectRange'
 
@@ -13,7 +13,7 @@ const LoginBtn = createConnectedBtn(
       ...state.settings.login,
     }),
     dispatch => ({
-      loginAction: bindActionCreators(loginAction, dispatch),
+      loginAction: bindActionCreators(loginActions, dispatch),
     })
   )
 )(Login)

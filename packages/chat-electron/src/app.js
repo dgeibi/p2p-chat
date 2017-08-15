@@ -33,6 +33,7 @@ ipcRenderer.on('logout-reply', (event, { errMsg }) => {
 ipcRenderer.on('setup-reply', (event, { errMsg, id }) => {
   if (!errMsg) {
     store.dispatch(LoginActions.updateSettings(id))
+    store.dispatch(chatListActions.show())
   } else {
     showError(errMsg)
   }

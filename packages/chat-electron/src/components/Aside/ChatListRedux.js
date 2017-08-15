@@ -8,12 +8,15 @@ const TYPES = {
   REMOVE_USER: '',
   CREATE_CHANNLE: '',
   ADD_CHANNLE: '',
+  SHOW_LIST: '',
+  HIDE_LIST: '',
 }
 constants(TYPES, 'ASIDE')
 
 const initalState = {
   users: {},
   channels: {},
+  visible: false,
 }
 
 export default (state = initalState, action) => {
@@ -49,6 +52,18 @@ export default (state = initalState, action) => {
           ...state.channels,
           [action.payload.key]: action.payload,
         },
+      }
+    }
+    case TYPES.SHOW_LIST: {
+      return {
+        ...state,
+        visible: true,
+      }
+    }
+    case TYPES.HIDE_LIST: {
+      return {
+        ...state,
+        visible: false,
       }
     }
     default:
@@ -89,7 +104,15 @@ export const createChannel = ({ tags, name }) => {
   }
 }
 
+export const show = () => ({
+  type: TYPES.SHOW_LIST,
+})
+
+export const hide = () => ({
+  type: TYPES.HIDE_LIST,
+})
+
 // @todo
-// export const changeDialog = (type, id) => ({
-//   type: TYPES.CHANGE_DIALOG,
-// })
+export const changeDialog = (type, id) => ({
+  type: TYPES.CHANGE_DIALOG,
+})

@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import SettingNav from '../views/Settings'
+import Aside from '../views/Aside'
 
 class Frame extends Component {
   render() {
@@ -7,6 +8,7 @@ class Frame extends Component {
       <div>
         <SettingNav />
         <main>
+          <Aside />
           {this.props.children}
         </main>
       </div>

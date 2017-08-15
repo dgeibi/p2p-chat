@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button } from 'antd'
+import { Button, Spin } from 'antd'
 import { ipcRenderer } from 'electron'
 import DialogType from './DialogType'
 
@@ -34,11 +34,14 @@ class ChatList extends Component {
   }
 
   render() {
-    const { users, channels } = this.props
+    const { users, channels, visible } = this.props
+    if (!visible) {
+      return <Spin />
+    }
     return (
       <div>
         <h1>Channels</h1>
-        {channels.map((channel) => {
+        {Object.entries(channels).map((channel) => {
           const { key, name } = channel
           return (
             <Button key={key} onClick={() => this.onClickChannel(key)}>
@@ -47,10 +50,10 @@ class ChatList extends Component {
           )
         })}
         <h1>Users</h1>
-        {users.map((user) => {
+        {Object.entries(users).map((user) => {
           const { tag, name } = user
           return (
-            <Button href="#" key={tag} onClick={() => this.onClickUser(tag)}>
+            <Button key={tag} onClick={() => this.onClickUser(tag)}>
               {name}
             </Button>
           )
