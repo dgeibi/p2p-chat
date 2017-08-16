@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-import { Button, Spin } from 'antd'
+import { Spin } from 'antd'
 import { ipcRenderer } from 'electron'
 import DialogType from './DialogType'
+import './ChatList.scss'
 
 class ChatList extends Component {
   componentWillMount() {
@@ -41,21 +42,21 @@ class ChatList extends Component {
     return (
       <div>
         <h1>Channels</h1>
-        {Object.entries(channels).map((channel) => {
+        {Object.values(channels).map((channel) => {
           const { key, name } = channel
           return (
-            <Button key={key} onClick={() => this.onClickChannel(key)}>
+            <a key={key} onClick={() => this.onClickChannel(key)} styleName="item">
               {name}
-            </Button>
+            </a>
           )
         })}
         <h1>Users</h1>
-        {Object.entries(users).map((user) => {
-          const { tag, name } = user
+        {Object.values(users).map((user) => {
+          const { tag, username: name } = user
           return (
-            <Button key={tag} onClick={() => this.onClickUser(tag)}>
+            <a key={tag} onClick={() => this.onClickUser(tag)} styleName="item">
               {name}
-            </Button>
+            </a>
           )
         })}
       </div>

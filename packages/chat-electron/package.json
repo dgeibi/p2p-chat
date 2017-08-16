@@ -41,12 +41,12 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-plugin-react-css-modules": "^3.1.1",
     "babili-webpack-plugin": "^0.1.2",
     "css-loader": "^0.28.4",
     "dateformat": "^2.0.0",
     "electron": "^1.6.10",
     "electron-builder": "^18.3.5",
-    "emotion": "^7.0.11",
     "escape-html": "^1.0.3",
     "eslint": "^4.4.1",
     "eslint-config-airbnb-base": "^11.3.1",
@@ -67,6 +67,9 @@
     "react-router": "^4.1.2",
     "react-router-dom": "^4.1.2",
     "react-router-redux": "^5.0.0-alpha.6",
+    "postcss-loader": "^2.0.6",
+    "postcss-scss": "^1.0.2",
+    "precss": "^2.0.0",
     "redux": "^3.7.2",
     "style-loader": "^0.18.2",
     "stylelint": "^8.0.0",
@@ -120,7 +123,17 @@
     "plugins": [
       "transform-decorators-legacy",
       "transform-runtime",
-      "emotion/babel",
+      ["react-css-modules", {
+        "filetypes": {
+          ".scss": {
+            "syntax": "postcss-scss",
+            "plugins": [
+              "postcss-nested"
+            ]
+          }
+        },
+        "webpackHotModuleReloading": true
+      }],
       [
         "import",
         {

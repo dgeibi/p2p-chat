@@ -36,7 +36,7 @@ export class ConnectRange extends Component {
         <Form>
           <FormItem label="Least address">
             {getFieldDecorator('hostStart', {
-              validateTrigger: ['onChange', 'onBlur'],
+              validateTrigger: ['onChange'],
               rules: [
                 {
                   validator: validAddress,
@@ -46,7 +46,7 @@ export class ConnectRange extends Component {
           </FormItem>
           <FormItem label="Biggest address">
             {getFieldDecorator('hostEnd', {
-              validateTrigger: ['onChange', 'onBlur'],
+              validateTrigger: ['onChange'],
               rules: [
                 {
                   validator: validAddress,
@@ -56,7 +56,7 @@ export class ConnectRange extends Component {
           </FormItem>
           <FormItem label="Least port">
             {getFieldDecorator('portStart', {
-              validateTrigger: ['onChange', 'onBlur'],
+              validateTrigger: ['onChange'],
               rules: [
                 {
                   validator: validPort,

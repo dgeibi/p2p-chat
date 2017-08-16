@@ -1,0 +1,9 @@
+.item {
+  display: inline-block;
+  width: 100%;
+  height: 3em;
+  padding: .6em .7em;
+  &:hover {
+    background: rgb(223, 243, 232);
+  }
+}
