@@ -2,9 +2,12 @@ import React, { Component } from 'react'
 import { Spin } from 'antd'
 import { ipcRenderer } from 'electron'
 import PropTypes from 'prop-types'
+import EventObservable from 'utils/EventObservable'
 import classNames from 'classnames'
 import DialogType from './DialogType'
 import './ChatList.scss'
+
+const observe = EventObservable(ipcRenderer)
 
 class ChatList extends Component {
   static propTypes = {
@@ -14,30 +17,40 @@ class ChatList extends Component {
     }),
   }
 
+  observables = []
+
+  observe(type, listener) {
+    this.observables.push(observe(type, listener))
+  }
+
+  destroyObservables() {
+    this.observables.forEach((destroy) => {
+      destroy()
+    })
+    this.observables.splice(0)
+  }
+
   componentWillMount() {
     const { addUser, removeUser, addChannel, setup } = this.props
-    ipcRenderer.on('login', (event, { tag, username }) => {
+    this.observe('login', (event, { tag, username }) => {
       addUser(username, tag)
     })
 
-    ipcRenderer.on('logout', (event, { tag, username }) => {
+    this.observe('logout', (event, { tag, username }) => {
       removeUser(username, tag)
     })
 
-    ipcRenderer.on('channel-create', (events, { channel }) => {
+    this.observe('channel-create', (events, { channel }) => {
       addChannel(channel)
     })
 
-    ipcRenderer.on('before-setup', (event, { users, channels }) => {
+    this.observe('before-setup', (event, { users, channels }) => {
       setup({ users, channels })
     })
   }
 
   componentWillUnmount() {
-    ipcRenderer.removeAllListeners('login')
-    ipcRenderer.removeAllListeners('logout')
-    ipcRenderer.removeAllListeners('before-setup')
-    ipcRenderer.removeAllListeners('channel-create')
+    this.destroyObservables()
   }
 
   onClickChannel(key) {
