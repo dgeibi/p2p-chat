@@ -9,13 +9,14 @@ import Frame from './layouts/Frame'
 import { showError } from './utils/message'
 import * as LoginActions from './components/Settings/LoginRedux'
 import * as chatListActions from './components/Aside/ChatListRedux'
+import Dialog from './components/Chatting/Dialog'
 
 render(
   <Provider store={store}>
     <Frame>
       <Router history={history}>
         <Switch>
-          <Route path="/" />
+          <Route path="/dialog/:type/:key" component={Dialog} />
         </Switch>
       </Router>
     </Frame>

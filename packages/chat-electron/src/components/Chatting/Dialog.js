@@ -2,17 +2,28 @@ import React, { Component } from 'react'
 import Messages from './Messages'
 
 class Dialog extends Component {
+  static defaultProps = {
+    messages: [],
+  }
+
   componentDidMount() {
-    this.props.fetchMessage(this.props.id)
+    // this.props.fetchMessage(this.props.id)
   }
 
   render() {
-    const { messages } = this.props
+    const { match } = this.props
     return (
-      <div>
-        <Messages messages={messages} />
-      </div>
+      <p>
+        {JSON.stringify(match.params)}
+      </p>
     )
+    // const { messages } = this.props
+    // if (messages.length <= 0) return <p> Nothing </p>
+    // return (
+    //   <div>
+    //     <Messages messages={messages} />
+    //   </div>
+    // )
   }
 }
 

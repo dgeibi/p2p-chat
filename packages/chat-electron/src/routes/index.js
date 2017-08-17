@@ -8,8 +8,7 @@ const routes = history =>
   <Router history={history}>
     <Frame>
       <Switch>
-        <Route path="/channels/:id" component={Channel} />
-        <Route path="/user/:tag" component={Single} />
+        <Route path="/dialog/:type/:key" component={Channel} />
         <Route path="/settings" component={Settings} />
         <Route path="/" component={CreateChannel} />
       </Switch>

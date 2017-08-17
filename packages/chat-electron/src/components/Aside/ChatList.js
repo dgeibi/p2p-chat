@@ -1,10 +1,19 @@
 import React, { Component } from 'react'
 import { Spin } from 'antd'
 import { ipcRenderer } from 'electron'
+import PropTypes from 'prop-types'
+import classNames from 'classnames'
 import DialogType from './DialogType'
 import './ChatList.scss'
 
 class ChatList extends Component {
+  static propTypes = {
+    current: PropTypes.shape({
+      type: PropTypes.string,
+      key: PropTypes.string,
+    }),
+  }
+
   componentWillMount() {
     const { addUser, removeUser, addChannel } = this.props
     ipcRenderer.on('login', (event, { tag, username }) => {
@@ -34,31 +43,64 @@ class ChatList extends Component {
     this.props.changeDialog(DialogType.USER, key)
   }
 
+  getOnClick(type) {
+    const { changeDialog } = this.props
+
+    return function onClick(e) {
+      const node = e.target
+      if (node.matches('a')) {
+        changeDialog(type, node.dataset.key)
+      }
+    }
+  }
+
+  matchCurrent(type, key) {
+    const { current } = this.props
+    return type === current.type && current.key === key
+  }
+
   render() {
     const { users, channels, visible } = this.props
     if (!visible) {
       return <Spin />
     }
+
     return (
-      <div>
+      <div style={{ borderRight: '1px solid #eee' }}>
         <h1>Channels</h1>
-        {Object.values(channels).map((channel) => {
-          const { key, name } = channel
-          return (
-            <a key={key} onClick={() => this.onClickChannel(key)} styleName="item">
-              {name}
-            </a>
-          )
-        })}
+        <ul onClick={this.getOnClick(DialogType.CHANNEL)}>
+          {Object.values(channels).map((channel) => {
+            const { key, name } = channel
+            const styleName = classNames({
+              item: true,
+              item__active: this.matchCurrent(DialogType.CHANNEL, key),
+            })
+            return (
+              <li key={key}>
+                <a styleName={styleName} data-key={key}>
+                  {name}
+                </a>
+              </li>
+            )
+          })}
+        </ul>
         <h1>Users</h1>
-        {Object.values(users).map((user) => {
-          const { tag, username: name } = user
-          return (
-            <a key={tag} onClick={() => this.onClickUser(tag)} styleName="item">
-              {name}
-            </a>
-          )
-        })}
+        <ul onClick={this.getOnClick(DialogType.USER)}>
+          {Object.values(users).map((user) => {
+            const { tag: key, username: name } = user
+            const styleName = classNames({
+              item: true,
+              item__active: this.matchCurrent(DialogType.USER, key),
+            })
+            return (
+              <li key={key}>
+                <a styleName={styleName} data-key={key}>
+                  {name}
+                </a>
+              </li>
+            )
+          })}
+        </ul>
       </div>
     )
   }

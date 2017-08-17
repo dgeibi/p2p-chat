@@ -1,4 +1,5 @@
 import { ipcRenderer } from 'electron'
+import { push } from 'react-router-redux'
 import constants from '../../utils/constants'
 
 const TYPES = {
@@ -112,7 +113,4 @@ export const hide = () => ({
   type: TYPES.HIDE_LIST,
 })
 
-// @todo
-export const changeDialog = (type, id) => ({
-  type: TYPES.CHANGE_DIALOG,
-})
+export const changeDialog = (type, key) => push(`/dialog/${type}/${key}`)
