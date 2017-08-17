@@ -7,8 +7,6 @@ import classNames from 'classnames'
 import DialogType from './DialogType'
 import './ChatList.scss'
 
-const observe = EventObservable(ipcRenderer)
-
 class ChatList extends Component {
   static propTypes = {
     current: PropTypes.shape({
@@ -17,40 +15,29 @@ class ChatList extends Component {
     }),
   }
 
-  observables = []
-
-  observe(type, listener) {
-    this.observables.push(observe(type, listener))
-  }
-
-  destroyObservables() {
-    this.observables.forEach((destroy) => {
-      destroy()
-    })
-    this.observables.splice(0)
-  }
+  observables = EventObservable(ipcRenderer)
 
   componentWillMount() {
     const { addUser, removeUser, addChannel, setup } = this.props
-    this.observe('login', (event, { tag, username }) => {
+    this.observables.observe('login', (event, { tag, username }) => {
       addUser(username, tag)
     })
 
-    this.observe('logout', (event, { tag, username }) => {
+    this.observables.observe('logout', (event, { tag, username }) => {
       removeUser(username, tag)
     })
 
-    this.observe('channel-create', (events, { channel }) => {
+    this.observables.observe('channel-create', (events, { channel }) => {
       addChannel(channel)
     })
 
-    this.observe('before-setup', (event, { users, channels }) => {
+    this.observables.observe('before-setup', (event, { users, channels }) => {
       setup({ users, channels })
     })
   }
 
   componentWillUnmount() {
-    this.destroyObservables()
+    this.observables.removeAllObservables()
   }
 
   onClickChannel(key) {
