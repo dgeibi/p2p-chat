@@ -12,7 +12,7 @@ class FilePanel extends Component {
 }
 
 function mapper(msg) {
-  const { id, type, payload } = msg
+  const { type, payload } = msg
   if (payload.error) return <ErrorMessage message={payload.error} />
   switch (type) {
     case 'file:receive':

@@ -5,3 +5,5 @@ class Settings extends Component {
     return <div />
   }
 }
+
+export default Settings
