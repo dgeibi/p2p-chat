@@ -40,10 +40,6 @@ ipcRenderer.on('setup-reply', (event, { errMsg, id }) => {
   }
 })
 
-ipcRenderer.on('before-setup', (event, { users, channels }) => {
-  store.dispatch(chatListActions.setup({ users, channels }))
-})
-
 ipcRenderer.on('bg-err', (event, { errMsg }) => {
   showError(errMsg)
 })

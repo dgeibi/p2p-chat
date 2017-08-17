@@ -15,7 +15,7 @@ class ChatList extends Component {
   }
 
   componentWillMount() {
-    const { addUser, removeUser, addChannel } = this.props
+    const { addUser, removeUser, addChannel, setup } = this.props
     ipcRenderer.on('login', (event, { tag, username }) => {
       addUser(username, tag)
     })
@@ -27,11 +27,16 @@ class ChatList extends Component {
     ipcRenderer.on('channel-create', (events, { channel }) => {
       addChannel(channel)
     })
+
+    ipcRenderer.on('before-setup', (event, { users, channels }) => {
+      setup({ users, channels })
+    })
   }
 
   componentWillUnmount() {
     ipcRenderer.removeAllListeners('login')
     ipcRenderer.removeAllListeners('logout')
+    ipcRenderer.removeAllListeners('before-setup')
     ipcRenderer.removeAllListeners('channel-create')
   }
 
