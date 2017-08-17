@@ -7,16 +7,16 @@ import { ConnectedRouter as Router } from 'react-router-redux'
 import { store, history } from './redux'
 import Frame from './layouts/Frame'
 import { showError } from './utils/message'
-import * as LoginActions from './components/Settings/LoginRedux'
-import * as chatListActions from './components/Aside/ChatListRedux'
-import Dialog from './components/Chatting/Dialog'
+import { loginActions } from './views/SettingsRedux'
+import { chatListActions } from './views/AsideRedux'
+import Chatting from './views/Chatting'
 
 render(
   <Provider store={store}>
     <Frame>
       <Router history={history}>
         <Switch>
-          <Route path="/dialog/:type/:key" component={Dialog} />
+          <Route path="/chat/:type/:key" component={Chatting} />
         </Switch>
       </Router>
     </Frame>
@@ -33,7 +33,7 @@ ipcRenderer.on('logout-reply', (event, { errMsg }) => {
 
 ipcRenderer.on('setup-reply', (event, { errMsg, id }) => {
   if (!errMsg) {
-    store.dispatch(LoginActions.updateSettings(id))
+    store.dispatch(loginActions.updateSettings(id))
     store.dispatch(chatListActions.show())
   } else {
     showError(errMsg)

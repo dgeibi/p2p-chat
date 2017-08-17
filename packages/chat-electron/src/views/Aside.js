@@ -20,7 +20,7 @@ class Aside extends Component {
     const { routing } = this.props
     const match = routing.location
       ? matchPath(routing.location.pathname, {
-        path: '/dialog/:type/:key',
+        path: '/chat/:type/:key',
       })
       : null
     const current = match

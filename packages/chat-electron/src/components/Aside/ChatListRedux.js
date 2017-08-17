@@ -113,4 +113,4 @@ export const hide = () => ({
   type: TYPES.HIDE_LIST,
 })
 
-export const changeDialog = (type, key) => push(`/dialog/${type}/${key}`)
+export const changeDialog = (type, key) => push(`/chat/${type}/${key}`)

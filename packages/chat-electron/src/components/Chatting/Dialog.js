@@ -7,14 +7,17 @@ class Dialog extends Component {
   }
 
   componentDidMount() {
-    // this.props.fetchMessage(this.props.id)
+    this.props.fetchMessages(this.props.id)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.id.key !== this.props.id.key) this.props.fetchMessages(nextProps.id)
   }
 
   render() {
-    const { match } = this.props
     return (
       <p>
-        {JSON.stringify(match.params)}
+        {JSON.stringify(this.props.id)}
       </p>
     )
     // const { messages } = this.props
