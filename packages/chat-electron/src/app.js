@@ -10,6 +10,7 @@ import { showError } from './utils/message'
 import { loginActions } from './views/SettingsRedux'
 import { chatListActions } from './views/AsideRedux'
 import Chatting from './views/Chatting'
+import { dialogActions } from './views/ChattingRedux'
 
 render(
   <Provider store={store}>
@@ -44,10 +45,12 @@ ipcRenderer.on('bg-err', (event, { errMsg }) => {
   showError(errMsg)
 })
 
+ipcRenderer.on('text', (event, { tag, username, text, channel }) => {
+  store.dispatch(dialogActions.newMessage({ tag, username, text, channel }))
+})
 /*
 
 // msg
-ipcRenderer.on('text', (event, { tag, username, text, channel }) => {})
 
 // file info
 ipcRenderer.on('fileinfo', (event, { username, tag, filename, id, size }) => {})

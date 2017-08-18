@@ -71,7 +71,7 @@ class ChatList extends Component {
     }
 
     return (
-      <div style={{ borderRight: '1px solid #eee' }}>
+      <div>
         <h1>Channels</h1>
         <ul onClick={this.getOnClick(DialogType.CHANNEL)}>
           {Object.values(channels).map((channel) => {

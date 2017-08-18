@@ -73,9 +73,10 @@ const bypassChatToMain = (key) => {
   })
 }
 
-bypassChatToMain('text')
 bypassChatToMain('logout')
 bypassChatToMain('login')
+
+bypassChatToMain('text')
 bypassChatToMain('fileinfo')
 bypassChatToMain('file-receiced')
 bypassChatToMain('file-write-fail')

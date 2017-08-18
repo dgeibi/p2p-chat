@@ -1,9 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
+import { Alert } from 'antd'
 
-class Settings extends Component {
-  render() {
-    return <div />
-  }
-}
-
-export default Settings
+export default props => <Alert message="Informational Notes" type="info" showIcon {...props} />

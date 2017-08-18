@@ -7,7 +7,9 @@ import * as actions from './ChattingRedux'
 
 @connect(
   state => ({
-    dialog: state.aside.dialog,
+    messages: getMessages(state.chatting.dialog),
+    username: state.settings.login.username,
+    dialog: state.chatting.dialog,
     routing: state.routing,
   }),
   dispatch => ({
@@ -21,15 +23,22 @@ class Chatting extends Component {
   }
 
   render() {
-    const { dialog, dialogActions } = this.props
+    const { dialog, dialogActions, username, messages } = this.props
     const id = this.id
 
     return (
       <div>
-        <Dialog {...dialogActions} {...dialog} id={id} />
+        <Dialog {...dialogActions} {...dialog} id={id} username={username} messages={messages} />
       </div>
     )
   }
 }
 
 export default Chatting
+
+function getMessages(dialogState) {
+  const { type, key } = dialogState.id
+  if (!type) return []
+  const types = `${type}s`
+  return dialogState[types][key] || []
+}
