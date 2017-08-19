@@ -1,4 +1,7 @@
 import React, { Component } from 'react'
+import ErrorMessage from './ErrorMessage'
+import FileInfo from './FileInfo'
+import FileReceive from './FileReceive'
 
 class FilePanel extends Component {
   render() {
@@ -12,15 +15,15 @@ class FilePanel extends Component {
 }
 
 function mapper(msg) {
-  const { type, payload } = msg
-  if (payload.error) return <ErrorMessage message={payload.error} />
+  const { type, errMsg, id, ...payload } = msg
+  if (errMsg) return <ErrorMessage message={errMsg} />
   switch (type) {
     case 'file:receive':
-      return <FileReceive {...payload} />
+      return <FileReceive key={id} {...payload} />
     case 'file:info':
-      return <FileInfo {...payload} />
+      return <FileInfo key={id} {...payload} />
     default:
-      break
+      return null
   }
 }
 

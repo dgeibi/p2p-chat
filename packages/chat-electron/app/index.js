@@ -235,7 +235,7 @@ ipcRenderer.on('file-unable-to-send', (event, { errMsg }) => {
   writeErrorMsg(`>> ${errMsg}`)
 })
 
-ipcRenderer.on('file-write-fail', (event, { tag, username, filename, id }) => {
+ipcRenderer.on('file-receive-fail', (event, { tag, username, filename, id }) => {
   const fileSection = document.querySelector(`[data-file-id="${id}"]`)
   writeMsg(`>> ${username}[${formatTag(tag)}] 发送的 ${filename} 接收失败。`, fileSection, true)
 })

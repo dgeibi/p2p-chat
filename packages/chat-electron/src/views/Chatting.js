@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Dialog from '../components/Chatting/Dialog'
+// import FilePanel from '../components/Chatting/FilePanel'
 import * as actions from './ChattingRedux'
 
 @connect(
@@ -10,10 +11,12 @@ import * as actions from './ChattingRedux'
     messages: getMessages(state.chatting.dialog),
     username: state.settings.login.username,
     dialog: state.chatting.dialog,
+    filePanel: state.chatting.filePanel,
     routing: state.routing,
   }),
   dispatch => ({
     dialogActions: bindActionCreators(actions.dialogActions, dispatch),
+    filePanelActions: bindActionCreators(actions.filePanelActions, dispatch),
   })
 )
 class Chatting extends Component {

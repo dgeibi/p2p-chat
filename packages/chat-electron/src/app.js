@@ -10,7 +10,7 @@ import { showError } from './utils/message'
 import { loginActions } from './views/SettingsRedux'
 import { chatListActions } from './views/AsideRedux'
 import Chatting from './views/Chatting'
-import { dialogActions } from './views/ChattingRedux'
+import { dialogActions, filePanelActions } from './views/ChattingRedux'
 
 render(
   <Provider store={store}>
@@ -48,10 +48,34 @@ ipcRenderer.on('bg-err', (event, { errMsg }) => {
 ipcRenderer.on('text', (event, { tag, username, text, channel }) => {
   store.dispatch(dialogActions.newMessage({ tag, username, text, channel }))
 })
+
+/* file receive */
+ipcRenderer.on('fileinfo', (event, { username, tag, filename, id, size }) => {
+  store.dispatch(filePanelActions.fileCome({ username, tag, filename, id, size }))
+})
+
+ipcRenderer.on('file-process-start', (event, message) => {
+  store.dispatch(filePanelActions.fileCome(message))
+})
+
+ipcRenderer.on('file-processing', (event, message) => {
+  store.dispatch(filePanelActions.fileProcessing(message))
+})
+
+ipcRenderer.on('file-process-done', (event, message) => {
+  store.dispatch(filePanelActions.fileEnd(message))
+})
+
+ipcRenderer.on('file-receive-fail', (event, message) => {
+  store.dispatch(filePanelActions.fileReceiveError(message))
+})
+
+ipcRenderer.on('file-receiced', (event, message) => {
+  store.dispatch(filePanelActions.fileReceived(message))
+})
+
 /*
-
 // msg
-
 // file info
 ipcRenderer.on('fileinfo', (event, { username, tag, filename, id, size }) => {})
 
@@ -59,12 +83,4 @@ ipcRenderer.on('fileinfo', (event, { username, tag, filename, id, size }) => {})
 ipcRenderer.on('file-sent', (event, { tag, username, filename }) => {})
 ipcRenderer.on('file-send-fail', (event, { tag, username, filename, errMsg }) => {})
 ipcRenderer.on('file-unable-to-send', (event, { errMsg }) => {})
-
-// file:receive
-ipcRenderer.on('file-process-start', (event, { id }) => {})
-ipcRenderer.on('file-processing', (event, { id, percent, speed }) => {})
-ipcRenderer.on('file-process-done', (event, { id }) => {})
-ipcRenderer.on('file-write-fail', (event, { tag, username, filename, id }) => {})
-ipcRenderer.on('file-receiced', (event, { tag, username, filename, filepath, id }) => {})
-
 */

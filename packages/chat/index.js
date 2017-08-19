@@ -47,29 +47,30 @@ const getMessage = () => ({
 function handleFile(socket, message) {
   const { tag, checksum, username, filepath, channel } = message
   const id = `${checksum}.${process.uptime()}`
-  emitter.emit('file-process-start', { id, channel })
+  const filename = path.basename(filepath)
+  emitter.emit('file-process-start', { id, tag, channel, filename, username })
 
   const processing = (check, percent, speed) => {
     if (check !== checksum) return
-    emitter.emit('file-processing', { id, percent, speed, channel })
+    emitter.emit('file-processing', { tag, channel, id, percent, speed })
   }
 
   const done = (check) => {
     if (check !== checksum) return
     socket.removeListener('file-processing', processing)
     socket.removeListener('file-done', done)
-    emitter.emit('file-process-done', { id, channel })
+    emitter.emit('file-process-done', { id, tag, channel })
   }
 
   const close = (check) => {
     if (check !== checksum) return
     socket.removeListener('file-close', close)
 
-    const filename = path.basename(filepath)
     md5.file(filepath, false, (md5Err, realChecksum) => {
       // 检查checksum
       if (md5Err || !fileAccepted[realChecksum] || realChecksum !== checksum) {
-        emitter.emit('file-receive-fail', { tag, username, filename, id, channel })
+        emitter.emit('file-receive-fail', { tag, channel, username, filename, id })
+        return
       }
       emitter.emit('file-receiced', { tag, username, filename, filepath, id, channel })
       logger.verbose('file receiced', filepath)
