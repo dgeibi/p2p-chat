@@ -1,9 +1,8 @@
-import React, { Component } from 'react'
+import React from 'react'
+import { Button } from 'antd'
 
-class Settings extends Component {
-  render() {
-    return <div />
-  }
-}
-
-export default Settings
+export default props =>
+  <div>
+    {props.filename}
+    <Button onClick={props.onClick}>Accept</Button>
+  </div>

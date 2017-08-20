@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Input, Button, Form } from 'antd'
+import { Input, Button, Form, Upload, Icon } from 'antd'
 import ErrorMessage from './ErrorMessage'
 import Text from './Text'
 import './Dialog.scss'
@@ -9,20 +9,7 @@ const { TextArea } = Input
 class Dialog extends Component {
   state = {
     text: '',
-  }
-
-  componentDidMount() {
-    const { initStore, fetchMessages } = this.props
-    initStore(this.props.id)
-    fetchMessages(this.props.id)
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const { fetchMessages, initStore } = this.props
-    if (nextProps.id.key !== this.props.id.key) {
-      initStore(nextProps.id)
-      fetchMessages(nextProps.id)
-    }
+    fileList: [],
   }
 
   handleTextChange = (e) => {
@@ -31,16 +18,40 @@ class Dialog extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault()
-    this.props.sendMessage(this.props.id, this.state.text)
-
+    const { text, fileList } = this.state
+    const { id } = this.props
+    if (text) this.props.sendMessage(id, text)
+    if (fileList.length > 0) {
+      const filePaths = [...new Set(fileList.map(x => x.path))]
+      this.props.sendFiles(id, filePaths)
+    }
     this.setState({
       text: '',
+      fileList: [],
     })
+  }
+
+  handleFileRemove = (file) => {
+    this.setState(({ fileList }) => {
+      const index = fileList.indexOf(file)
+      const newFileList = fileList.slice()
+      newFileList.splice(index, 1)
+      return {
+        fileList: newFileList,
+      }
+    })
+  }
+
+  handleFileAdd = (file) => {
+    this.setState(({ fileList }) => ({
+      fileList: [...fileList, file],
+    }))
+    return false
   }
 
   render() {
     const { messages, username } = this.props
-    const { text } = this.state
+    const { text, fileList } = this.state
     return (
       <div styleName="dialog">
         <div styleName="messages">
@@ -51,9 +62,19 @@ class Dialog extends Component {
             return null
           })}
         </div>
+        <Upload
+          multiple
+          onRemove={this.handleFileRemove}
+          beforeUpload={this.handleFileAdd}
+          fileList={fileList}
+        >
+          <Button>
+            <Icon type="upload" /> Upload
+          </Button>
+        </Upload>
         <Form onSubmit={this.handleSubmit}>
           <TextArea rows={4} value={text} onChange={this.handleTextChange} />
-          <Button type="primary" htmlType="submit" disabled={!text}>
+          <Button type="primary" htmlType="submit" disabled={!text && fileList.length <= 0}>
             Send
           </Button>
         </Form>

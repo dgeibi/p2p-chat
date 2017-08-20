@@ -1,6 +1,6 @@
 import React from 'react'
 
-const FileReceive = ({ username, filename, errMsg, speed, percent }) => {
+const FileReceive = ({ username, filename, errMsg, speed, percent, ok, filepath }) => {
   if (errMsg) {
     return (
       <div>
@@ -8,12 +8,14 @@ const FileReceive = ({ username, filename, errMsg, speed, percent }) => {
       </div>
     )
   }
+  const open = ok ? <div> open : {filepath} </div> : null
   return (
     <div>
       <span>{filename}</span>
       <span>{username}</span>
       speed: {showSpeed(speed)}
       percent: {showPercent(percent)}
+      {open}
     </div>
   )
 }

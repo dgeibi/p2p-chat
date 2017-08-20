@@ -55,7 +55,7 @@ ipcRenderer.on('fileinfo', (event, { username, tag, filename, id, size }) => {
 })
 
 ipcRenderer.on('file-process-start', (event, message) => {
-  store.dispatch(filePanelActions.fileCome(message))
+  store.dispatch(filePanelActions.fileStart(message))
 })
 
 ipcRenderer.on('file-processing', (event, message) => {

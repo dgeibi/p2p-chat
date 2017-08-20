@@ -3,15 +3,16 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Dialog from '../components/Chatting/Dialog'
-// import FilePanel from '../components/Chatting/FilePanel'
+import FilePanel from '../components/Chatting/FilePanel'
 import * as actions from './ChattingRedux'
+import './Chatting.scss'
 
 @connect(
-  state => ({
-    messages: getMessages(state.chatting.dialog),
+  (state, ownProps) => ({
+    messages: getMessages(state.chatting.dialog, ownProps),
+    files: getFiles(state.chatting.filePanel, ownProps),
+    id: getIDObj(state.aside.chatList, ownProps),
     username: state.settings.login.username,
-    dialog: state.chatting.dialog,
-    filePanel: state.chatting.filePanel,
     routing: state.routing,
   }),
   dispatch => ({
@@ -20,18 +21,12 @@ import * as actions from './ChattingRedux'
   })
 )
 class Chatting extends Component {
-  get id() {
-    const { match } = this.props
-    return match.params
-  }
-
   render() {
-    const { dialog, dialogActions, username, messages } = this.props
-    const id = this.id
-
+    const { dialogActions, username, messages, files, filePanelActions, id } = this.props
     return (
-      <div>
-        <Dialog {...dialogActions} {...dialog} id={id} username={username} messages={messages} />
+      <div styleName="chatting">
+        <Dialog {...dialogActions} username={username} messages={messages} id={id} />
+        <FilePanel {...filePanelActions} files={files} id={id} />
       </div>
     )
   }
@@ -39,9 +34,28 @@ class Chatting extends Component {
 
 export default Chatting
 
-function getMessages(dialogState) {
-  const { type, key } = dialogState.id
+function getMessages(dialogState, ownProps) {
+  const { type, key } = ownProps.match.params
   if (!type) return []
-  const types = `${type}s`
-  return dialogState[types][key] || []
+  return dialogState[type][key] || []
+}
+
+function getFiles(filePanelState, ownProps) {
+  const { type, key } = ownProps.match.params
+  if (!type) return {}
+  return filePanelState[type][key] || {}
+}
+
+function getIDObj(chatListState, ownProps) {
+  const { type, key } = ownProps.match.params
+  const id = { type, key }
+  if (!type) {
+    id.tags = []
+  } else if (type === 'channel') {
+    id.tags = Object.keys(chatListState.channels[key].users)
+    id.channel = key
+  } else {
+    id.tags = [key]
+  }
+  return id
 }

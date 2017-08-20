@@ -37,13 +37,11 @@ export default (state = initalState, action) => {
       }
     }
     case TYPES.REMOVE_USER: {
-      const { users } = state
+      const users = { ...state.users }
       delete users[action.payload.tag]
       return {
         ...state,
-        users: {
-          ...users,
-        },
+        users,
       }
     }
     case TYPES.ADD_CHANNLE: {
