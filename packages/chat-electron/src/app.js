@@ -75,10 +75,6 @@ ipcRenderer.on('file-receiced', (event, message) => {
 })
 
 /*
-// msg
-// file info
-ipcRenderer.on('fileinfo', (event, { username, tag, filename, id, size }) => {})
-
 // file:send
 ipcRenderer.on('file-sent', (event, { tag, username, filename }) => {})
 ipcRenderer.on('file-send-fail', (event, { tag, username, filename, errMsg }) => {})

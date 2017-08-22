@@ -2,8 +2,11 @@ import React, { Component } from 'react'
 import { Spin, Menu } from 'antd'
 import { ipcRenderer } from 'electron'
 import PropTypes from 'prop-types'
+import sortBy from 'lodash.sortby'
+import assert from 'assert'
 import EventObservable from 'utils/EventObservable'
 import formatTag from '../../utils/formatTag'
+import ListItem from './ListItem'
 import DialogType from './DialogType'
 
 class ChatList extends Component {
@@ -17,7 +20,7 @@ class ChatList extends Component {
   observables = EventObservable(ipcRenderer)
 
   componentWillMount() {
-    const { addUser, offUser, addChannel, setup } = this.props
+    const { addUser, offUser, addChannel, setup, increaseBadge } = this.props
     this.observables.observe('login', (event, { tag, username }) => {
       addUser(username, tag)
     })
@@ -33,10 +36,32 @@ class ChatList extends Component {
     this.observables.observe('before-setup', (event, { users, channels }) => {
       setup({ users, channels })
     })
+
+    this.observables.observe('text', (event, { tag, text, channel }) => {
+      const currentID = this.props.current
+      const id = idOf(tag, channel)
+      try {
+        assert.deepEqual(id, currentID)
+      } catch (e) {
+        increaseBadge(id, text)
+      }
+    })
   }
 
   componentWillUnmount() {
     this.observables.removeAllObservables()
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const currentID = this.props.current
+    const nextID = nextProps.current
+    try {
+      assert.deepEqual(currentID, nextID)
+    } catch (e) {
+      if (nextID) {
+        this.props.clearBadge(nextID)
+      }
+    }
   }
 
   handleClick = (e) => {
@@ -54,24 +79,29 @@ class ChatList extends Component {
       <div>
         <Menu mode="inline" onClick={this.handleClick} selectedKeys={[this.props.current.key]}>
           <Menu.SubMenu key={DialogType.CHANNEL} title="Channels">
-            {Object.values(channels).map((channel) => {
-              const { key, name } = channel
-              return (
-                <Menu.Item key={key}>
-                  {name}[{formatTag(key)}]
-                </Menu.Item>
-              )
-            })}
+            {Object.values(channels).map(({ key, name, badge }) =>
+              <Menu.Item key={key}>
+                <ListItem
+                  title={`${name}[${formatTag(key)}]`}
+                  badge={badge || 0}
+                  online
+                />
+              </Menu.Item>
+            )}
           </Menu.SubMenu>
           <Menu.SubMenu key={DialogType.USER} title="Users">
-            {Object.values(users).map((user) => {
-              const { tag: key, username: name, online } = user
-              return (
-                <Menu.Item key={key} disabled={!online}>
-                  {name}[{formatTag(key)}]
-                </Menu.Item>
-              )
-            })}
+            {sortBy(
+              Object.values(users),
+              ({ online }) => (online ? 0 : 1)
+            ).map(({ tag: key, username: name, online, badge }) =>
+              <Menu.Item key={key}>
+                <ListItem
+                  title={`${name}[${formatTag(key)}]`}
+                  badge={badge || 0}
+                  online={online}
+                />
+              </Menu.Item>
+            )}
           </Menu.SubMenu>
         </Menu>
       </div>
@@ -80,3 +110,10 @@ class ChatList extends Component {
 }
 
 export default ChatList
+
+function idOf(tag, channel) {
+  if (channel) {
+    return { type: 'channel', key: channel }
+  }
+  return { type: 'user', key: tag }
+}

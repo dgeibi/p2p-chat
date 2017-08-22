@@ -12,6 +12,7 @@ import './Chatting.scss'
     messages: getMessages(state.chatting.dialog, ownProps),
     files: getFiles(state.chatting.filePanel, ownProps),
     id: getIDObj(state.aside.chatList, ownProps),
+    online: getUserOnline(state.aside.chatList, ownProps),
     username: state.settings.login.username,
     routing: state.routing,
   }),
@@ -22,10 +23,16 @@ import './Chatting.scss'
 )
 class Chatting extends Component {
   render() {
-    const { dialogActions, username, messages, files, filePanelActions, id } = this.props
+    const { dialogActions, username, messages, files, filePanelActions, id, online } = this.props
     return (
       <div styleName="chatting">
-        <Dialog {...dialogActions} username={username} messages={messages} id={id} />
+        <Dialog
+          {...dialogActions}
+          username={username}
+          messages={messages}
+          online={online}
+          id={id}
+        />
         <FilePanel {...filePanelActions} files={files} id={id} />
       </div>
     )
@@ -58,4 +65,10 @@ function getIDObj(chatListState, ownProps) {
     id.tags = [key]
   }
   return id
+}
+
+function getUserOnline(chatListState, ownProps) {
+  const { type, key } = ownProps.match.params
+  if (!type || type !== 'user') return true
+  return chatListState.users[key] ? chatListState.users[key].online : false
 }

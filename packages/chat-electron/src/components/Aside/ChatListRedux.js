@@ -11,6 +11,8 @@ const TYPES = {
   ADD_CHANNLE: '',
   SHOW_LIST: '',
   HIDE_LIST: '',
+  CLEAR_BADGE: '',
+  INCREASE_BADGE: '',
 }
 constants(TYPES, 'ASIDE')
 
@@ -56,6 +58,36 @@ export default (state = initalState, action) => {
       return {
         ...state,
         visible: false,
+      }
+    }
+    case TYPES.INCREASE_BADGE: {
+      const { type, key } = action.id
+      const types = `${type}s`
+      return {
+        ...state,
+        [types]: {
+          ...state[types],
+          [key]: {
+            ...state[types][key],
+            badge: (state[types][key].badge || 0) + 1,
+            text: action.text,
+          },
+        },
+      }
+    }
+    case TYPES.CLEAR_BADGE: {
+      const { type, key } = action.id
+      const types = `${type}s`
+      return {
+        ...state,
+        [types]: {
+          ...state[types],
+          [key]: {
+            ...state[types][key],
+            badge: 0,
+            text: '',
+          },
+        },
       }
     }
     default:
@@ -107,3 +139,14 @@ export const hide = () => ({
 })
 
 export const changeDialog = (type, key) => push(`/chat/${type}/${key}`)
+
+export const clearBadge = id => ({
+  type: TYPES.CLEAR_BADGE,
+  id,
+})
+
+export const increaseBadge = (id, text) => ({
+  type: TYPES.INCREASE_BADGE,
+  id,
+  text,
+})

@@ -50,7 +50,7 @@ class Dialog extends Component {
   }
 
   render() {
-    const { messages, username } = this.props
+    const { messages, username, online } = this.props
     const { text, fileList } = this.state
     return (
       <div styleName="dialog">
@@ -69,12 +69,16 @@ class Dialog extends Component {
           fileList={fileList}
         >
           <Button>
-            <Icon type="upload" /> Upload
+            <Icon type="upload" /> File
           </Button>
         </Upload>
         <Form onSubmit={this.handleSubmit}>
           <TextArea rows={4} value={text} onChange={this.handleTextChange} />
-          <Button type="primary" htmlType="submit" disabled={!text && fileList.length <= 0}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            disabled={!online || (!text && fileList.length <= 0)}
+          >
             Send
           </Button>
         </Form>
