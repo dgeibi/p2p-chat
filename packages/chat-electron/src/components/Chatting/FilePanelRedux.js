@@ -1,3 +1,4 @@
+import { ipcRenderer } from 'electron'
 import getConstants from '../../utils/constants'
 
 const initialState = {
@@ -12,6 +13,7 @@ const TYPES = {
   FILE_END: '',
   FILE_FAIL: '',
   FILE_DONE: '',
+  ACCEPT_FILE: '',
 }
 
 getConstants(TYPES, 'CHATTING_FILE')
@@ -31,6 +33,12 @@ export default function filePanel(state = initialState, action) {
           },
         },
       }
+    }
+    case TYPES.ACCEPT_FILE: {
+      const { type, key, id } = findPos(action.payload)
+      const newState = { ...state }
+      delete newState[type][key][id]
+      return newState
     }
     case TYPES.FILE_END:
     case TYPES.FILE_PROCESSING:
@@ -85,6 +93,14 @@ export const fileReceived = message => ({
   type: TYPES.FILE_DONE,
   payload: { ...message, ok: true },
 })
+
+export const acceptFile = ({ tag, checksum, channel, id }) => {
+  ipcRenderer.send('accept-file', { tag, checksum, payload: { checksum, channel } })
+  return {
+    type: TYPES.ACCEPT_FILE,
+    payload: { tag, channel, id },
+  }
+}
 
 function findPos({ tag, channel, id }) {
   if (channel) {

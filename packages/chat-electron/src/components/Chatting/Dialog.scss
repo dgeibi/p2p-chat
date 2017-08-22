@@ -1,5 +1,6 @@
 .dialog {
   display: flex;
+  flex-grow: 1;
   height: 100vh;
   flex-direction: column;
   padding: 16px 0;

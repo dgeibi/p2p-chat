@@ -13,7 +13,7 @@ class Frame extends Component {
             <SettingNav />
             <Aside />
           </Col>
-          <Col span={14} offset={2} styleName="col">
+          <Col span={14} offset={1} styleName="col">
             {this.props.children}
           </Col>
         </Row>

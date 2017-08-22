@@ -1,8 +1,9 @@
 import React from 'react'
 import { Button } from 'antd'
+import Card from './CustomCard'
 
 export default props =>
-  <div>
+  <Card>
     {props.filename}
     <Button onClick={props.onClick}>Accept</Button>
-  </div>
+  </Card>

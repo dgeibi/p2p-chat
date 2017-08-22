@@ -1,41 +1,44 @@
 import React, { Component } from 'react'
-import { ipcRenderer } from 'electron'
 
 import ErrorMessage from './ErrorMessage'
 import FileInfo from './FileInfo'
 import FileReceive from './FileReceive'
+import './FilePanel.scss'
 
 class FilePanel extends Component {
   render() {
-    const { files } = this.props
+    const { files, acceptFile } = this.props
     return (
-      <div>
-        {Object.values(files).map(mapper)}
+      <div styleName="filePanel">
+        {Object.values(files).map((msg) => {
+          const { type, errMsg, id, ...payload } = msg
+          if (errMsg) return <ErrorMessage message={errMsg} />
+          switch (type) {
+            case 'file:receive':
+              return <FileReceive key={id} {...payload} />
+            case 'file:info':
+              return (
+                <FileInfo
+                  key={id}
+                  {...payload}
+                  onClick={() => {
+                    const { tag, channel } = payload
+                    const checksum = id.split('.')[0]
+                    acceptFile({
+                      id,
+                      tag,
+                      channel,
+                      checksum,
+                    })
+                  }}
+                />
+              )
+            default:
+              return null
+          }
+        })}
       </div>
     )
-  }
-}
-
-function mapper(msg) {
-  const { type, errMsg, id, ...payload } = msg
-  if (errMsg) return <ErrorMessage message={errMsg} />
-  switch (type) {
-    case 'file:receive':
-      return <FileReceive key={id} {...payload} />
-    case 'file:info':
-      return (
-        <FileInfo
-          key={id}
-          {...payload}
-          onClick={() => {
-            const { tag, channel } = payload
-            const checksum = id.split('.')[0]
-            ipcRenderer.send('accept-file', { tag, checksum, payload: { checksum, channel } })
-          }}
-        />
-      )
-    default:
-      return null
   }
 }
 

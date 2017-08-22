@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
-import { Spin } from 'antd'
+import { Spin, Menu } from 'antd'
 import { ipcRenderer } from 'electron'
 import PropTypes from 'prop-types'
 import EventObservable from 'utils/EventObservable'
-import classNames from 'classnames'
+import formatTag from '../../utils/formatTag'
 import DialogType from './DialogType'
-import './ChatList.scss'
 
 class ChatList extends Component {
   static propTypes = {
@@ -18,13 +17,13 @@ class ChatList extends Component {
   observables = EventObservable(ipcRenderer)
 
   componentWillMount() {
-    const { addUser, removeUser, addChannel, setup } = this.props
+    const { addUser, offUser, addChannel, setup } = this.props
     this.observables.observe('login', (event, { tag, username }) => {
       addUser(username, tag)
     })
 
     this.observables.observe('logout', (event, { tag, username }) => {
-      removeUser(username, tag)
+      offUser(username, tag)
     })
 
     this.observables.observe('channel-create', (events, { channel }) => {
@@ -40,28 +39,9 @@ class ChatList extends Component {
     this.observables.removeAllObservables()
   }
 
-  onClickChannel(key) {
-    this.props.changeDialog(DialogType.CHANNEL, key)
-  }
-
-  onClickUser(key) {
-    this.props.changeDialog(DialogType.USER, key)
-  }
-
-  getOnClick(type) {
-    const { changeDialog } = this.props
-
-    return function onClick(e) {
-      const node = e.target
-      if (node.matches('a')) {
-        changeDialog(type, node.dataset.key)
-      }
-    }
-  }
-
-  matchCurrent(type, key) {
-    const { current } = this.props
-    return type === current.type && current.key === key
+  handleClick = (e) => {
+    const [key, type] = e.keyPath
+    this.props.changeDialog(type, key)
   }
 
   render() {
@@ -72,40 +52,28 @@ class ChatList extends Component {
 
     return (
       <div>
-        <h1>Channels</h1>
-        <ul onClick={this.getOnClick(DialogType.CHANNEL)}>
-          {Object.values(channels).map((channel) => {
-            const { key, name } = channel
-            const styleName = classNames({
-              item: true,
-              item__active: this.matchCurrent(DialogType.CHANNEL, key),
-            })
-            return (
-              <li key={key}>
-                <a styleName={styleName} data-key={key}>
-                  {name}
-                </a>
-              </li>
-            )
-          })}
-        </ul>
-        <h1>Users</h1>
-        <ul onClick={this.getOnClick(DialogType.USER)}>
-          {Object.values(users).map((user) => {
-            const { tag: key, username: name } = user
-            const styleName = classNames({
-              item: true,
-              item__active: this.matchCurrent(DialogType.USER, key),
-            })
-            return (
-              <li key={key}>
-                <a styleName={styleName} data-key={key}>
-                  {name}
-                </a>
-              </li>
-            )
-          })}
-        </ul>
+        <Menu mode="inline" onClick={this.handleClick} selectedKeys={[this.props.current.key]}>
+          <Menu.SubMenu key={DialogType.CHANNEL} title="Channels">
+            {Object.values(channels).map((channel) => {
+              const { key, name } = channel
+              return (
+                <Menu.Item key={key}>
+                  {name}[{formatTag(key)}]
+                </Menu.Item>
+              )
+            })}
+          </Menu.SubMenu>
+          <Menu.SubMenu key={DialogType.USER} title="Users">
+            {Object.values(users).map((user) => {
+              const { tag: key, username: name, online } = user
+              return (
+                <Menu.Item key={key} disabled={!online}>
+                  {name}[{formatTag(key)}]
+                </Menu.Item>
+              )
+            })}
+          </Menu.SubMenu>
+        </Menu>
       </div>
     )
   }

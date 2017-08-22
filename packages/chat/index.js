@@ -45,10 +45,10 @@ const getMessage = () => ({
  * @param {object} message
  */
 function handleFile(socket, message) {
-  const { tag, checksum, username, filepath, channel } = message
+  const { tag, checksum, username, filepath, channel, size } = message
   const id = `${checksum}.${process.uptime()}`
   const filename = path.basename(filepath)
-  emitter.emit('file-process-start', { id, tag, channel, filename, username })
+  emitter.emit('file-process-start', { id, tag, channel, size, filename, username })
 
   const processing = (check, percent, speed) => {
     if (check !== checksum) return

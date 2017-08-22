@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Text = ({ username, tag, text, myName }) =>
+const Text = ({ username, text, myName }) =>
   <div
     style={{
       marginBottom: '16px',
@@ -16,7 +16,7 @@ const Text = ({ username, tag, text, myName }) =>
         color: '#222',
       }}
     >
-      {username ? `${username} [${tag.slice(0, 5)}]` : myName}:{' '}
+      {username || myName}:{' '}
     </span>
     {text}
   </div>

@@ -6,7 +6,7 @@ const TYPES = {
   SETUP: '',
   ADD_USER: '',
   CHANGE_DIALOG: '',
-  REMOVE_USER: '',
+  OFF_USER: '',
   CREATE_CHANNLE: '',
   ADD_CHANNLE: '',
   SHOW_LIST: '',
@@ -27,6 +27,7 @@ export default (state = initalState, action) => {
         ...state,
         ...action.payload,
       }
+    case TYPES.OFF_USER:
     case TYPES.ADD_USER: {
       return {
         ...state,
@@ -34,14 +35,6 @@ export default (state = initalState, action) => {
           ...state.users,
           [action.payload.tag]: action.payload,
         },
-      }
-    }
-    case TYPES.REMOVE_USER: {
-      const users = { ...state.users }
-      delete users[action.payload.tag]
-      return {
-        ...state,
-        users,
       }
     }
     case TYPES.ADD_CHANNLE: {
@@ -80,14 +73,16 @@ export const addUser = (username, tag) => ({
   payload: {
     username,
     tag,
+    online: true,
   },
 })
 
-export const removeUser = (username, tag) => ({
-  type: TYPES.REMOVE_USER,
+export const offUser = (username, tag) => ({
+  type: TYPES.OFF_USER,
   payload: {
     username,
     tag,
+    online: false,
   },
 })
 
