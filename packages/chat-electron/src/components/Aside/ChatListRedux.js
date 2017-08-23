@@ -70,7 +70,6 @@ export default (state = initalState, action) => {
           [key]: {
             ...state[types][key],
             badge: (state[types][key].badge || 0) + 1,
-            text: action.text,
           },
         },
       }
@@ -85,7 +84,6 @@ export default (state = initalState, action) => {
           [key]: {
             ...state[types][key],
             badge: 0,
-            text: '',
           },
         },
       }
@@ -145,8 +143,7 @@ export const clearBadge = id => ({
   id,
 })
 
-export const increaseBadge = (id, text) => ({
+export const increaseBadge = id => ({
   type: TYPES.INCREASE_BADGE,
   id,
-  text,
 })

@@ -1,9 +1,13 @@
 import React from 'react'
-import { Button } from 'antd'
 import Card from './CustomCard'
+import { formatName, formatSize } from '../../utils/format'
 
-export default props =>
+export default ({ filename, onClick, size, username }) =>
   <Card>
-    {props.filename}
-    <Button onClick={props.onClick}>Accept</Button>
+    <section>
+      {formatName(filename)}
+      <br />
+      {formatSize(size)} by {formatName(username)}
+    </section>
+    <a onClick={onClick}>Accept</a>
   </Card>

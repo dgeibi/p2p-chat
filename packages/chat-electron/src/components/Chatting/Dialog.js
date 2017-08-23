@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Input, Button, Form, Upload, Icon } from 'antd'
-import ErrorMessage from './ErrorMessage'
-import Text from './Text'
+import Messages from './Messages'
 import './Dialog.scss'
 
 const { TextArea } = Input
@@ -54,15 +53,10 @@ class Dialog extends Component {
     const { text, fileList } = this.state
     return (
       <div styleName="dialog">
-        <div styleName="messages">
-          {messages.map((msg) => {
-            const props = { myName: username, key: Math.random() }
-            if (msg.error) return <ErrorMessage message={msg.error} {...props} />
-            if (msg.text) return <Text {...msg} {...props} />
-            return null
-          })}
+        <Messages messages={messages} username={username} />
+        <div>
+          {this.props.children}
         </div>
-        <div>{this.props.children}</div>
         <Upload
           multiple
           onRemove={this.handleFileRemove}

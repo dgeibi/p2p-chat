@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import sortBy from 'lodash.sortby'
 import assert from 'assert'
 import EventObservable from 'utils/EventObservable'
-import formatTag from '../../utils/formatTag'
+import { formatTag } from '../../utils/format'
 import ListItem from './ListItem'
 import DialogType from './DialogType'
 
@@ -37,15 +37,18 @@ class ChatList extends Component {
       setup({ users, channels })
     })
 
-    this.observables.observe('text', (event, { tag, text, channel }) => {
+    const handleIncome = (event, { tag, channel }) => {
       const currentID = this.props.current
       const id = idOf(tag, channel)
       try {
         assert.deepEqual(id, currentID)
       } catch (e) {
-        increaseBadge(id, text)
+        increaseBadge(id)
       }
-    })
+    }
+
+    this.observables.observe('fileinfo', handleIncome)
+    this.observables.observe('text', handleIncome)
   }
 
   componentWillUnmount() {
@@ -77,15 +80,16 @@ class ChatList extends Component {
 
     return (
       <div>
-        <Menu mode="inline" onClick={this.handleClick} selectedKeys={[this.props.current.key]}>
+        <Menu
+          mode="inline"
+          defaultOpenKeys={[DialogType.CHANNEL, DialogType.USER]}
+          onClick={this.handleClick}
+          selectedKeys={[this.props.current.key]}
+        >
           <Menu.SubMenu key={DialogType.CHANNEL} title="Channels">
             {Object.values(channels).map(({ key, name, badge }) =>
               <Menu.Item key={key}>
-                <ListItem
-                  title={`${name}[${formatTag(key)}]`}
-                  badge={badge || 0}
-                  online
-                />
+                <ListItem title={`${name}${formatTag(key)}`} badge={badge || 0} online />
               </Menu.Item>
             )}
           </Menu.SubMenu>
@@ -95,11 +99,7 @@ class ChatList extends Component {
               ({ online }) => (online ? 0 : 1)
             ).map(({ tag: key, username: name, online, badge }) =>
               <Menu.Item key={key}>
-                <ListItem
-                  title={`${name}[${formatTag(key)}]`}
-                  badge={badge || 0}
-                  online={online}
-                />
+                <ListItem title={`${name}${formatTag(key)}`} badge={badge || 0} online={online} />
               </Menu.Item>
             )}
           </Menu.SubMenu>

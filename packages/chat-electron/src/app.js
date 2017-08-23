@@ -45,13 +45,13 @@ ipcRenderer.on('bg-err', (event, { errMsg }) => {
   showError(errMsg)
 })
 
-ipcRenderer.on('text', (event, { tag, username, text, channel }) => {
-  store.dispatch(dialogActions.newMessage({ tag, username, text, channel }))
+ipcRenderer.on('text', (event, message) => {
+  store.dispatch(dialogActions.newMessage(message))
 })
 
 /* file receive */
-ipcRenderer.on('fileinfo', (event, { username, tag, filename, id, size }) => {
-  store.dispatch(filePanelActions.fileCome({ username, tag, filename, id, size }))
+ipcRenderer.on('fileinfo', (event, message) => {
+  store.dispatch(filePanelActions.fileCome(message))
 })
 
 ipcRenderer.on('file-process-start', (event, message) => {
