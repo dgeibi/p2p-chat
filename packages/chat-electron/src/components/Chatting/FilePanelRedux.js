@@ -28,8 +28,8 @@ export default function filePanel(state = initialState, action) {
         [type]: {
           ...state[type],
           [key]: {
-            ...state[type][key],
             [id]: action.payload,
+            ...state[type][key],
           },
         },
       }

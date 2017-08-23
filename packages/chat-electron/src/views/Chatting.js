@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import Dialog from '../components/Chatting/Dialog'
 import FilePanel from '../components/Chatting/FilePanel'
 import * as actions from './ChattingRedux'
-import './Chatting.scss'
 
 @connect(
   (state, ownProps) => ({
@@ -25,15 +24,16 @@ class Chatting extends Component {
   render() {
     const { dialogActions, username, messages, files, filePanelActions, id, online } = this.props
     return (
-      <div styleName="chatting">
+      <div>
         <Dialog
           {...dialogActions}
           username={username}
           messages={messages}
           online={online}
           id={id}
-        />
-        <FilePanel {...filePanelActions} files={files} id={id} />
+        >
+          <FilePanel {...filePanelActions} files={files} id={id} />
+        </Dialog>
       </div>
     )
   }

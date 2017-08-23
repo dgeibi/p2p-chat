@@ -62,6 +62,7 @@ class Dialog extends Component {
             return null
           })}
         </div>
+        <div>{this.props.children}</div>
         <Upload
           multiple
           onRemove={this.handleFileRemove}

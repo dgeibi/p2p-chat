@@ -61,7 +61,7 @@ const FileReceive = ({ username, size, filename, errMsg, speed, percent, ok, fil
         {formatSize(size)} by {cutName(username)}
       </section>
       {showSpeed}
-      <Progress percent={formatPercent(percent)} status={status} />
+      {status !== 'success' && <Progress percent={formatPercent(percent)} status={status} />}
       {showOpenBtn}
       {showErrorMsg}
     </Card>
@@ -81,15 +81,12 @@ function formatSpeed(speed) {
   return `${formatSize(speed)}/s`
 }
 
-function cutdown(str) {
-  const strArr = String(str).split('.')
-  if (strArr.length < 2) return str
-  strArr[1] = strArr[1].slice(0, 2)
-  return strArr.join('.')
+function cutdown(num) {
+  return num.toFixed(2)
 }
 
 function formatPercent(percent) {
-  return (percent * 100).toFixed(3)
+  return Number((percent * 100).toPrecision(3))
 }
 
 function cutName(str) {

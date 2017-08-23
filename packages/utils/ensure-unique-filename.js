@@ -35,7 +35,7 @@ const ensureUnique = (filepath) => {
           if (!isNaN(n)) {
             arr[idx] = n + 1
           } else {
-            arr.push(1)
+            arr.splice(arr.length - 1, 0, '1')
           }
         }
       }
