@@ -17,12 +17,7 @@
     "lint": "run-p lint:*",
     "postinstall": "run-p webpack"
   },
-  "keywords": [
-    "electron-app",
-    "electron",
-    "p2p",
-    "socket"
-  ],
+  "keywords": ["electron-app", "electron", "p2p", "socket"],
   "dependencies": {
     "chat": "^1.2.3",
     "electron-settings": "^3.1.1",
@@ -107,6 +102,7 @@
       "allowToChangeInstallationDirectory": true
     }
   },
+  "@std": { "esm": "js" },
   "babel": {
     "presets": [
       [
@@ -125,17 +121,18 @@
     "plugins": [
       "transform-decorators-legacy",
       "transform-runtime",
-      ["react-css-modules", {
-        "filetypes": {
-          ".scss": {
-            "syntax": "postcss-scss",
-            "plugins": [
-              "postcss-nested"
-            ]
-          }
-        },
-        "webpackHotModuleReloading": true
-      }],
+      [
+        "react-css-modules",
+        {
+          "filetypes": {
+            ".scss": {
+              "syntax": "postcss-scss",
+              "plugins": ["postcss-nested"]
+            }
+          },
+          "webpackHotModuleReloading": true
+        }
+      ],
       [
         "import",
         {
@@ -146,9 +143,7 @@
     ],
     "env": {
       "test": {
-        "plugins": [
-          "transform-es2015-modules-commonjs"
-        ]
+        "plugins": ["transform-es2015-modules-commonjs"]
       }
     }
   }

@@ -1,29 +1,15 @@
 import React from 'react'
 import { render } from 'react-dom'
 import { ipcRenderer } from 'electron'
-import { Provider } from 'react-redux'
-import { Route, Switch } from 'react-router-dom'
-import { ConnectedRouter as Router } from 'react-router-redux'
-import { store, history } from './redux'
-import Frame from './layouts/Frame'
+
+import { store } from './redux'
 import { showError } from './utils/message'
 import { loginActions } from './views/SettingsRedux'
 import { chatListActions } from './views/AsideRedux'
-import Chatting from './views/Chatting'
 import { dialogActions, filePanelActions } from './views/ChattingRedux'
+import App from './layouts/App'
 
-render(
-  <Provider store={store}>
-    <Frame>
-      <Router history={history}>
-        <Switch>
-          <Route path="/chat/:type/:key" component={Chatting} />
-        </Switch>
-      </Router>
-    </Frame>
-  </Provider>,
-  document.querySelector('#root')
-)
+render(<App />, document.querySelector('#root'))
 
 // global
 ipcRenderer.on('logout-reply', (event, { errMsg }) => {
