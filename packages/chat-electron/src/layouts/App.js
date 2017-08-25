@@ -5,6 +5,7 @@ import { ConnectedRouter as Router } from 'react-router-redux'
 import { store, history } from '../redux'
 import Frame from './Frame'
 import Chatting from '../views/Chatting'
+import './scrollbar.scss'
 
 const App = () =>
   <Provider store={store}>

@@ -8,9 +8,11 @@ import './FilePanel.scss'
 class FilePanel extends Component {
   render() {
     const { files, acceptFile } = this.props
+    const filesArr = Object.values(files)
+    if (filesArr.length <= 0) return null
     return (
       <div styleName="filePanel">
-        {Object.values(files).map((msg) => {
+        {filesArr.map((msg) => {
           const { type, errMsg, id, ...payload } = msg
           if (errMsg) return <ErrorMessage message={errMsg} />
           switch (type) {

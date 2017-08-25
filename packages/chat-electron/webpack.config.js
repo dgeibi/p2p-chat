@@ -52,6 +52,7 @@ module.exports = (env = {}) => {
             modules: true,
             localIdentName: '[path]___[name]__[local]___[hash:base64:5]',
             importLoaders: 1,
+            minimize: true,
           },
         },
         'postcss-loader',
@@ -59,7 +60,16 @@ module.exports = (env = {}) => {
     })
     .rule({
       test: /\.less$/,
-      use: ['style-loader', 'css-loader', 'less-loader'],
+      use: [
+        'style-loader',
+        {
+          loader: 'css-loader',
+          options: {
+            minimize: true,
+          },
+        },
+        'less-loader',
+      ],
     })
     .plugin(HtmlWebpackPlugin, [
       {

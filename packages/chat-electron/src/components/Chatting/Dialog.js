@@ -68,7 +68,7 @@ class Dialog extends Component {
           </Button>
         </Upload>
         <Form onSubmit={this.handleSubmit}>
-          <TextArea rows={4} value={text} onChange={this.handleTextChange} />
+          <TextArea rows={4} value={text} onChange={this.handleTextChange} styleName="text" />
           <Button
             type="primary"
             htmlType="submit"
