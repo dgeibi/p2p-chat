@@ -102,7 +102,6 @@
       "allowToChangeInstallationDirectory": true
     }
   },
-  "@std": { "esm": "js" },
   "babel": {
     "presets": [
       [

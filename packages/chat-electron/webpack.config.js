@@ -16,10 +16,10 @@ module.exports = (env = {}) => {
   const isProduction = env.production === true
 
   const config = new Config({
-    entry: `${SRC_DIR}/app.js`,
+    entry: { app: `${SRC_DIR}/index.js` },
     output: {
       path: OUTPUT_DIR,
-      filename: 'bundle.js',
+      filename: '[name].bundle.js',
       publicPath: PUBLIC_PATH,
     },
     target: 'electron-renderer',
@@ -34,8 +34,6 @@ module.exports = (env = {}) => {
     },
     externals: [],
   })
-
-  config
     .use(devServer(), !isProduction)
     .use(babili(), isProduction)
     .use(
