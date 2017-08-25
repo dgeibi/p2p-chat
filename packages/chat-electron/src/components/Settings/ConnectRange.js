@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import { ipcRenderer } from 'electron'
-import { Input, Form, Modal, Icon } from 'antd'
+import { Input, Form, Modal } from 'antd'
 import { validAddress, validPort } from './validators'
 import ModalBtn from '../Common/ModalBtn'
 import { showError } from '../../utils/message'
+import './ConnectRange.scss'
 
 const FormItem = Form.Item
 
@@ -14,7 +15,6 @@ const handleCreate = (form) => {
       return
     }
     ipcRenderer.send('change-setting', values)
-    console.log('Received values of form: ', values)
   })
 }
 
@@ -27,11 +27,12 @@ export class ConnectRange extends Component {
     return (
       <Modal
         visible={visible}
-        title="Connect Clients Range"
+        title="Connect Clients from Range"
         okText="Connect"
         cancelText="Cancel"
         onCancel={onCancel}
         onOk={onCreate}
+        styleName="modal"
       >
         <Form>
           <FormItem label="Least address">
@@ -85,6 +86,4 @@ export class ConnectRange extends Component {
 }
 
 export const ConnectRangeBtn = props =>
-  <ModalBtn component={ConnectRange} handleCreate={handleCreate} {...props}>
-    <Icon type="plus" />
-  </ModalBtn>
+  <ModalBtn component={ConnectRange} handleCreate={handleCreate} icon="plus" {...props} />

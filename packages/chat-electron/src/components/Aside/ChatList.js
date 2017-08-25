@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Spin, Menu } from 'antd'
+import { Menu } from 'antd'
 import { ipcRenderer } from 'electron'
 import PropTypes from 'prop-types'
 import sortBy from 'lodash.sortby'
@@ -76,7 +76,7 @@ class ChatList extends Component {
   render() {
     const { users, channels, visible } = this.props
     if (!visible) {
-      return <Spin />
+      return null
     }
 
     return (

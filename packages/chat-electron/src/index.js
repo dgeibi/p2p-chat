@@ -3,7 +3,7 @@ import { render } from 'react-dom'
 import { ipcRenderer } from 'electron'
 
 import { store } from './redux'
-import { showError } from './utils/message'
+import { showError, showInfo } from './utils/message'
 import { loginActions } from './views/SettingsRedux'
 import { chatListActions } from './views/AsideRedux'
 import { dialogActions, filePanelActions } from './views/ChattingRedux'
@@ -15,6 +15,8 @@ render(<App />, document.querySelector('#root'))
 ipcRenderer.on('logout-reply', (event, { errMsg }) => {
   if (errMsg) {
     showError(errMsg)
+  } else {
+    showInfo('Logouted.')
   }
 })
 

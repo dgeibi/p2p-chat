@@ -44,13 +44,8 @@ export default class ModalBtn extends Component {
     const { ref, onCancel, onCreate, visible, ...props } = componentProps
 
     return (
-      <span
-        style={{
-          marginRight: 8,
-          marginBottom: 12,
-        }}
-      >
-        <Button onClick={compose(this.showModal, onClick)} {...btnProps} shape="circle" />
+      <span>
+        <Button onClick={compose(this.showModal, onClick)} {...btnProps} />
         <this.props.component
           {...props}
           visible={this.state.visible}

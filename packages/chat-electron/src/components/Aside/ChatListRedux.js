@@ -13,6 +13,7 @@ const TYPES = {
   HIDE_LIST: '',
   CLEAR_BADGE: '',
   INCREASE_BADGE: '',
+  RESET: '',
 }
 constants(TYPES, 'ASIDE')
 
@@ -88,6 +89,9 @@ export default (state = initalState, action) => {
         },
       }
     }
+    case TYPES.RESET: {
+      return { ...initalState }
+    }
     default:
       return state
   }
@@ -146,4 +150,8 @@ export const clearBadge = id => ({
 export const increaseBadge = id => ({
   type: TYPES.INCREASE_BADGE,
   id,
+})
+
+export const reset = () => ({
+  type: TYPES.RESET,
 })

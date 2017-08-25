@@ -131,6 +131,7 @@ ipcMain.on('logout', () => {
   locals.username = null
   locals.channels = null
   locals.users = null
+  win.setTitle(pkg.name)
 })
 
 // worker events

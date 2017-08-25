@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Input, Form, Modal, Icon } from 'antd'
+import { Input, Form, Modal } from 'antd'
 import { ipcRenderer } from 'electron'
 import { validPort } from './validators'
 import ModalBtn from '../Common/ModalBtn'
@@ -70,6 +70,11 @@ export class Login extends Component {
 }
 
 export default props =>
-  <ModalBtn component={Login} handleCreate={validator} {...props}>
-    <Icon type="setting" />
-  </ModalBtn>
+  <ModalBtn
+    component={Login}
+    handleCreate={validator}
+    type="primary"
+    icon="setting"
+    ghost
+    {...props}
+  />

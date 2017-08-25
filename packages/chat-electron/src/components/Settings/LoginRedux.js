@@ -19,6 +19,13 @@ export default (state = initialState, action) => {
       return {
         ...state,
         ...action.payload,
+        logined: true,
+      }
+    }
+    case TYPES.LOGOUT: {
+      return {
+        ...state,
+        logined: false,
       }
     }
     default:
@@ -33,24 +40,7 @@ export const logout = () => {
   }
 }
 
-export const updateSettings = (id) => {
-  console.log(id)
-  return {
-    type: TYPES.UPDATE_SETTINGS,
-    payload: id,
-  }
-}
-
-// export const setupAside = (users, channels) => {
-//   console.log(users, channels)
-//   return {
-//     type: TYPES.SETUP_ASIDE,
-//   }
-// }
-
-// export const showError = (errMsg) => {
-//   console.error(errMsg)
-//   return {
-//     type: TYPES.ERROR,
-//   }
-// }
+export const updateSettings = id => ({
+  type: TYPES.UPDATE_SETTINGS,
+  payload: id,
+})
