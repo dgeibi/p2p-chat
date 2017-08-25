@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Input, Button, Form, Upload, Icon } from 'antd'
+import { Input, Button, Form, Upload } from 'antd'
 import Messages from './Messages'
 import './Dialog.scss'
 

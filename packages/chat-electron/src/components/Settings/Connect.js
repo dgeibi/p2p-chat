@@ -28,7 +28,6 @@ const handleCreate = (form) => {
     }
 
     ipcRenderer.send('change-setting', { connects })
-    console.log('Received values of form: ', connects)
   })
 }
 
