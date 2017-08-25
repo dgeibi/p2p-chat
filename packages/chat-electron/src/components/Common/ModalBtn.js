@@ -50,7 +50,7 @@ export default class ModalBtn extends Component {
           marginBottom: 12,
         }}
       >
-        <Button onClick={compose(this.showModal, onClick)} {...btnProps} />
+        <Button onClick={compose(this.showModal, onClick)} {...btnProps} shape="circle" />
         <this.props.component
           {...props}
           visible={this.state.visible}

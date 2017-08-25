@@ -8,6 +8,7 @@ import EventObservable from 'utils/EventObservable'
 import { formatTag } from '../../utils/format'
 import ListItem from './ListItem'
 import DialogType from './DialogType'
+import './ChatList.scss'
 
 class ChatList extends Component {
   static propTypes = {
@@ -79,32 +80,31 @@ class ChatList extends Component {
     }
 
     return (
-      <div>
-        <Menu
-          mode="inline"
-          defaultOpenKeys={[DialogType.CHANNEL, DialogType.USER]}
-          onClick={this.handleClick}
-          selectedKeys={[this.props.current.key]}
-        >
-          <Menu.SubMenu key={DialogType.CHANNEL} title="Channels">
-            {Object.values(channels).map(({ key, name, badge }) =>
-              <Menu.Item key={key}>
-                <ListItem title={`${name}${formatTag(key)}`} badge={badge || 0} online />
-              </Menu.Item>
-            )}
-          </Menu.SubMenu>
-          <Menu.SubMenu key={DialogType.USER} title="Users">
-            {sortBy(
-              Object.values(users),
-              ({ online }) => (online ? 0 : 1)
-            ).map(({ tag: key, username: name, online, badge }) =>
-              <Menu.Item key={key}>
-                <ListItem title={`${name}${formatTag(key)}`} badge={badge || 0} online={online} />
-              </Menu.Item>
-            )}
-          </Menu.SubMenu>
-        </Menu>
-      </div>
+      <Menu
+        mode="inline"
+        defaultOpenKeys={[DialogType.CHANNEL, DialogType.USER]}
+        onClick={this.handleClick}
+        selectedKeys={[this.props.current.key]}
+        styleName="menu"
+      >
+        <Menu.SubMenu key={DialogType.CHANNEL} title="Channels">
+          {Object.values(channels).map(({ key, name, badge }) =>
+            <Menu.Item key={key}>
+              <ListItem title={`${name}${formatTag(key)}`} badge={badge || 0} online />
+            </Menu.Item>
+          )}
+        </Menu.SubMenu>
+        <Menu.SubMenu key={DialogType.USER} title="Users">
+          {sortBy(
+            Object.values(users),
+            ({ online }) => (online ? 0 : 1)
+          ).map(({ tag: key, username: name, online, badge }) =>
+            <Menu.Item key={key}>
+              <ListItem title={`${name}${formatTag(key)}`} badge={badge || 0} online={online} />
+            </Menu.Item>
+          )}
+        </Menu.SubMenu>
+      </Menu>
     )
   }
 }

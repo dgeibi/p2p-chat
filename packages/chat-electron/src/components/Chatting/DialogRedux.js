@@ -49,10 +49,14 @@ export default function dialog(state = initialState, action) {
   }
 }
 
-export const newMessage = msg => ({
-  type: TYPES.NEW_MESSAGE,
-  payload: msg,
-})
+export const newMessage = (msg) => {
+  const payload = { ...msg }
+  payload.uid = msg.username + performance.now()
+  return {
+    type: TYPES.NEW_MESSAGE,
+    payload,
+  }
+}
 
 export const sendMessage = (id, text) => {
   const { tags, channel } = id

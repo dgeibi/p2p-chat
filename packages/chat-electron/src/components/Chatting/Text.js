@@ -7,9 +7,9 @@ const Text = ({ username, text, myName }) =>
     <header styleName="text__header">
       {username || myName}
     </header>
-    <pre styleName="text__main">
+    <main styleName="text__main">
       {text}
-    </pre>
+    </main>
     <footer styleName="text__footer">
       {dateFormat(new Date(), 'HH:MM')}
     </footer>

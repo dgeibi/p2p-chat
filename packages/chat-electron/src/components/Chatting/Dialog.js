@@ -63,19 +63,19 @@ class Dialog extends Component {
           beforeUpload={this.handleFileAdd}
           fileList={fileList}
         >
-          <Button>
-            <Icon type="upload" /> File
-          </Button>
+          <Button shape="circle" icon="paper-clip" />
         </Upload>
         <Form onSubmit={this.handleSubmit}>
           <TextArea rows={4} value={text} onChange={this.handleTextChange} styleName="text" />
-          <Button
-            type="primary"
-            htmlType="submit"
-            disabled={!online || (!text && fileList.length <= 0)}
-          >
-            Send
-          </Button>
+          <div styleName="send-btn-div">
+            <Button
+              type="primary"
+              htmlType="submit"
+              disabled={!online || (!text && fileList.length <= 0)}
+            >
+              Send
+            </Button>
+          </div>
         </Form>
       </div>
     )

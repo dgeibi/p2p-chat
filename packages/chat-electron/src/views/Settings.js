@@ -6,6 +6,7 @@ import LoginBtn from '../components/Settings/Login'
 import { loginActions } from './SettingsRedux'
 import { ConnectBtn } from '../components/Settings/Connect'
 import { ConnectRangeBtn } from '../components/Settings/ConnectRange'
+import './Settings.scss'
 
 @connect(
   state => ({
@@ -18,7 +19,7 @@ import { ConnectRangeBtn } from '../components/Settings/ConnectRange'
 export default class Settings extends Component {
   render() {
     return (
-      <div>
+      <div styleName="settings">
         <LoginBtn
           visibleDefault
           componentProps={{ ...this.props.login, ...this.props.loginActions }}

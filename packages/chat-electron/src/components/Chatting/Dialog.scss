@@ -2,9 +2,16 @@
   display: flex;
   height: 100vh;
   flex-direction: column;
-  padding: 16px 0;
+  padding: 16px;
 }
 
 .text {
+  width: 100%;
   font-size: 1.1em;
+  margin: 15px 0;
+  resize: none;
+}
+
+.send-btn-div {
+  text-align: right;
 }

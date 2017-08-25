@@ -118,6 +118,4 @@ export const Connect = Form.create()((props) => {
 })
 
 export const ConnectBtn = props =>
-  <ModalBtn component={Connect} handleCreate={handleCreate} {...props}>
-    <Icon type="plus" />
-  </ModalBtn>
+  <ModalBtn component={Connect} handleCreate={handleCreate} {...props} icon="cloud-o" />

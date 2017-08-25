@@ -15,13 +15,12 @@ class Messages extends Component {
     this.messageList.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0
   }
 
-  componentDidUpdate(prevProps) {
-    const { messages: prevMessages } = prevProps
-    const { messages } = this.props
+  componentDidUpdate() {
+    this.scrollToBottom()
+  }
 
-    if (prevMessages && messages && messages.length !== prevMessages.length) {
-      this.scrollToBottom()
-    }
+  shouldComponentUpdate(nextProps) {
+    return this.props.messages.length !== nextProps.messages.length
   }
 
   render() {
@@ -29,7 +28,7 @@ class Messages extends Component {
     return (
       <div styleName="messages" ref={this.saveMessageList}>
         {messages.map((msg) => {
-          const props = { myName: username, key: Math.random() }
+          const props = { myName: username, key: msg.uid }
           if (msg.error) return <ErrorMessage message={msg.error} {...props} />
           if (msg.text) return <Text {...msg} {...props} />
           return null
