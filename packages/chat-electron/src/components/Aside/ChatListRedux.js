@@ -1,4 +1,3 @@
-import { ipcRenderer } from 'electron'
 import { push } from 'react-router-redux'
 import constants from '../../utils/constants'
 
@@ -7,7 +6,6 @@ const TYPES = {
   ADD_USER: '',
   CHANGE_DIALOG: '',
   OFF_USER: '',
-  CREATE_CHANNLE: '',
   ADD_CHANNLE: '',
   SHOW_LIST: '',
   HIDE_LIST: '',
@@ -124,13 +122,6 @@ export const addChannel = channel => ({
   type: TYPES.ADD_CHANNLE,
   payload: channel,
 })
-
-export const createChannel = ({ tags, name }) => {
-  ipcRenderer.send('create-channel', { tags, name })
-  return {
-    type: TYPES.CREATE_CHANNLE,
-  }
-}
 
 export const show = () => ({
   type: TYPES.SHOW_LIST,

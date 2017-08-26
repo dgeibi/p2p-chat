@@ -21,17 +21,28 @@ export default class ModalBtn extends Component {
   handleCancel = () => {
     this.setState({ visible: false })
   }
+
   handleCreate = () => {
-    const form = this.form
     if (this.props.handleCreate) {
-      this.props.handleCreate(form)
+      this.props.handleCreate(this.form, (err) => {
+        if (!err) {
+          this.reset()
+        }
+      })
+    } else {
+      this.reset()
     }
-    form.resetFields()
-    this.setState({ visible: false })
   }
+
   saveFormRef = (form) => {
     this.form = form
   }
+
+  reset() {
+    this.form.resetFields()
+    this.setState({ visible: false })
+  }
+
   render() {
     const {
       visibleDefault,

@@ -4,17 +4,17 @@ import { Input, Form } from 'antd'
 import { validAddress, validPort } from './validators'
 import ModalBtn from '../Common/ModalBtn'
 import Modal from '../Common/Modal'
-import { showError } from '../../utils/message'
 
 const FormItem = Form.Item
 
-const handleCreate = (form) => {
+const handleCreate = (form, callback) => {
   form.validateFields((err, values) => {
     if (err) {
-      showError('Connection Invalid')
+      callback(err)
       return
     }
     ipcRenderer.send('change-setting', values)
+    callback()
   })
 }
 

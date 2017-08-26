@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
 import { Input, Form } from 'antd'
 import { ipcRenderer } from 'electron'
-import { validPort } from './validators'
+import { validPort, validName } from './validators'
 import ModalBtn from '../Common/ModalBtn'
 import Modal from '../Common/Modal'
-import { showError } from '../../utils/message'
 
 function FormItem(props) {
   const formItemLayout = {
@@ -14,13 +13,14 @@ function FormItem(props) {
   return <Form.Item {...formItemLayout} {...props} />
 }
 
-const validator = (form) => {
+const validator = (form, callback) => {
   form.validateFields((err, options) => {
     if (err) {
-      showError('Settings Invalid')
+      callback(err)
       return
     }
     ipcRenderer.send('setup', options)
+    callback()
   })
 }
 
@@ -47,6 +47,9 @@ export class Login extends Component {
                 {
                   required: true,
                   message: 'Please input your username!',
+                },
+                {
+                  validator: validName,
                 },
               ],
             })(<Input />)}

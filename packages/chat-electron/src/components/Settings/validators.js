@@ -16,3 +16,11 @@ export const validAddress = (rule, value, callback) => {
     callback(Error(`${value} is not a regular IP`))
   }
 }
+
+export const validName = (rule, value, callback) => {
+  if (!/\s/.test(value)) {
+    callback()
+  } else {
+    callback(Error('should not contain white space'))
+  }
+}

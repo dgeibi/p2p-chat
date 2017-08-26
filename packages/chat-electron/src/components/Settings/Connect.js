@@ -4,17 +4,16 @@ import { ipcRenderer } from 'electron'
 import ModalBtn from '../Common/ModalBtn'
 import Modal from '../Common/Modal'
 import { validAddress, validPort } from './validators'
-import { showError } from '../../utils/message'
 
 const InputGroup = Input.Group
 const FormItem = Form.Item
 
 let uuid = 0
 
-const handleCreate = (form) => {
+const handleCreate = (form, callback) => {
   form.validateFields((err, values) => {
     if (err) {
-      showError('Connection Invalid')
+      callback(err)
       return
     }
 
@@ -24,11 +23,11 @@ const handleCreate = (form) => {
       return { port, host }
     })
 
-    if (connects.length <= 0) {
-      return
+    if (connects.length > 0) {
+      ipcRenderer.send('change-setting', { connects })
     }
 
-    ipcRenderer.send('change-setting', { connects })
+    callback()
   })
 }
 

@@ -8,11 +8,21 @@ import { loginActions } from './SettingsRedux'
 import { chatListActions } from './AsideRedux'
 import { ConnectBtn } from '../components/Settings/Connect'
 import { ConnectRangeBtn } from '../components/Settings/ConnectRange'
+import { CreateChannelModalBtn } from '../components/Settings/CreateChannel'
+
+import { formatTag } from '../utils/format'
 import './Settings.scss'
+
+const selectOnlineUsers = chatListState =>
+  Object.values(chatListState.users).filter(({ online }) => online).map(({ tag, username }) => ({
+    label: username + formatTag(tag),
+    value: tag,
+  }))
 
 @connect(
   state => ({
     login: state.settings.login,
+    onlineUsers: selectOnlineUsers(state.aside.chatList),
   }),
   dispatch => ({
     resetChatList: () => dispatch(chatListActions.reset()),
@@ -26,16 +36,14 @@ export default class Settings extends Component {
   }
 
   render() {
+    const { onlineUsers, login } = this.props
     return (
       <div styleName="settings">
-        <LoginBtn
-          visibleDefault
-          componentProps={{ ...this.props.login, ...this.props.loginActions }}
-        />{' '}
-        {this.props.login.logined &&
+        <LoginBtn visibleDefault componentProps={{ ...login, ...this.props.loginActions }} />{' '}
+        {login.logined &&
           <span>
             <Button type="danger" onClick={this.logout} icon="disconnect" /> <ConnectBtn />{' '}
-            <ConnectRangeBtn />
+            <ConnectRangeBtn /> <CreateChannelModalBtn componentProps={{ onlineUsers }} />
           </span>}
       </div>
     )
