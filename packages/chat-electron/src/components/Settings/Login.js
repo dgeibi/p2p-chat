@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import { Input, Form, Modal } from 'antd'
+import { Input, Form } from 'antd'
 import { ipcRenderer } from 'electron'
 import { validPort } from './validators'
 import ModalBtn from '../Common/ModalBtn'
+import Modal from '../Common/Modal'
 import { showError } from '../../utils/message'
 
 function FormItem(props) {

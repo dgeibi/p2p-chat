@@ -1,7 +1,8 @@
-import { Form, Input, Icon, Button, Col, Modal } from 'antd'
+import { Form, Input, Icon, Button, Col } from 'antd'
 import React from 'react'
 import { ipcRenderer } from 'electron'
 import ModalBtn from '../Common/ModalBtn'
+import Modal from '../Common/Modal'
 import { validAddress, validPort } from './validators'
 import { showError } from '../../utils/message'
 

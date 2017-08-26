@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import { ipcRenderer } from 'electron'
-import { Input, Form, Modal } from 'antd'
+import { Input, Form } from 'antd'
 import { validAddress, validPort } from './validators'
 import ModalBtn from '../Common/ModalBtn'
+import Modal from '../Common/Modal'
 import { showError } from '../../utils/message'
-import './ConnectRange.scss'
 
 const FormItem = Form.Item
 
@@ -32,7 +32,6 @@ export class ConnectRange extends Component {
         cancelText="Cancel"
         onCancel={onCancel}
         onOk={onCreate}
-        styleName="modal"
       >
         <Form>
           <FormItem label="Least address">
