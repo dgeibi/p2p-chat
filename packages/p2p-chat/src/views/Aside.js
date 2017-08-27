@@ -23,9 +23,7 @@ class Aside extends Component {
         path: '/chat/:type/:key',
       })
       : null
-    const current = match
-      ? match.params
-      : {}
+    const current = match ? match.params : {}
     return (
       <div>
         <ChatList {...chatList} {...actions} current={current} />
