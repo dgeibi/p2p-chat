@@ -1,6 +1,6 @@
 module.exports = ({ rule, extractOptions, extract }) => (config) => {
   if (!rule || !rule.use) {
-    throw Error('rule required')
+    throw Error('rule and rule.use required')
   }
   if (extract && extractOptions) {
     const ExtractTextPlugin = require('extract-text-webpack-plugin') // eslint-disable-line global-require
