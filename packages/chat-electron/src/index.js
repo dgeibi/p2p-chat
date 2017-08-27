@@ -37,7 +37,24 @@ ipcRenderer.on('text', (event, message) => {
   store.dispatch(dialogActions.newMessage(message))
 })
 
-/* file receive */
+ipcRenderer.on('text-sent', (event, message) => {
+  store.dispatch(dialogActions.textSent(message))
+})
+
+// file:send
+ipcRenderer.on('file-sent', (event, info) => {
+  store.dispatch(dialogActions.fileSentNotice(info))
+})
+
+ipcRenderer.on('file-send-fail', (event, info) => {
+  store.dispatch(dialogActions.fileSendError(info))
+})
+
+ipcRenderer.on('file-unable-to-send', (event, { errMsg }) => {
+  showError(errMsg)
+})
+
+// file receive
 ipcRenderer.on('fileinfo', (event, message) => {
   store.dispatch(filePanelActions.fileCome(message))
 })
@@ -61,10 +78,3 @@ ipcRenderer.on('file-receive-fail', (event, message) => {
 ipcRenderer.on('file-receiced', (event, message) => {
   store.dispatch(filePanelActions.fileReceived(message))
 })
-
-/*
-// file:send
-ipcRenderer.on('file-sent', (event, { tag, username, filename }) => {})
-ipcRenderer.on('file-send-fail', (event, { tag, username, filename, errMsg }) => {})
-ipcRenderer.on('file-unable-to-send', (event, { errMsg }) => {})
-*/

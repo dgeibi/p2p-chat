@@ -385,10 +385,10 @@ function textToUsers(opts) {
   const { tags, payload } = opts
   const message = Object.assign(getMessage(), payload)
   message.type = 'text'
-
   each(locals.clients, tags, (socket) => {
     socket.send(message)
   })
+  emitter.emit('text-sent', Object.assign({ tag: tags[0] }, payload))
 }
 
 /**
@@ -475,6 +475,8 @@ function sendFile(message) {
   const { checksum, port, host } = message
   fileModule.send(checksum, { port, host }, (e, filename) => {
     const payload = Object.assign({}, message)
+    payload.filename = filename
+
     if (e) {
       payload.errMsg = e.message
       logger.err('file-send-fail', filename, payload.errMsg)

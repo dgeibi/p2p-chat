@@ -71,8 +71,11 @@ function send(checksum, options, callback) {
         socket.send(fileMsg)
         const readStream = fs.createReadStream(filepath)
         readStream.pipe(socket)
-        readStream.on('end', () => {
+        readStream.once('end', () => {
           socket.end()
+          socket.once('close', () => {
+            callback(null, filename)
+          })
         })
       })
       .on('error', (e) => {

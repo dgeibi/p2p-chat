@@ -25,13 +25,7 @@ class Chatting extends Component {
     const { dialogActions, username, messages, files, filePanelActions, id, online } = this.props
     return (
       <div>
-        <Dialog
-          {...dialogActions}
-          username={username}
-          messages={messages}
-          online={online}
-          id={id}
-        >
+        <Dialog {...dialogActions} username={username} messages={messages} online={online} id={id}>
           <FilePanel {...filePanelActions} files={files} id={id} />
         </Dialog>
       </div>
@@ -58,10 +52,10 @@ function getIDObj(chatListState, ownProps) {
   const id = { type, key }
   if (!type) {
     id.tags = []
-  } else if (type === 'channel') {
+  } else if (type === 'channel' && chatListState.channels[key]) {
     id.tags = Object.keys(chatListState.channels[key].users)
     id.channel = key
-  } else {
+  } else if (type === 'user') {
     id.tags = [key]
   }
   return id

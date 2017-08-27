@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-import ErrorMessage from './ErrorMessage'
+import { Alert } from 'antd'
 import FileInfo from './FileInfo'
 import FileReceive from './FileReceive'
 import './FilePanel.scss'
@@ -14,7 +14,7 @@ class FilePanel extends Component {
       <div styleName="filePanel">
         {filesArr.map((msg) => {
           const { type, errMsg, id, ...payload } = msg
-          if (errMsg) return <ErrorMessage message={errMsg} />
+          if (errMsg) return <Alert type="error" message={errMsg} />
           switch (type) {
             case 'file:receive':
               return <FileReceive key={id} {...payload} />

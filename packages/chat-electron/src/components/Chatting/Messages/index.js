@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import ErrorMessage from './ErrorMessage'
+
+import { Alert } from 'antd'
 import Text from './Text'
 import './Messages.scss'
 
@@ -28,9 +29,17 @@ class Messages extends Component {
     return (
       <div styleName="messages" ref={this.saveMessageList}>
         {messages.map((msg) => {
-          const props = { myName: username, key: msg.uid }
-          if (msg.error) return <ErrorMessage message={msg.error} {...props} />
-          if (msg.text) return <Text {...msg} {...props} />
+          const props = { key: msg.uid }
+          if (msg.alert) {
+            const { message, description, alert } = msg
+            return (
+              <Alert message={message} description={description} type={alert} showIcon {...props} />
+            )
+          }
+          if (msg.text) {
+            props.myName = username
+            return <Text {...msg} {...props} />
+          }
           return null
         })}
       </div>

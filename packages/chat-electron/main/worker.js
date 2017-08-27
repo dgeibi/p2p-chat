@@ -77,6 +77,7 @@ bypassChatToMain('logout')
 bypassChatToMain('login')
 
 bypassChatToMain('text')
+bypassChatToMain('text-sent')
 bypassChatToMain('fileinfo')
 bypassChatToMain('file-receiced')
 bypassChatToMain('file-receive-fail')
