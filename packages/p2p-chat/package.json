@@ -17,7 +17,7 @@
     "lint": "run-p lint:*",
     "postinstall": "run-p webpack"
   },
-  "keywords": ["electron-app", "electron", "p2p", "socket"],
+  "keywords": ["electron-app", "electron", "p2p", "socket", "react", "redux"],
   "dependencies": {
     "chat-core": "^1.2.3",
     "electron-settings": "^3.1.1",
