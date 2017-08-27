@@ -16,6 +16,7 @@
     "postinstall": "lerna bootstrap",
     "dist": "lerna run dist",
     "start": "cd packages/p2p-chat; npm run start",
+    "prod": "cd packages/p2p-chat; npm run prod",
     "format": "prettier-eslint --write '**/*.js'",
     "lint": "eslint ."
   },

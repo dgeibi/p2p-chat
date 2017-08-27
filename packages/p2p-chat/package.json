@@ -4,18 +4,19 @@
   "license": "MIT",
   "description": "a p2p chat app",
   "main": "index.js",
+  "output": "assets",
   "author": "dgeibi <png.inside@gmail.com> (blog.dgeibi.xyz)",
   "private": true,
   "scripts": {
     "start": "webpack-dev-server",
-    "start:local": "electron .",
-    "builder": "build -wl",
+    "prod": "run-s webpack electron",
     "dist": "run-s webpack builder",
-    "webpack": "webpack --env.production",
-    "format": "prettier-eslint --write '**/*.js'",
     "lint:js": "eslint .",
     "lint": "run-p lint:*",
-    "postinstall": "run-p webpack"
+    "builder": "build -wl",
+    "webpack": "webpack --env.production",
+    "electron": "electron .",
+    "format": "prettier-eslint --write '**/*.js'"
   },
   "keywords": ["electron-app", "electron", "p2p", "socket", "react", "redux"],
   "dependencies": {
@@ -69,10 +70,11 @@
     "style-loader": "^0.18.2",
     "webpack": "^3.4.1",
     "webpack-dev-server": "^2.6.1",
-    "wtf-webpack-config": "^0.1.1",
+    "wtf-webpack-config": "^0.1.2",
     "ip-regex": "^2.1.0",
     "prop-types": "15.5.10",
-    "lodash.sortby": "^4.7.0"
+    "lodash.sortby": "^4.7.0",
+    "extract-text-webpack-plugin": "^3.0.0"
   },
   "build": {
     "appId": "xyz.dgeibi.p2pchat",
