@@ -2,6 +2,7 @@ const path = require('path')
 const Config = require('wtf-webpack-config')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
+const define = require('wtf-webpack-config/plugins/define')
 const babel = require('wtf-webpack-config/rules/js/babel')
 const babili = require('wtf-webpack-config/plugins/babili')
 const devServer = require('./webpack-config/devServer')
@@ -34,6 +35,7 @@ module.exports = (env = {}) => {
     },
     externals: [],
   })
+    .use(define(), isProduction)
     .use(devServer(), !isProduction)
     .use(babili(), isProduction)
     .use(
