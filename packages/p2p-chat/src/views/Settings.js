@@ -33,6 +33,7 @@ export default class Settings extends Component {
   logout = () => {
     this.props.loginActions.logout()
     this.props.resetChatList()
+    this.props.loginActions.backToRoot()
   }
 
   render() {

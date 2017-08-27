@@ -1,4 +1,5 @@
 import { ipcRenderer } from 'electron'
+import { push } from 'react-router-redux'
 
 import getConstants from '../../utils/constants'
 
@@ -44,3 +45,5 @@ export const updateSettings = id => ({
   type: TYPES.UPDATE_SETTINGS,
   payload: id,
 })
+
+export const backToRoot = () => push('/')

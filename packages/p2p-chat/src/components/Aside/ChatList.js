@@ -62,7 +62,7 @@ class ChatList extends Component {
     try {
       assert.deepEqual(currentID, nextID)
     } catch (e) {
-      if (nextID) {
+      if (nextID && nextID.type) {
         this.props.clearBadge(nextID)
       }
     }

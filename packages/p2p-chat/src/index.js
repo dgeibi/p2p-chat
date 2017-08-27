@@ -2,7 +2,7 @@ import React from 'react'
 import { render } from 'react-dom'
 import { ipcRenderer } from 'electron'
 
-import { store } from './redux'
+import { store, history } from './redux'
 import { showError, showInfo } from './utils/message'
 import { loginActions } from './views/SettingsRedux'
 import { chatListActions } from './views/AsideRedux'
@@ -10,6 +10,8 @@ import { dialogActions, filePanelActions } from './views/ChattingRedux'
 import App from './layouts/App'
 
 render(<App />, document.querySelector('#root'))
+
+if (history.location !== '/') store.dispatch(loginActions.backToRoot())
 
 // global
 ipcRenderer.on('logout-reply', (event, { errMsg }) => {
