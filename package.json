@@ -1,5 +1,5 @@
 {
-  "name": "p2p-chat",
+  "name": "chat",
   "version": "1.0.0",
   "description": "a p2p chat app",
   "main": "index.js",
@@ -15,7 +15,7 @@
   "scripts": {
     "postinstall": "lerna bootstrap",
     "dist": "lerna run dist",
-    "start": "cd packages/chat-electron; npm run start",
+    "start": "cd packages/p2p-chat; npm run start",
     "format": "prettier-eslint --write '**/*.js'",
     "lint": "eslint ."
   },

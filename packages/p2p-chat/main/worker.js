@@ -1,4 +1,4 @@
-const chat = require('chat')
+const chat = require('chat-core')
 const logger = require('logger')
 
 const send = (key, ...args) => {
