@@ -1,8 +1,6 @@
 const { Menu } = require('electron')
 
-const selectionMenu = Menu.buildFromTemplate([
-  { role: 'copy' },
-])
+const selectionMenu = Menu.buildFromTemplate([{ role: 'copy' }])
 
 const inputMenu = Menu.buildFromTemplate([
   { role: 'undo' },
