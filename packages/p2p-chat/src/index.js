@@ -1,15 +1,23 @@
 import React from 'react'
-import { render } from 'react-dom'
+import ReactDOM from 'react-dom'
 import { ipcRenderer } from 'electron'
 
-import { store } from './redux'
+import { configureStore, history } from './redux'
 import { showError, showInfo } from './utils/message'
 import { loginActions } from './views/SettingsRedux'
 import { chatListActions } from './views/AsideRedux'
 import { dialogActions, filePanelActions } from './views/ChattingRedux'
 import App from './layouts/App'
+import storage from './utils/storage'
 
-render(<App />, document.querySelector('#root'))
+const APP_STORAGE = 'chat'
+
+const store = configureStore(storage.get(APP_STORAGE) || {})
+store.subscribe(() => {
+  storage.set(APP_STORAGE, store.getState())
+})
+
+ReactDOM.render(<App store={store} history={history} />, document.getElementById('root'))
 
 store.dispatch(loginActions.backToRoot())
 

@@ -85,4 +85,10 @@ export class ConnectRange extends Component {
 }
 
 export const ConnectRangeBtn = props =>
-  <ModalBtn component={ConnectRange} handleCreate={handleCreate} icon="plus" {...props} />
+  <ModalBtn
+    component={ConnectRange}
+    handleCreate={handleCreate}
+    icon="plus"
+    id="connectRange"
+    {...props}
+  />

@@ -79,6 +79,7 @@ export default props =>
     handleCreate={validator}
     type="primary"
     icon="setting"
+    id="login"
     ghost
     {...props}
   />

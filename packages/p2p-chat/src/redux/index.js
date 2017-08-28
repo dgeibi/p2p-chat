@@ -1,22 +1,31 @@
-import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
-import { routerReducer, routerMiddleware as createRouterMiddleware } from 'react-router-redux'
+import { createStore, applyMiddleware, compose } from 'redux'
+import { routerMiddleware as createRouterMiddleware } from 'react-router-redux'
 import createHistory from 'history/createHashHistory'
 import rootReducer from './reducers'
 
 const history = createHistory()
-
 const RouterMiddleware = createRouterMiddleware(history)
 
-const finalCreateStore = compose(
-  applyMiddleware(RouterMiddleware),
-  window && window.devToolsExtension ? window.devToolsExtension() : f => f
-)(createStore)
+const middlewares = [applyMiddleware(RouterMiddleware)]
 
-const reducer = combineReducers({
-  ...rootReducer,
-  routing: routerReducer,
-})
+if (process.env.NODE_ENV !== 'production') {
+  const DevTools = require('../layouts/DevTools').default // eslint-disable-line global-require
+  middlewares.push(DevTools.instrument())
+}
 
-const store = finalCreateStore(reducer)
+const finalCreateStore = compose(...middlewares)(createStore)
 
-export { store, history }
+const configureStore = (initialState) => {
+  const store = finalCreateStore(rootReducer, initialState)
+
+  if (module.hot) {
+    module.hot.accept('./reducers', () => {
+      const nextReducer = require('./reducers').default // eslint-disable-line global-require
+      store.replaceReducer(nextReducer)
+    })
+  }
+
+  return store
+}
+
+export { history, configureStore }

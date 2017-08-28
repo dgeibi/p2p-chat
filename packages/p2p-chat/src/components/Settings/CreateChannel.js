@@ -122,4 +122,10 @@ const handleCreate = (form, callback) => {
 }
 
 export const CreateChannelModalBtn = props =>
-  <ModalBtn component={CreateChannel} handleCreate={handleCreate} icon="usergroup-add" {...props} />
+  <ModalBtn
+    component={CreateChannel}
+    handleCreate={handleCreate}
+    icon="usergroup-add"
+    id="createChannel"
+    {...props}
+  />
