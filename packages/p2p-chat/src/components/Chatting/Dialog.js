@@ -21,7 +21,7 @@ class Dialog extends Component {
     const { id } = this.props
     if (text) this.props.sendMessage(id, text)
     if (fileList.length > 0) {
-      const filePaths = [...new Set(fileList.map(x => x.path))]
+      const filePaths = fileList.map(x => x.path)
       this.props.sendFiles(id, filePaths)
     }
     this.setState({
@@ -42,9 +42,15 @@ class Dialog extends Component {
   }
 
   handleFileAdd = (file) => {
-    this.setState(({ fileList }) => ({
-      fileList: [...fileList, file],
-    }))
+    this.setState(({ fileList }) => {
+      if (fileList.map(x => x.path).indexOf(file.path) === -1) {
+        return {
+          fileList: [...fileList, file],
+        }
+      }
+      return fileList
+    })
+
     return false
   }
 
