@@ -5,7 +5,7 @@ const webpack = require('webpack')
 
 const define = require('wtf-webpack-config/plugins/define')
 const babel = require('wtf-webpack-config/rules/js/babel')
-const babili = require('wtf-webpack-config/plugins/babili')
+const minify = require('wtf-webpack-config/plugins/babel-minify')
 const devServer = require('./webpack-config/devServer')
 const css = require('./webpack-config/css')
 const pkg = require('./package.json')
@@ -39,10 +39,13 @@ module.exports = (env = {}) => {
     externals: [],
   })
     .use(define(), isProduction)
-    .use(devServer({
-      contentBase: OUTPUT_DIR,
-    }), !isProduction)
-    .use(babili(), isProduction)
+    .use(
+      devServer({
+        contentBase: OUTPUT_DIR,
+      }),
+      !isProduction
+    )
+    .use(minify(), isProduction)
     .use(
       babel({
         include: defaultInclude,
