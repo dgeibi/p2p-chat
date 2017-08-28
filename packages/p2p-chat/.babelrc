@@ -1,0 +1,47 @@
+{
+  "presets": [
+    [
+      "env",
+      {
+        "targets": {
+          "node": 7
+        },
+        "modules": false,
+        "useBuiltIns": true
+      }
+    ],
+    "stage-0",
+    "react"
+  ],
+  "plugins": [
+    "transform-decorators-legacy",
+    "transform-runtime",
+    [
+      "react-css-modules",
+      {
+        "filetypes": {
+          ".scss": {
+            "syntax": "postcss-scss",
+            "plugins": ["postcss-nested"]
+          }
+        },
+        "webpackHotModuleReloading": true
+      }
+    ],
+    [
+      "import",
+      {
+        "libraryName": "antd",
+        "style": true
+      }
+    ]
+  ],
+  "env": {
+    "test": {
+      "plugins": ["transform-es2015-modules-commonjs"]
+    },
+    "development": {
+      "plugins": ["transform-decorators-legacy", "transform-class-properties", "transform-es2015-classes"]
+    }
+  }
+}

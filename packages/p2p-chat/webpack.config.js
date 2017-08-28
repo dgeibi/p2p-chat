@@ -8,10 +8,12 @@ const babel = require('wtf-webpack-config/rules/js/babel')
 const minify = require('wtf-webpack-config/plugins/babel-minify')
 const devServer = require('./webpack-config/devServer')
 const css = require('./webpack-config/css')
+const reactHMR = require('./webpack-config/react-hmr')
 const pkg = require('./package.json')
 
 module.exports = (env = {}) => {
   const isProduction = env.production === true
+  const isDev = !isProduction
 
   const PUBLIC_PATH = isProduction ? '' : '/'
   const SRC_DIR = path.resolve(__dirname, 'src')
@@ -38,12 +40,10 @@ module.exports = (env = {}) => {
     },
     externals: [],
   })
-    .use(define(), isProduction)
     .use(
-      devServer({
-        contentBase: OUTPUT_DIR,
-      }),
-      !isProduction
+      define({
+        'process.env.NODE_ENV': JSON.stringify(isDev ? 'developement' : 'production'),
+      })
     )
     .use(minify(), isProduction)
     .use(
@@ -99,7 +99,14 @@ module.exports = (env = {}) => {
         filename: 'index.html',
       },
     ])
-    .plugin(webpack.NamedModulesPlugin, null, !isProduction)
+    .plugin(webpack.NamedModulesPlugin, null, isDev)
+    .use(reactHMR, isDev)
+    .use(
+      devServer({
+        contentBase: OUTPUT_DIR,
+      }),
+      isDev
+    )
 
   return config.toConfig()
 }

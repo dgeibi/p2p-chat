@@ -1,5 +1,6 @@
+/* eslint-disable global-require */
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { render } from 'react-dom'
 import { ipcRenderer } from 'electron'
 
 import { configureStore, history } from './redux'
@@ -8,16 +9,29 @@ import { loginActions } from './views/SettingsRedux'
 import { chatListActions } from './views/AsideRedux'
 import { dialogActions, filePanelActions } from './views/ChattingRedux'
 import App from './layouts/App'
-import storage from './utils/storage'
 
-const APP_STORAGE = 'chat'
+const store = configureStore()
 
-const store = configureStore(storage.get(APP_STORAGE) || {})
-store.subscribe(() => {
-  storage.set(APP_STORAGE, store.getState())
-})
+if (!module.hot) {
+  render(<App store={store} history={history} />, document.getElementById('root'))
+} else {
+  const { AppContainer } = require('react-hot-loader')
 
-ReactDOM.render(<App store={store} history={history} />, document.getElementById('root'))
+  const renderHot = (Root) => {
+    render(
+      <AppContainer>
+        <Root store={store} history={history} />
+      </AppContainer>,
+      document.getElementById('root')
+    )
+  }
+  renderHot(App)
+
+  module.hot.accept('./layouts/App', () => {
+    const NextApp = require('./layouts/App').default
+    renderHot(NextApp)
+  })
+}
 
 store.dispatch(loginActions.backToRoot())
 
@@ -51,7 +65,7 @@ ipcRenderer.on('text-sent', (event, message) => {
   store.dispatch(dialogActions.textSent(message))
 })
 
-// file:send
+// file send
 ipcRenderer.on('file-sent', (event, info) => {
   store.dispatch(dialogActions.fileSentNotice(info))
 })
