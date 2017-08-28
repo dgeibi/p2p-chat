@@ -1,4 +1,3 @@
-/* eslint-disable global-require */
 import { createStore, applyMiddleware, compose } from 'redux'
 import { routerMiddleware as createRouterMiddleware } from 'react-router-redux'
 import createHistory from 'history/createHashHistory'
@@ -10,6 +9,7 @@ const RouterMiddleware = createRouterMiddleware(history)
 const middlewares = [applyMiddleware(RouterMiddleware)]
 
 if (process.env.NODE_ENV !== 'production') {
+  // eslint-disable-next-line global-require
   const DevTools = require('../layouts/DevTools').default
   middlewares.push(DevTools.instrument())
 }
@@ -21,8 +21,7 @@ const configureStore = (initialState) => {
 
   if (module.hot) {
     module.hot.accept('./reducer', () => {
-      const nextReducer = require('./reducer').default
-      store.replaceReducer(nextReducer)
+      store.replaceReducer(rootReducer)
     })
   }
 

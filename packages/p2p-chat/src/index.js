@@ -1,4 +1,3 @@
-/* eslint-disable global-require */
 import React from 'react'
 import { render } from 'react-dom'
 import { ipcRenderer } from 'electron'
@@ -15,6 +14,7 @@ const store = configureStore()
 if (!module.hot) {
   render(<App store={store} history={history} />, document.getElementById('root'))
 } else {
+  // eslint-disable-next-line global-require
   const { AppContainer } = require('react-hot-loader')
 
   const renderHot = (Root) => {
@@ -28,8 +28,7 @@ if (!module.hot) {
   renderHot(App)
 
   module.hot.accept('./layouts/App', () => {
-    const NextApp = require('./layouts/App').default
-    renderHot(NextApp)
+    renderHot(App)
   })
 }
 

@@ -41,7 +41,12 @@
       "plugins": ["transform-es2015-modules-commonjs"]
     },
     "development": {
-      "plugins": ["transform-decorators-legacy", "transform-class-properties", "transform-es2015-classes"]
+      "plugins": [
+        "react-hot-loader/babel",
+        "transform-decorators-legacy",
+        "transform-class-properties",
+        "transform-es2015-classes"
+      ]
     }
   }
 }
