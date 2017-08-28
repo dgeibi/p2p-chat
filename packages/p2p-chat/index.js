@@ -16,6 +16,7 @@ const pick = require('utils/pick')
 
 const getDir = require('./main/getDir')
 const Settings = require('./main/Settings')
+const setContextMenu = require('./main/setContextMenu')
 
 const workerEE = new EventEmitter()
 let win
@@ -237,6 +238,8 @@ function createWindow() {
   win.on('closed', () => {
     win = null
   })
+
+  setContextMenu(win)
 }
 
 function bypassRendererToWorker(key) {
