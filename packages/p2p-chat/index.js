@@ -221,11 +221,11 @@ function createWindow() {
     locals.devPort
       ? {
         protocol: 'http:',
-        host: `localhost:${locals.devPort}/${pkg.output}`,
+        host: `localhost:${locals.devPort}`,
         pathname: 'index.html',
       }
       : {
-        pathname: path.join(__dirname, 'index.html'),
+        pathname: path.join(__dirname, pkg.output, 'index.html'),
         protocol: 'file:',
       }
   )

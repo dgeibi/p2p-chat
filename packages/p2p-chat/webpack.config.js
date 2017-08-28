@@ -13,7 +13,7 @@ const pkg = require('./package.json')
 module.exports = (env = {}) => {
   const isProduction = env.production === true
 
-  const PUBLIC_PATH = isProduction ? `${pkg.output}/` : `/${pkg.output}/`
+  const PUBLIC_PATH = isProduction ? '' : '/'
   const SRC_DIR = path.resolve(__dirname, 'src')
   const OUTPUT_DIR = path.resolve(__dirname, pkg.output)
   const defaultInclude = [SRC_DIR]
@@ -39,7 +39,9 @@ module.exports = (env = {}) => {
     externals: [],
   })
     .use(define(), isProduction)
-    .use(devServer(), !isProduction)
+    .use(devServer({
+      contentBase: OUTPUT_DIR,
+    }), !isProduction)
     .use(babili(), isProduction)
     .use(
       babel({
@@ -91,7 +93,7 @@ module.exports = (env = {}) => {
       {
         title: pkg.name,
         template: 'src/index.ejs',
-        filename: isProduction ? '../index.html' : 'index.html',
+        filename: 'index.html',
       },
     ])
     .plugin(webpack.NamedModulesPlugin, null, !isProduction)
