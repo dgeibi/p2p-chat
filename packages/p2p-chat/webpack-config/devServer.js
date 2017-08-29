@@ -9,6 +9,7 @@ module.exports = options => (config) => {
     config.config.devServer,
     {
       hot: true,
+      // hotOnly: true,
       stats: {
         colors: true,
         chunks: false,

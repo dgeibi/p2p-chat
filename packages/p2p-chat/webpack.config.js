@@ -11,6 +11,8 @@ const css = require('./webpack-config/css')
 const reactHMR = require('./webpack-config/react-hmr')
 const pkg = require('./package.json')
 
+const getEnv = isDev => (isDev ? 'developement' : 'production')
+
 module.exports = (env = {}) => {
   const isProduction = env.production === true
   const isDev = !isProduction
@@ -20,6 +22,7 @@ module.exports = (env = {}) => {
   const OUTPUT_DIR = path.resolve(__dirname, pkg.output)
   const defaultInclude = [SRC_DIR]
 
+  process.env.BABEL_ENV = getEnv(isDev)
   const config = new Config({
     devtool: isProduction ? 'source-map' : 'cheap-module-eval-source-map',
     entry: { app: `${SRC_DIR}/index.js` },
@@ -42,7 +45,7 @@ module.exports = (env = {}) => {
   })
     .use(
       define({
-        'process.env.NODE_ENV': JSON.stringify(isDev ? 'developement' : 'production'),
+        'process.env.NODE_ENV': JSON.stringify(getEnv(isDev)),
       })
     )
     .use(minify(), isProduction)
