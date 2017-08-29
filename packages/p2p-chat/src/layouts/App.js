@@ -3,7 +3,6 @@ import { Provider } from 'react-redux'
 import { Route, Switch } from 'react-router-dom'
 import { ConnectedRouter as Router } from 'react-router-redux'
 
-import globalIPC from '../side-effects/global-ipc'
 import Frame from './Frame'
 import Chatting from '../views/Chatting'
 import './global.scss'
@@ -16,20 +15,17 @@ function getDevTool() {
   return null
 }
 
-const App = ({ store, hot, history }) => {
-  globalIPC(store, hot)
-  return (
-    <Provider store={store}>
-      <Frame>
-        <Router history={history}>
-          <Switch>
-            <Route path="/chat/:type/:key" component={Chatting} />
-          </Switch>
-        </Router>
-        {getDevTool()}
-      </Frame>
-    </Provider>
-  )
-}
+const App = ({ store, history }) => (
+  <Provider store={store}>
+    <Frame>
+      <Router history={history}>
+        <Switch>
+          <Route path="/chat/:type/:key" component={Chatting} />
+        </Switch>
+      </Router>
+      {getDevTool()}
+    </Frame>
+  </Provider>
+)
 
 export default App
