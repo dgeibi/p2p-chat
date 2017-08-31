@@ -1,5 +1,6 @@
 import { ipcRenderer } from 'electron'
 import constants from '../../utils/constants'
+import getNewState from '../../utils/getNewState'
 
 const initialState = {
   user: {},
@@ -15,6 +16,9 @@ const TYPES = {
   SEND_FILES: '',
   FILE_SENT: '',
   FILE_SEND_ERROR: '',
+  ADD_FILE: '',
+  REMOVE_FILE: '',
+  SET_TEXT: '',
 }
 constants(TYPES, 'DIALOG')
 
@@ -26,13 +30,45 @@ export default function dialog(state = initialState, action) {
     case TYPES.NEW_MESSAGE: {
       const type = action.payload.channel ? 'channel' : 'user'
       const key = action.payload.channel || action.payload.tag
-      return {
-        ...state,
-        [type]: {
-          ...state[type],
-          [key]: [...(state[type][key] || []), action.payload],
-        },
+      const newState = getNewState(state, type, key)
+      if (newState[type][key].messages) {
+        newState[type][key].messages = [...state[type][key].messages, action.payload]
+      } else {
+        newState[type][key].messages = [action.payload]
       }
+      return newState
+    }
+    case TYPES.ADD_FILE: {
+      const { type, key } = action.id
+      const newState = getNewState(state, type, key)
+      const s = newState[type][key]
+      if (s.filePaths) {
+        s.filePaths = [...new Set([...s.filePaths, action.payload])]
+      } else {
+        s.filePaths = [action.payload]
+      }
+      return newState
+    }
+    case TYPES.REMOVE_FILE: {
+      const { type, key } = action.id
+      const newState = getNewState(state, type, key)
+      const s = newState[type][key]
+      s.filePaths = s.filePaths.slice()
+      const index = s.filePaths.indexOf(action.payload)
+      s.filePaths.splice(index, 1)
+      return newState
+    }
+    case TYPES.SEND_FILES: {
+      const { type, key } = action.id
+      const newState = getNewState(state, type, key)
+      newState[type][key].filePaths = []
+      return newState
+    }
+    case TYPES.SET_TEXT: {
+      const { type, key } = action.id
+      const newState = getNewState(state, type, key)
+      newState[type][key].text = action.payload
+      return newState
     }
     default:
       return state
@@ -53,19 +89,20 @@ export const sendMessage = (id, text) => {
 
   return {
     type: TYPES.SEND_MY_MESSAGE,
+    id,
   }
 }
 
-export const sendFiles = (id, filePaths) => {
+export const sendFiles = (id, paths) => {
   const { tags, channel } = id
 
-  filePaths.forEach((filePath) => {
-    ipcRenderer.send('local-file', { tags, filepath: filePath, payload: { channel } })
+  paths.forEach((filepath) => {
+    ipcRenderer.send('local-file', { tags, filepath, payload: { channel } })
   })
+
   return {
     type: TYPES.SEND_FILES,
     id,
-    filePaths,
   }
 }
 
@@ -108,3 +145,21 @@ export const fileSendError = (info) => {
     payload,
   }
 }
+
+export const addFile = (id, path) => ({
+  type: TYPES.ADD_FILE,
+  id,
+  payload: path,
+})
+
+export const removeFile = (id, path) => ({
+  type: TYPES.REMOVE_FILE,
+  id,
+  payload: path,
+})
+
+export const setText = (id, text) => ({
+  type: TYPES.SET_TEXT,
+  id,
+  payload: text,
+})

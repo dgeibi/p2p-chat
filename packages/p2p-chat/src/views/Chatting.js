@@ -1,20 +1,34 @@
 import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { basename } from 'path'
 
 import Dialog from '../components/Chatting/Dialog'
 import FilePanel from '../components/Chatting/FilePanel'
 import * as actions from './ChattingRedux'
 
+const fileMapper = filepath => ({
+  uid: filepath,
+  path: filepath,
+  name: basename(filepath),
+})
 @connect(
-  (state, ownProps) => ({
-    messages: getMessages(state.chatting.dialog, ownProps),
-    files: getFiles(state.chatting.filePanel, ownProps),
-    id: getIDObj(state.aside.chatList, ownProps),
-    online: getUserOnline(state.aside.chatList, ownProps),
-    username: state.settings.login.username,
-    routing: state.routing,
-  }),
+  (state, ownProps) => {
+    const { dialog, filePanel } = state.chatting
+    const { chatList } = state.aside
+    return {
+      dialogProps: {
+        messages: selectState(dialog, ownProps, 'messages') || [],
+        text: selectState(dialog, ownProps, 'text') || '',
+        fileList: (selectState(dialog, ownProps, 'filePaths') || []).map(fileMapper),
+        online: getUserOnline(chatList, ownProps),
+        username: state.settings.login.username,
+      },
+      routing: state.routing,
+      id: getIDObj(chatList, ownProps),
+      files: selectState(filePanel, ownProps) || {},
+    }
+  },
   dispatch => ({
     dialogActions: bindActionCreators(actions.dialogActions, dispatch),
     filePanelActions: bindActionCreators(actions.filePanelActions, dispatch),
@@ -22,10 +36,10 @@ import * as actions from './ChattingRedux'
 )
 class Chatting extends Component {
   render() {
-    const { dialogActions, username, messages, files, filePanelActions, id, online } = this.props
+    const { dialogActions, files, filePanelActions, id, dialogProps } = this.props
     return (
       <div>
-        <Dialog {...dialogActions} username={username} messages={messages} online={online} id={id}>
+        <Dialog {...dialogActions} {...dialogProps} id={id}>
           <FilePanel {...filePanelActions} files={files} id={id} />
         </Dialog>
       </div>
@@ -35,16 +49,12 @@ class Chatting extends Component {
 
 export default Chatting
 
-function getMessages(dialogState, ownProps) {
+function selectState(state, ownProps, fleid) {
   const { type, key } = ownProps.match.params
-  if (!type) return []
-  return dialogState[type][key] || []
-}
-
-function getFiles(filePanelState, ownProps) {
-  const { type, key } = ownProps.match.params
-  if (!type) return {}
-  return filePanelState[type][key] || {}
+  if (!type) return null
+  if (!fleid) return state[type][key]
+  if (!state[type][key]) return null
+  return state[type][key][fleid]
 }
 
 function getIDObj(chatListState, ownProps) {

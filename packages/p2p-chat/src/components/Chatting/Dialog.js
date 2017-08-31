@@ -6,57 +6,39 @@ import './Dialog.scss'
 const { TextArea } = Input
 
 class Dialog extends Component {
-  state = {
-    text: '',
-    fileList: [],
-  }
-
   handleTextChange = (e) => {
-    this.setState({ text: e.target.value })
+    const { setText, id } = this.props
+    const text = e.target.value
+    setText(id, text)
   }
 
   handleSubmit = (e) => {
     e.preventDefault()
-    const { text, fileList } = this.state
-    const { id } = this.props
-    if (text) this.props.sendMessage(id, text)
+    const { id, fileList, sendFiles, text, sendMessage, setText } = this.props
+    if (text) {
+      sendMessage(id, text)
+      setText(id, '')
+    }
     if (fileList.length > 0) {
       const filePaths = fileList.map(x => x.path)
-      this.props.sendFiles(id, filePaths)
+      sendFiles(id, filePaths)
     }
-    this.setState({
-      text: '',
-      fileList: [],
-    })
   }
 
   handleFileRemove = (file) => {
-    this.setState(({ fileList }) => {
-      const index = fileList.indexOf(file)
-      const newFileList = fileList.slice()
-      newFileList.splice(index, 1)
-      return {
-        fileList: newFileList,
-      }
-    })
+    const { removeFile, id } = this.props
+    removeFile(id, file.path)
   }
 
   handleFileAdd = (file) => {
-    this.setState(({ fileList }) => {
-      if (fileList.map(x => x.path).indexOf(file.path) === -1) {
-        return {
-          fileList: [...fileList, file],
-        }
-      }
-      return fileList
-    })
+    const { addFile, id } = this.props
+    addFile(id, file.path)
 
     return false
   }
 
   render() {
-    const { messages, username, online } = this.props
-    const { text, fileList } = this.state
+    const { messages, username, online, fileList, text } = this.props
     return (
       <div styleName="dialog">
         <Messages messages={messages} username={username} />
