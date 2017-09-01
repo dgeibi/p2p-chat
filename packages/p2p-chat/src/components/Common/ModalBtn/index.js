@@ -24,12 +24,8 @@ export default class ModalBtn extends Component {
     visible: PropTypes.bool.isRequired,
   }
 
-  getProps = () => {
-    const { show, hide, visible } = this.props
-    return { show, hide, visible }
-  }
-
   render() {
-    return this.props.children(this.getProps)
+    const { show, hide, visible, children } = this.props
+    return children({ show, hide, visible })
   }
 }

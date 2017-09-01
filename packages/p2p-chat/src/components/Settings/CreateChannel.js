@@ -139,15 +139,12 @@ export const CreateChannelModalBtn = (props) => {
   const { visibleDefault, componentProps } = props
   return (
     <ModalBtn id="create-channel" visibleDefault={visibleDefault}>
-      {(getProps) => {
-        const { show, hide, visible } = getProps()
-        return (
-          <span>
-            <Button onClick={show} icon="usergroup-add" />
-            <CreateChannel hide={hide} visible={visible} {...componentProps} />
-          </span>
-        )
-      }}
+      {({ show, hide, visible }) => (
+        <span>
+          <Button onClick={show} icon="usergroup-add" />
+          <CreateChannel hide={hide} visible={visible} {...componentProps} />
+        </span>
+      )}
     </ModalBtn>
   )
 }

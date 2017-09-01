@@ -100,15 +100,12 @@ export default (props) => {
 
   return (
     <ModalBtn id="login" visibleDefault={visibleDefault}>
-      {(getProps) => {
-        const { show, hide, visible } = getProps()
-        return (
-          <span>
-            <Button onClick={show} ghost type="primary" icon="setting" />
-            <Login hide={hide} visible={visible} {...componentProps} />
-          </span>
-        )
-      }}
+      {({ show, hide, visible }) => (
+        <span>
+          <Button onClick={show} ghost type="primary" icon="setting" />
+          <Login hide={hide} visible={visible} {...componentProps} />
+        </span>
+      )}
     </ModalBtn>
   )
 }

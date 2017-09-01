@@ -102,15 +102,12 @@ export const ConnectRangeBtn = (props) => {
   const { visibleDefault, componentProps } = props
   return (
     <ModalBtn id="connect-range" visibleDefault={visibleDefault}>
-      {(getProps) => {
-        const { show, hide, visible } = getProps()
-        return (
-          <span>
-            <Button onClick={show} icon="plus" />
-            <ConnectRange hide={hide} visible={visible} {...componentProps} />
-          </span>
-        )
-      }}
+      {({ show, hide, visible }) => (
+        <span>
+          <Button onClick={show} icon="plus" />
+          <ConnectRange hide={hide} visible={visible} {...componentProps} />
+        </span>
+      )}
     </ModalBtn>
   )
 }
