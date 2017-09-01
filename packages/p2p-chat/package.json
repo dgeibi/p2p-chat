@@ -18,14 +18,7 @@
     "electron": "electron .",
     "format": "prettier-eslint --write '**/*.js'"
   },
-  "keywords": [
-    "electron-app",
-    "electron",
-    "p2p",
-    "socket",
-    "react",
-    "redux"
-  ],
+  "keywords": ["electron-app", "electron", "p2p", "socket", "react", "redux"],
   "dependencies": {
     "chat-core": "^1.2.3",
     "electron-settings": "^3.1.1",
@@ -65,6 +58,7 @@
     "ip-regex": "^2.1.0",
     "less": "^2.7.2",
     "less-loader": "^4.0.5",
+    "lodash.isequal": "^4.5.0",
     "lodash.sortby": "^4.7.0",
     "npm-run-all": "^4.0.2",
     "postcss-loader": "^2.0.6",

@@ -3,7 +3,7 @@ import { Menu } from 'antd'
 import { ipcRenderer } from 'electron'
 import PropTypes from 'prop-types'
 import sortBy from 'lodash.sortby'
-import assert from 'assert'
+import isEqual from 'lodash.isequal'
 import EventObservable from 'utils/EventObservable'
 import { formatTag } from '../../utils/format'
 import ListItem from './ListItem'
@@ -41,10 +41,8 @@ class ChatList extends Component {
     const handleIncome = (event, { tag, channel }) => {
       const currentID = this.props.current
       const id = idOf(tag, channel)
-      try {
-        assert.deepEqual(id, currentID)
-      } catch (e) {
-        increaseBadge(id)
+      if (!isEqual(id, currentID)) {
+        increaseBadge(id, currentID)
       }
     }
 
@@ -59,12 +57,9 @@ class ChatList extends Component {
   componentWillReceiveProps(nextProps) {
     const currentID = this.props.current
     const nextID = nextProps.current
-    try {
-      assert.deepEqual(currentID, nextID)
-    } catch (e) {
-      if (nextID && nextID.type) {
-        this.props.clearBadge(nextID)
-      }
+
+    if (nextID && nextID.type && !isEqual(currentID, nextID)) {
+      this.props.clearBadge(nextID)
     }
   }
 
