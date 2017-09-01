@@ -9,12 +9,41 @@ import { validName } from './validators'
 const CheckboxGroup = Checkbox.Group
 const FormItem = Form.Item
 
+const create = ({ tags, name }) => {
+  ipcRenderer.send('create-channel', { tags, name })
+}
+
+const validForm = (form, callback) => {
+  form.validateFields((err, values) => {
+    if (err) {
+      callback(err)
+      return
+    }
+    create(values)
+    callback()
+  })
+}
+
 @Form.create()
 export class CreateChannel extends Component {
   static checkboxsField = 'tags'
   state = {
     indeterminate: false,
     checkAll: false,
+  }
+
+  handleCancel = () => {
+    this.props.hide()
+  }
+
+  handleCreate = () => {
+    const { form, hide } = this.props
+    validForm(form, (err) => {
+      if (!err) {
+        form.resetFields()
+        hide()
+      }
+    })
   }
 
   onChange = (checkedList) => {
@@ -78,11 +107,11 @@ export class CreateChannel extends Component {
   }
 
   render() {
-    const { onlineUsers, visible, onCancel, onCreate } = this.props
+    const { onlineUsers, visible } = this.props
     const props = {}
     if (onlineUsers.length <= 0) {
       props.footer = (
-        <Button size="large" type="primary" onClick={onCancel}>
+        <Button size="large" type="primary" onClick={this.handleCancel}>
           OK
         </Button>
       )
@@ -98,34 +127,27 @@ export class CreateChannel extends Component {
         title="Create a channel"
         okText="Create"
         cancelText="Cancel"
-        onCancel={onCancel}
-        onOk={onCreate}
+        onCancel={this.handleCancel}
+        onOk={this.handleCreate}
         {...props}
       />
     )
   }
 }
 
-const create = ({ tags, name }) => {
-  ipcRenderer.send('create-channel', { tags, name })
+export const CreateChannelModalBtn = (props) => {
+  const { visibleDefault, componentProps } = props
+  return (
+    <ModalBtn id="create-channel" visibleDefault={visibleDefault}>
+      {(getProps) => {
+        const { show, hide, visible } = getProps()
+        return (
+          <span>
+            <Button onClick={show} icon="usergroup-add" />
+            <CreateChannel hide={hide} visible={visible} {...componentProps} />
+          </span>
+        )
+      }}
+    </ModalBtn>
+  )
 }
-
-const handleCreate = (form, callback) => {
-  form.validateFields((err, values) => {
-    if (err) {
-      callback(err)
-      return
-    }
-    create(values)
-    callback()
-  })
-}
-
-export const CreateChannelModalBtn = props =>
-  <ModalBtn
-    component={CreateChannel}
-    handleCreate={handleCreate}
-    icon="usergroup-add"
-    id="createChannel"
-    {...props}
-  />

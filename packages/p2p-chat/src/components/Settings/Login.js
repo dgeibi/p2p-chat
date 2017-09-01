@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
-import { Input, Form } from 'antd'
+import { Input, Form, Button } from 'antd'
 import { ipcRenderer } from 'electron'
+import PropTypes from 'prop-types'
+
 import { validPort, validName } from './validators'
 import ModalBtn from '../Common/ModalBtn'
 import Modal from '../Common/Modal'
@@ -13,7 +15,7 @@ function FormItem(props) {
   return <Form.Item {...formItemLayout} {...props} />
 }
 
-const validator = (form, callback) => {
+const validForm = (form, callback) => {
   form.validateFields((err, options) => {
     if (err) {
       callback(err)
@@ -26,9 +28,29 @@ const validator = (form, callback) => {
 
 @Form.create()
 export class Login extends Component {
+  static propTypes = {
+    hide: PropTypes.func.isRequired,
+    visible: PropTypes.bool.isRequired,
+    form: PropTypes.object.isRequired,
+  }
+
+  handleCancel = () => {
+    this.props.hide()
+  }
+
+  handleCreate = () => {
+    const { form } = this.props
+    validForm(form, (err) => {
+      if (!err) {
+        this.props.form.resetFields()
+        this.props.hide()
+      }
+    })
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form
-    const { visible, onCancel, onCreate } = this.props
+    const { visible } = this.props
 
     return (
       <Modal
@@ -36,8 +58,8 @@ export class Login extends Component {
         title="Settings/Login"
         okText="OK"
         cancelText="Cancel"
-        onCancel={onCancel}
-        onOk={onCreate}
+        onCancel={this.handleCancel}
+        onOk={this.handleCreate}
       >
         <Form>
           <FormItem label="Username">
@@ -73,13 +95,20 @@ export class Login extends Component {
   }
 }
 
-export default props =>
-  <ModalBtn
-    component={Login}
-    handleCreate={validator}
-    type="primary"
-    icon="setting"
-    id="login"
-    ghost
-    {...props}
-  />
+export default (props) => {
+  const { visibleDefault, componentProps } = props
+
+  return (
+    <ModalBtn id="login" visibleDefault={visibleDefault}>
+      {(getProps) => {
+        const { show, hide, visible } = getProps()
+        return (
+          <span>
+            <Button onClick={show} ghost type="primary" icon="setting" />
+            <Login hide={hide} visible={visible} {...componentProps} />
+          </span>
+        )
+      }}
+    </ModalBtn>
+  )
+}

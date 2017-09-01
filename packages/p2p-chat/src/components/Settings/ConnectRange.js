@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 import { ipcRenderer } from 'electron'
-import { Input, Form } from 'antd'
+import { Input, Form, Button } from 'antd'
 import { validAddress, validPort } from './validators'
 import ModalBtn from '../Common/ModalBtn'
 import Modal from '../Common/Modal'
 
 const FormItem = Form.Item
 
-const handleCreate = (form, callback) => {
+const validForm = (form, callback) => {
   form.validateFields((err, values) => {
     if (err) {
       callback(err)
@@ -20,8 +20,22 @@ const handleCreate = (form, callback) => {
 
 @Form.create()
 export class ConnectRange extends Component {
+  handleCancel = () => {
+    this.props.hide()
+  }
+
+  handleCreate = () => {
+    const { form, hide } = this.props
+    validForm(form, (err) => {
+      if (!err) {
+        form.resetFields()
+        hide()
+      }
+    })
+  }
+
   render() {
-    const { visible, onCancel, onCreate } = this.props
+    const { visible } = this.props
     const { getFieldDecorator } = this.props.form
 
     return (
@@ -30,8 +44,8 @@ export class ConnectRange extends Component {
         title="Connect Clients from Range"
         okText="Connect"
         cancelText="Cancel"
-        onCancel={onCancel}
-        onOk={onCreate}
+        onCancel={this.handleCancel}
+        onOk={this.handleCreate}
       >
         <Form>
           <FormItem label="Least address">
@@ -84,11 +98,19 @@ export class ConnectRange extends Component {
   }
 }
 
-export const ConnectRangeBtn = props =>
-  <ModalBtn
-    component={ConnectRange}
-    handleCreate={handleCreate}
-    icon="plus"
-    id="connectRange"
-    {...props}
-  />
+export const ConnectRangeBtn = (props) => {
+  const { visibleDefault, componentProps } = props
+  return (
+    <ModalBtn id="connect-range" visibleDefault={visibleDefault}>
+      {(getProps) => {
+        const { show, hide, visible } = getProps()
+        return (
+          <span>
+            <Button onClick={show} icon="plus" />
+            <ConnectRange hide={hide} visible={visible} {...componentProps} />
+          </span>
+        )
+      }}
+    </ModalBtn>
+  )
+}
