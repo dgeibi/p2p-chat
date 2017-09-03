@@ -24,7 +24,6 @@ const fileMapper = filepath => ({
         online: getUserOnline(chatList, ownProps),
         username: state.settings.login.username,
       },
-      routing: state.routing,
       id: getIDObj(chatList, ownProps),
       files: selectState(filePanel, ownProps) || {},
     }
