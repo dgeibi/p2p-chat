@@ -19,14 +19,7 @@
     "electron": "electron .",
     "format": "prettier-eslint --write '**/*.js'"
   },
-  "keywords": [
-    "electron-app",
-    "electron",
-    "p2p",
-    "socket",
-    "react",
-    "redux"
-  ],
+  "keywords": ["electron-app", "electron", "p2p", "socket", "react", "redux"],
   "dependencies": {
     "p2p-chat-core": "^1.2.3",
     "electron-settings": "^3.1.1",
@@ -106,18 +99,13 @@
       "target": [
         {
           "target": "portable",
-          "arch": [
-            "x64",
-            "ia32"
-          ]
+          "arch": "ia32"
         }
       ]
     },
     "linux": {
       "category": "Network",
-      "target": [
-        "AppImage"
-      ]
+      "target": ["AppImage"]
     },
     "nsis": {
       "artifactName": "${productName}-installer-${version}.${ext}",
