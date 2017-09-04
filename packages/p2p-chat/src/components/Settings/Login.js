@@ -102,7 +102,7 @@ export default (props) => {
     <ModalBtn id="login" visibleDefault={visibleDefault}>
       {({ show, hide, visible }) => (
         <span>
-          <Button onClick={show} ghost type="primary" icon="setting" />
+          <Button onClick={show} ghost type="primary" icon="setting" size="large" />
           <Login hide={hide} visible={visible} {...componentProps} />
         </span>
       )}

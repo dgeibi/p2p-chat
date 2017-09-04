@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { Button } from 'antd'
 
 import LoginBtn from '../components/Settings/Login'
+import MyInfo from '../components/Settings/MyInfo'
 import { loginActions } from './SettingsRedux'
 import { chatListActions } from './AsideRedux'
 import { ConnectBtn } from '../components/Settings/Connect'
@@ -47,11 +48,12 @@ export default class Settings extends Component {
           <LoginBtn visibleDefault componentProps={{ ...login, ...this.props.loginActions }} />
         )}
         {logined && (
-          <span>
+          <div>
             <Button type="danger" onClick={this.logout} icon="disconnect" /> <ConnectBtn />{' '}
             <ConnectRangeBtn /> <CreateChannelModalBtn componentProps={{ onlineUsers }} />
-          </span>
+          </div>
         )}
+        <MyInfo {...login} />
       </div>
     )
   }
