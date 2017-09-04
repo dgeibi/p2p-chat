@@ -2,7 +2,7 @@
 
 const parseChunks = require('./parseChunks')
 const fs = require('fs-extra')
-const ensureUnique = require('utils/ensure-unique-filename')
+const ensureUnique = require('p2p-chat-utils/ensure-unique-filename')
 const { EventEmitter } = require('events')
 const { resolve } = require('path')
 

@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron'
-import replaceable from 'utils/event-replaceable'
+import replaceable from 'p2p-chat-utils/event-replaceable'
 import ipcListeners from '../side-effects/global-ipc'
 
 export default (store) => {

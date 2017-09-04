@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const net = require('net')
 
-const md5 = require('utils/md5')
+const md5 = require('p2p-chat-utils/md5')
 const enhanceSocket = require('./enhanceSocket')
 
 const messages = {}

@@ -9,14 +9,14 @@ module.exports = emitter
 const logger = require('logger')
 
 const enhanceSocket = require('./lib/enhanceSocket')
-const md5 = require('utils/md5')
-const getNewHost = require('utils/get-new-address')
-const isIPLarger = require('utils/is-ip-larger')
+const md5 = require('p2p-chat-utils/md5')
+const getNewHost = require('p2p-chat-utils/get-new-address')
+const isIPLarger = require('p2p-chat-utils/is-ip-larger')
 
-const each = require('utils/each')
-const pick = require('utils/pick')
+const each = require('p2p-chat-utils/each')
+const pick = require('p2p-chat-utils/pick')
 
-const IPset = require('utils/ipset')
+const IPset = require('p2p-chat-utils/ipset')
 const login = require('./lib/login')
 const fileModule = require('./lib/file')
 

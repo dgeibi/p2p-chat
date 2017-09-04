@@ -1,7 +1,14 @@
 {
-  "lerna": "2.0.0",
+  "lerna": "2.1.2",
   "packages": [
     "packages/*"
   ],
-  "version": "0.0.0"
+  "version": "0.0.0",
+  "commands": {
+    "publish": {
+      "ignore": [
+        "p2p-chat"
+      ]
+    }
+  }
 }

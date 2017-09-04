@@ -9,7 +9,7 @@
     "eslint-config-dgeibi": "^3.0.3",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-no-async-without-await": "^1.2.0",
-    "lerna": "^2.0.0",
+    "lerna": "^2.1.2",
     "prettier-eslint-cli": "^4.1.1"
   },
   "scripts": {

@@ -1,4 +1,4 @@
-const chat = require('chat-core')
+const chat = require('p2p-chat-core')
 const logger = require('logger')
 
 const send = (key, ...args) => {
