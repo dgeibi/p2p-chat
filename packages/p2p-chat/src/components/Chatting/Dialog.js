@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
-import { Input, Button, Form, Upload } from 'antd'
+import { Input, Button, Form, Upload, Collapse } from 'antd'
 import Messages from './Messages'
+import { formatTag } from '../../utils/format'
 import './Dialog.scss'
 
 const { TextArea } = Input
+const Panel = Collapse.Panel
 
 class Dialog extends Component {
   handleTextChange = (e) => {
@@ -38,13 +40,33 @@ class Dialog extends Component {
   }
 
   render() {
-    const { messages, username, online, fileList, text } = this.props
+    const { messages, username, fileList, text, info } = this.props
     return (
       <div styleName="dialog">
+        {info.name && (
+          <Collapse bordered={false}>
+            <Panel header={`${info.name} (${info.onlineCount + 1}/${info.totalCount + 1})`} key="1">
+              <p>
+                onlines:{' '}
+                {Object.values(info.users)
+                  .filter(x => x.online)
+                  .map(x => (
+                    <span key={x.tag}>
+                      {x.username}{formatTag(x.tag)}{' '}
+                    </span>
+                  ))}
+              </p>
+            </Panel>
+          </Collapse>
+        )}
+        {info.username && (
+          <section styleName="user-info">
+            {info.username}
+            {formatTag(info.tag)} ({info.host}:{info.port})
+          </section>
+        )}
         <Messages messages={messages} username={username} />
-        <div>
-          {this.props.children}
-        </div>
+        <div>{this.props.children}</div>
         <Upload
           multiple
           onRemove={this.handleFileRemove}
@@ -59,7 +81,7 @@ class Dialog extends Component {
             <Button
               type="primary"
               htmlType="submit"
-              disabled={!online || (!text && fileList.length <= 0)}
+              disabled={!info.online || (!text && fileList.length <= 0)}
             >
               Send
             </Button>

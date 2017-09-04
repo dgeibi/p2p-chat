@@ -28,13 +28,29 @@ export default (state = initalState, action) => {
         ...state,
         ...action.payload,
       }
-    case TYPES.OFF_USER:
+    case TYPES.OFF_USER: {
+      return {
+        ...state,
+        users: {
+          ...state.users,
+          [action.payload.tag]: {
+            ...state.users[action.payload.tag],
+            ...action.payload,
+            online: false,
+          },
+        },
+      }
+    }
     case TYPES.ADD_USER: {
       return {
         ...state,
         users: {
           ...state.users,
-          [action.payload.tag]: action.payload,
+          [action.payload.tag]: {
+            ...state.users[action.payload.tag],
+            ...action.payload,
+            online: true,
+          },
         },
       }
     }
@@ -100,22 +116,14 @@ export const setup = ({ users, channels }) => ({
   payload: { users, channels },
 })
 
-export const addUser = (username, tag) => ({
+export const addUser = message => ({
   type: TYPES.ADD_USER,
-  payload: {
-    username,
-    tag,
-    online: true,
-  },
+  payload: message,
 })
 
-export const offUser = (username, tag) => ({
+export const offUser = message => ({
   type: TYPES.OFF_USER,
-  payload: {
-    username,
-    tag,
-    online: false,
-  },
+  payload: message,
 })
 
 export const addChannel = channel => ({

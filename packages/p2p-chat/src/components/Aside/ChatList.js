@@ -6,6 +6,7 @@ import sortBy from 'lodash.sortby'
 import isEqual from 'lodash.isequal'
 import EventObservable from 'p2p-chat-utils/EventObservable'
 import { formatTag } from '../../utils/format'
+import { getChannelOnlineMembers } from './chatInfo'
 import ListItem from './ListItem'
 import DialogType from './DialogType'
 import './ChatList.scss'
@@ -22,12 +23,12 @@ class ChatList extends Component {
 
   componentWillMount() {
     const { addUser, offUser, addChannel, setup, increaseBadge } = this.props
-    this.observables.observe('login', (event, { tag, username }) => {
-      addUser(username, tag)
+    this.observables.observe('login', (event, message) => {
+      addUser(message)
     })
 
-    this.observables.observe('logout', (event, { tag, username }) => {
-      offUser(username, tag)
+    this.observables.observe('logout', (event, message) => {
+      offUser(message)
     })
 
     this.observables.observe('channel-create', (events, { channel }) => {
@@ -83,21 +84,24 @@ class ChatList extends Component {
         styleName="menu"
       >
         <Menu.SubMenu key={DialogType.CHANNEL} title="Channels">
-          {Object.values(channels).map(({ key, name, badge }) =>
-            <Menu.Item key={key}>
-              <ListItem title={`${name}${formatTag(key)}`} badge={badge || 0} online />
-            </Menu.Item>
+          {Object.values(channels).map(
+            ({ key, name, badge, users: members }) =>
+              (getChannelOnlineMembers(members, users).length > 0 ? (
+                <Menu.Item key={key}>
+                  <ListItem title={`${name}${formatTag(key)}`} badge={badge || 0} online />
+                </Menu.Item>
+              ) : null)
           )}
         </Menu.SubMenu>
         <Menu.SubMenu key={DialogType.USER} title="Users">
           {sortBy(
             Object.values(users),
             ({ online }) => (online ? 0 : 1)
-          ).map(({ tag: key, username: name, online, badge }) =>
+          ).map(({ tag: key, username: name, online, badge }) => (
             <Menu.Item key={key}>
               <ListItem title={`${name}${formatTag(key)}`} badge={badge || 0} online={online} />
             </Menu.Item>
-          )}
+          ))}
         </Menu.SubMenu>
       </Menu>
     )

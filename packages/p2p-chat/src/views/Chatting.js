@@ -5,6 +5,7 @@ import { basename } from 'path'
 
 import Dialog from '../components/Chatting/Dialog'
 import FilePanel from '../components/Chatting/FilePanel'
+import selectInfo from '../components/Chatting/selectInfo'
 import * as actions from './ChattingRedux'
 
 const fileMapper = filepath => ({
@@ -15,16 +16,15 @@ const fileMapper = filepath => ({
 @connect(
   (state, ownProps) => {
     const { dialog, filePanel } = state.chatting
-    const { chatList } = state.aside
     return {
       dialogProps: {
         messages: selectState(dialog, ownProps, 'messages') || [],
         text: selectState(dialog, ownProps, 'text') || '',
         fileList: (selectState(dialog, ownProps, 'filePaths') || []).map(fileMapper),
-        online: getUserOnline(chatList, ownProps),
         username: state.settings.login.username,
+        info: selectInfo(state, ownProps),
       },
-      id: getIDObj(chatList, ownProps),
+      id: getIDObj(state, ownProps),
       files: selectState(filePanel, ownProps) || {},
     }
   },
@@ -56,7 +56,8 @@ function selectState(state, ownProps, fleid) {
   return state[type][key][fleid]
 }
 
-function getIDObj(chatListState, ownProps) {
+function getIDObj(state, ownProps) {
+  const chatListState = state.aside.chatList
   const { type, key } = ownProps.match.params
   const id = { type, key }
   if (!type) {
@@ -68,10 +69,4 @@ function getIDObj(chatListState, ownProps) {
     id.tags = [key]
   }
   return id
-}
-
-function getUserOnline(chatListState, ownProps) {
-  const { type, key } = ownProps.match.params
-  if (!type || type !== 'user') return true
-  return chatListState.users[key] ? chatListState.users[key].online : false
 }
