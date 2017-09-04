@@ -14,10 +14,12 @@ import { formatTag } from '../utils/format'
 import './Settings.scss'
 
 const selectOnlineUsers = chatListState =>
-  Object.values(chatListState.users).filter(({ online }) => online).map(({ tag, username }) => ({
-    label: username + formatTag(tag),
-    value: tag,
-  }))
+  Object.values(chatListState.users)
+    .filter(({ online }) => online)
+    .map(({ tag, username }) => ({
+      label: username + formatTag(tag),
+      value: tag,
+    }))
 
 @connect(
   state => ({
@@ -38,14 +40,18 @@ export default class Settings extends Component {
 
   render() {
     const { onlineUsers, login } = this.props
+    const { logined } = login
     return (
       <div styleName="settings">
-        <LoginBtn visibleDefault componentProps={{ ...login, ...this.props.loginActions }} />{' '}
-        {login.logined &&
+        {!logined && (
+          <LoginBtn visibleDefault componentProps={{ ...login, ...this.props.loginActions }} />
+        )}
+        {logined && (
           <span>
             <Button type="danger" onClick={this.logout} icon="disconnect" /> <ConnectBtn />{' '}
             <ConnectRangeBtn /> <CreateChannelModalBtn componentProps={{ onlineUsers }} />
-          </span>}
+          </span>
+        )}
       </div>
     )
   }
