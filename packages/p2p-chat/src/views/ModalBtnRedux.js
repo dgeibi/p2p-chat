@@ -1,4 +1,5 @@
-import constants from '../../../utils/constants'
+import { createAction } from 'redux-actions'
+import constants from '../utils/constants'
 
 const initalState = {}
 
@@ -25,12 +26,12 @@ export default (state = initalState, action) => {
   }
 }
 
-export const show = id => ({
-  type: TYPES.SHOW,
-  payload: id,
-})
+export const modalBtnActions = {
+  show: createAction(TYPES.SHOW),
+  hide: createAction(TYPES.HIDE),
+}
 
-export const hide = id => ({
-  type: TYPES.HIDE,
-  payload: id,
-})
+export function selectVisible(state, ownProp) {
+  if (state[ownProp.id] === undefined) return !!ownProp.visibleDefault
+  return !!state[ownProp.id]
+}

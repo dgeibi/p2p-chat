@@ -4,7 +4,7 @@ import { routerReducer } from 'react-router-redux'
 import settings from '../views/SettingsRedux'
 import aside from '../views/AsideRedux'
 import chatting from '../views/ChattingRedux'
-import modalbtns from '../components/Common/ModalBtn/redux'
+import modalbtns from '../views/ModalBtnRedux'
 
 export default combineReducers({
   settings,

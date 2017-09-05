@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import { ipcRenderer } from 'electron'
-import { Input, Form, Button } from 'antd'
+import { Input, Form } from 'antd'
 import { validAddress, validPort } from './validators'
-import ModalBtn from '../Common/ModalBtn'
 import Modal from '../Common/Modal'
 
 const FormItem = Form.Item
@@ -19,7 +18,7 @@ const validForm = (form, callback) => {
 }
 
 @Form.create()
-export class ConnectRange extends Component {
+export default class ConnectRange extends Component {
   handleCancel = () => {
     this.props.hide()
   }
@@ -96,18 +95,4 @@ export class ConnectRange extends Component {
       </Modal>
     )
   }
-}
-
-export const ConnectRangeBtn = (props) => {
-  const { visibleDefault, componentProps } = props
-  return (
-    <ModalBtn id="connect-range" visibleDefault={visibleDefault}>
-      {({ show, hide, visible }) => (
-        <span>
-          <Button onClick={show} icon="plus" />
-          <ConnectRange hide={hide} visible={visible} {...componentProps} />
-        </span>
-      )}
-    </ModalBtn>
-  )
 }

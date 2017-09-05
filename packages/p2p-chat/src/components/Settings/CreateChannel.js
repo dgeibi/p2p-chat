@@ -2,7 +2,6 @@ import { Form, Input, Checkbox, Button, Alert } from 'antd'
 import React, { Component } from 'react'
 import { ipcRenderer } from 'electron'
 
-import ModalBtn from '../Common/ModalBtn'
 import Modal from '../Common/Modal'
 import { validName } from './validators'
 
@@ -25,7 +24,7 @@ const validForm = (form, callback) => {
 }
 
 @Form.create()
-export class CreateChannel extends Component {
+export default class CreateChannel extends Component {
   static checkboxsField = 'tags'
   state = {
     indeterminate: false,
@@ -133,18 +132,4 @@ export class CreateChannel extends Component {
       />
     )
   }
-}
-
-export const CreateChannelModalBtn = (props) => {
-  const { visibleDefault, componentProps } = props
-  return (
-    <ModalBtn id="create-channel" visibleDefault={visibleDefault}>
-      {({ show, hide, visible }) => (
-        <span>
-          <Button onClick={show} icon="usergroup-add" />
-          <CreateChannel hide={hide} visible={visible} {...componentProps} />
-        </span>
-      )}
-    </ModalBtn>
-  )
 }

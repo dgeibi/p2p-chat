@@ -1,7 +1,6 @@
 import { Form, Input, Icon, Button, Col } from 'antd'
 import React, { Component } from 'react'
 import { ipcRenderer } from 'electron'
-import ModalBtn from '../Common/ModalBtn'
 import Modal from '../Common/Modal'
 import { validAddress, validPort } from './validators'
 
@@ -32,7 +31,7 @@ const validForm = (form, callback) => {
 }
 
 @Form.create()
-export class Connect extends Component {
+export default class Connect extends Component {
   remove = (k) => {
     const { form } = this.props
     const keys = form.getFieldValue('keys')
@@ -136,18 +135,4 @@ export class Connect extends Component {
       </Modal>
     )
   }
-}
-
-export const ConnectBtn = (props) => {
-  const { visibleDefault, componentProps } = props
-  return (
-    <ModalBtn id="connect" visibleDefault={visibleDefault}>
-      {({ show, hide, visible }) => (
-        <span>
-          <Button onClick={show} icon="cloud-o" />
-          <Connect hide={hide} visible={visible} {...componentProps} />
-        </span>
-      )}
-    </ModalBtn>
-  )
 }

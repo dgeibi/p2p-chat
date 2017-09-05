@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
-import { Input, Form, Button } from 'antd'
+import { Input, Form } from 'antd'
 import { ipcRenderer } from 'electron'
 import PropTypes from 'prop-types'
 
 import { validPort, validName } from './validators'
-import ModalBtn from '../Common/ModalBtn'
 import Modal from '../Common/Modal'
 
 function FormItem(props) {
@@ -27,7 +26,7 @@ const validForm = (form, callback) => {
 }
 
 @Form.create()
-export class Login extends Component {
+export default class Login extends Component {
   static propTypes = {
     hide: PropTypes.func.isRequired,
     visible: PropTypes.bool.isRequired,
@@ -93,19 +92,4 @@ export class Login extends Component {
       </Modal>
     )
   }
-}
-
-export default (props) => {
-  const { visibleDefault, componentProps } = props
-
-  return (
-    <ModalBtn id="login" visibleDefault={visibleDefault}>
-      {({ show, hide, visible }) => (
-        <span>
-          <Button onClick={show} ghost type="primary" icon="setting" size="large" />
-          <Login hide={hide} visible={visible} {...componentProps} />
-        </span>
-      )}
-    </ModalBtn>
-  )
 }

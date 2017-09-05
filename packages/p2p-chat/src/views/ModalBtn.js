@@ -1,20 +1,15 @@
 import { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import * as actions from './redux'
-
-function selectVisible(state, ownProp) {
-  if (state[ownProp.id] === undefined) return !!ownProp.visibleDefault
-  return !!state[ownProp.id]
-}
+import { modalBtnActions, selectVisible } from './ModalBtnRedux'
 
 @connect(
   (state, ownProp) => ({
     visible: selectVisible(state.modalbtns, ownProp),
   }),
   (dispatch, ownProp) => ({
-    show: () => dispatch(actions.show(ownProp.id)),
-    hide: () => dispatch(actions.hide(ownProp.id)),
+    show: () => dispatch(modalBtnActions.show(ownProp.id)),
+    hide: () => dispatch(modalBtnActions.hide(ownProp.id)),
   })
 )
 export default class ModalBtn extends Component {
