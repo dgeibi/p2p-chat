@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-const { app, BrowserWindow, ipcMain } = require('electron')
+const electron = require('electron')
 const path = require('path')
 const url = require('url')
 const { fork } = require('child_process')
@@ -17,6 +17,8 @@ const pickByMap = require('p2p-chat-utils/pickByMap')
 const getDir = require('./main/getDir')
 const Settings = require('./main/Settings')
 const setContextMenu = require('./main/setContextMenu')
+
+const { app, BrowserWindow, ipcMain } = electron
 
 const workerEE = new EventEmitter()
 let win
@@ -203,14 +205,19 @@ function createWorker() {
 }
 
 function createWindow() {
-  // Keep a reference for dev mode
+  const {
+    workAreaSize: { width, height },
+    scaleFactor: zoomFactor,
+  } = electron.screen.getPrimaryDisplay()
+
   win = new BrowserWindow({
     minWidth: 800,
     minHeight: 600,
-    width: 800,
-    height: 600,
+    width,
+    height,
     title: pkg.name,
     webPreferences: {
+      zoomFactor,
       nodeIntegrationInWorker: true,
     },
   })
