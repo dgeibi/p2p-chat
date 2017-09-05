@@ -1,9 +1,11 @@
 .modal :global .ant-modal-body {
-  max-height: 75vh;
+  max-height: calc(100vh - 130px);
   overflow-y: auto;
 }
 
 .modal {
-  top: 10px;
+  top: 15px;
+  width: 520px!important;
+  margin: 0 auto!important;
   padding-bottom: 0;
 }
