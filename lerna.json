@@ -3,12 +3,5 @@
   "packages": [
     "packages/*"
   ],
-  "version": "1.2.5",
-  "commands": {
-    "publish": {
-      "ignore": [
-        "p2p-chat"
-      ]
-    }
-  }
+  "version": "1.2.5"
 }
