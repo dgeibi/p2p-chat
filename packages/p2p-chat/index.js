@@ -12,7 +12,7 @@ const pkg = require('./package.json')
 const IPset = require('p2p-chat-utils/ipset')
 const each = require('p2p-chat-utils/each')
 const md5 = require('p2p-chat-utils/md5')
-const pick = require('p2p-chat-utils/pick')
+const pickByMap = require('p2p-chat-utils/pickByMap')
 
 const getDir = require('./main/getDir')
 const Settings = require('./main/Settings')
@@ -252,7 +252,7 @@ function bypassRendererToWorker(key) {
 }
 
 function getUserFullInfos(tags) {
-  return pick(
+  return pickByMap(
     locals.users,
     {
       tag: 'tag',

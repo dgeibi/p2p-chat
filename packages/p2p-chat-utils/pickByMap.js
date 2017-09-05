@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 
-module.exports = function pick(object, props, keys) {
+module.exports = function pickByMap(object, props, keys) {
   if (!keys) keys = Object.keys(object)
   return keys.reduce((obj, key) => {
     const value = object[key]
@@ -20,13 +20,3 @@ function getValue(object, props) {
   if (!first) return object
   return getValue(object[first], rest)
 }
-
-// function pickKeyOnly(object, keys) {
-//   if (!keys) keys = Object.keys(object)
-//   return keys.reduce((obj, key) => {
-//     const value = object[key]
-//     if (!value) return obj
-//     obj[key] = 1
-//     return obj
-//   }, {})
-// }

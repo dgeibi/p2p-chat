@@ -14,7 +14,7 @@ const getNewHost = require('p2p-chat-utils/get-new-address')
 const isIPLarger = require('p2p-chat-utils/is-ip-larger')
 
 const each = require('p2p-chat-utils/each')
-const pick = require('p2p-chat-utils/pick')
+const pickByMap = require('p2p-chat-utils/pickByMap')
 
 const IPset = require('p2p-chat-utils/ipset')
 const login = require('./lib/login')
@@ -369,7 +369,7 @@ function connectRange(opts) {
  * @returns {Array<{tag: string, username: string}>}
  */
 function getOnlineUser() {
-  const infos = pick(locals.clients, {
+  const infos = pickByMap(locals.clients, {
     tag: ['info', 'tag'],
     username: ['info', 'username'],
   })

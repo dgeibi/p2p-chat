@@ -41,7 +41,6 @@ module.exports = (env = {}) => {
       __dirname: false,
       setImmediate: false,
     },
-    externals: [],
   })
     .use(
       define({
