@@ -1,7 +1,7 @@
-import EventObservable from './EventObservable'
+const EventObservable = require('./EventObservable')
 
 const noop = () => {}
-export default ({ emitter, callback, args, disable }) => {
+module.exports = ({ emitter, callback, args, disable }) => {
   let on
   let obs
 

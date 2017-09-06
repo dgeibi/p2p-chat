@@ -21,7 +21,9 @@
         "filetypes": {
           ".scss": {
             "syntax": "postcss-scss",
-            "plugins": ["postcss-nested"]
+            "plugins": [
+              "postcss-nested"
+            ]
           }
         },
         "webpackHotModuleReloading": true
@@ -37,13 +39,19 @@
   ],
   "env": {
     "test": {
-      "plugins": ["transform-es2015-modules-commonjs"]
+      "plugins": [
+        "transform-es2015-modules-commonjs"
+      ]
     },
     "development": {
-      "plugins": ["react-hot-loader/babel"]
+      "plugins": [
+        "react-hot-loader/babel"
+      ]
     },
     "production": {
-      "plugins": ["transform-react-remove-prop-types"]
+      "plugins": [
+        "transform-react-remove-prop-types"
+      ]
     }
   }
 }

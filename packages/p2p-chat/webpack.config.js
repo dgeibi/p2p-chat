@@ -6,9 +6,12 @@ const webpack = require('webpack')
 const define = require('wtf-webpack-config/plugins/define')
 const babel = require('wtf-webpack-config/rules/js/babel')
 const minify = require('wtf-webpack-config/plugins/babel-minify')
+
 const devServer = require('./webpack-config/devServer')
 const css = require('./webpack-config/css')
 const reactHMR = require('./webpack-config/react-hmr')
+const depExternals = require('./webpack-config/dep-externals')
+const analyzer = require('./webpack-config/analyzer')
 const pkg = require('./package.json')
 
 const getEnv = isDev => (isDev ? 'developement' : 'production')
@@ -41,6 +44,9 @@ module.exports = (env = {}) => {
       __dirname: false,
       setImmediate: false,
     },
+    externals: [
+      depExternals(pkg.dependencies),
+    ],
   })
     .use(
       define({
@@ -109,6 +115,7 @@ module.exports = (env = {}) => {
       }),
       isDev
     )
+    .use(analyzer, Boolean(env.report))
 
   return config.toConfig()
 }
