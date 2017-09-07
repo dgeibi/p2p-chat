@@ -3,7 +3,7 @@ import Card from './CustomCard'
 import { formatName, formatSize } from '../../utils/format'
 import './FileReceive.scss'
 
-export default ({ filename, onClick, size, username }) =>
+export default ({ filename, onClick, size, username }) => (
   <Card>
     <section>
       <span styleName="filename">{formatName(filename)}</span>
@@ -12,3 +12,4 @@ export default ({ filename, onClick, size, username }) =>
     </section>
     <a onClick={onClick}>Accept</a>
   </Card>
+)

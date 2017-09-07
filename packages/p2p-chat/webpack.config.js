@@ -44,9 +44,7 @@ module.exports = (env = {}) => {
       __dirname: false,
       setImmediate: false,
     },
-    externals: [
-      depExternals(pkg.dependencies),
-    ],
+    externals: [depExternals(pkg.dependencies)],
   })
     .use(
       define({

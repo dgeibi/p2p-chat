@@ -4,7 +4,7 @@ import SettingNav from '../views/Settings'
 import Aside from '../views/Aside'
 import './Frame.scss'
 
-const Frame = ({ children }) =>
+const Frame = ({ children }) => (
   <main>
     <Row>
       <Col span={6} styleName="col col-1">
@@ -16,5 +16,6 @@ const Frame = ({ children }) =>
       </Col>
     </Row>
   </main>
+)
 
 export default Frame

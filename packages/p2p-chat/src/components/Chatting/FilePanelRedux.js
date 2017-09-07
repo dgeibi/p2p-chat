@@ -95,7 +95,11 @@ export const fileReceived = message => ({
 })
 
 export const acceptFile = ({ tag, checksum, channel, id }) => {
-  ipcRenderer.send('accept-file', { tag, checksum, payload: { checksum, channel } })
+  ipcRenderer.send('accept-file', {
+    tag,
+    checksum,
+    payload: { checksum, channel },
+  })
   return {
     type: TYPES.ACCEPT_FILE,
     payload: { tag, channel, id },

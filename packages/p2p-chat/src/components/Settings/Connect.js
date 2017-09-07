@@ -75,11 +75,11 @@ export default class Connect extends Component {
     const keys = getFieldValue('keys')
     const minusCircle = k => ({
       addonAfter:
-        keys.length > 1
-          ? <Icon type="minus-circle-o" disabled={keys.length === 1} onClick={() => remove(k)} />
-          : null,
+        keys.length > 1 ? (
+          <Icon type="minus-circle-o" disabled={keys.length === 1} onClick={() => remove(k)} />
+        ) : null,
     })
-    const formItems = keys.map(k =>
+    const formItems = keys.map(k => (
       <InputGroup key={k}>
         <Col span={12}>
           <FormItem required={false}>
@@ -111,7 +111,7 @@ export default class Connect extends Component {
           </FormItem>
         </Col>
       </InputGroup>
-    )
+    ))
 
     const { visible } = this.props
     const { handleCancel, handleCreate } = this

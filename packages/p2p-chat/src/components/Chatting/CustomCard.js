@@ -1,7 +1,7 @@
 import React from 'react'
 import { Card } from 'antd'
 
-export default props =>
+export default props => (
   <Card
     bodyStyle={{
       width: '150px',
@@ -10,3 +10,4 @@ export default props =>
     }}
     {...props}
   />
+)

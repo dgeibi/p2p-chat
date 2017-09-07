@@ -52,7 +52,8 @@ class Dialog extends Component {
                   .filter(x => x.online)
                   .map(x => (
                     <span key={x.tag}>
-                      {x.username}{formatTag(x.tag)}{' '}
+                      {x.username}
+                      {formatTag(x.tag)}{' '}
                     </span>
                   ))}
               </p>

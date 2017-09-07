@@ -76,7 +76,11 @@ export default function dialog(state = initialState, action) {
 }
 
 export const newMessage = (msg) => {
-  const payload = { ...msg, uid: msg.tag + performance.now(), date: new Date() }
+  const payload = {
+    ...msg,
+    uid: msg.tag + performance.now(),
+    date: new Date(),
+  }
   return {
     type: TYPES.NEW_MESSAGE,
     payload,
@@ -122,7 +126,12 @@ export const fileSentNotice = (info) => {
 }
 
 export const textSent = (msg) => {
-  const payload = { ...msg, uid: performance.now(), self: true, date: new Date() }
+  const payload = {
+    ...msg,
+    uid: performance.now(),
+    self: true,
+    date: new Date(),
+  }
   return {
     type: TYPES.MESSAGE_SENT,
     payload,
