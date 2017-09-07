@@ -4,6 +4,7 @@ import { shell } from 'electron'
 import { dirname } from 'path'
 import Card from './CustomCard'
 import { formatName, formatSize, formatSpeed, formatPercent } from '../../utils/format'
+import './FileReceive.scss'
 
 const FileReceive = ({ username, size, filename, errMsg, speed, percent, ok, filepath }) => {
   let status
@@ -11,23 +12,6 @@ const FileReceive = ({ username, size, filename, errMsg, speed, percent, ok, fil
   if (ok) status = 'success'
   else if (errMsg) status = 'exception'
   else status = 'active'
-
-  const showFileName = ok
-    ? <span>
-      <a
-        onClick={() => {
-          shell.openItem(filepath)
-        }}
-        style={{
-          fontWeight: 700,
-        }}
-      >
-        {formatName(filename)}
-      </a>
-    </span>
-    : <span>
-      {formatName(filename)}
-    </span>
 
   const showErrorMsg = errMsg
     ? <div>
@@ -47,7 +31,7 @@ const FileReceive = ({ username, size, filename, errMsg, speed, percent, ok, fil
       </a>
     </div>
     : null
-
+  const name = formatName(filename)
   const showSpeed =
     status === 'active'
       ? <section>
@@ -58,7 +42,16 @@ const FileReceive = ({ username, size, filename, errMsg, speed, percent, ok, fil
   return (
     <Card>
       <section>
-        {showFileName} <br />
+        <span styleName="filename">
+          { ok ? <a
+            onClick={() => {
+              shell.openItem(filepath)
+            }}
+          >
+            {name}
+          </a> : name }
+        </span>
+        <br />
         {formatSize(size)} by {formatName(username)}
       </section>
       {showSpeed}

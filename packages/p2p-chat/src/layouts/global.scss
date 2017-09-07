@@ -2,18 +2,19 @@ body {
   height: 100vh;
 }
 
+$barWidth: 7px;
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: $barWidth;
+    height: $barWidth;
 }
 
-$radius: 20px;
+$radius: 5px;
 ::-webkit-scrollbar-track {
-    background: #ddd;
+    background: rgba(243, 243, 243, 0.43);
     border-radius: $radius;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #8D8B8B;
+  background: rgba(180, 180, 180, 0.89);
   border-radius: $radius;
 }

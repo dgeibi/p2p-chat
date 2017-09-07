@@ -18,8 +18,8 @@ export function formatPercent(percent) {
 }
 
 export function formatName(str) {
-  if (str.length > 30) {
-    return `${str.slice(0, 10)}...${str.slice(-10)}`
+  if (str.length > 20) {
+    return `${str.slice(0, 8)}..${str.slice(-8)}`
   }
   return str
 }

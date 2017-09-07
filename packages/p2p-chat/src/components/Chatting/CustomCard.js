@@ -4,8 +4,9 @@ import { Card } from 'antd'
 export default props =>
   <Card
     bodyStyle={{
-      width: '200px',
-      padding: '10px 16px',
+      width: '150px',
+      padding: '8px 12px',
+      overflow: 'hidden',
     }}
     {...props}
   />
