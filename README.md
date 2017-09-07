@@ -15,13 +15,13 @@ $ npm install
 运行
 
 ```
-$ npm start
+$ npm run app -- start
 ```
 
 生成安装包
 
 ```
-$ npm run dist
+$ npm run app -- dist
 ```
 
 ## LICENSE
