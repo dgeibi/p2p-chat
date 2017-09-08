@@ -7,7 +7,7 @@ import render from './global/render'
 const store = configureStore()
 
 render(store, history)
-addIPCListeners(store)
+addIPCListeners(store.dispatch)
 
 // redirect to root
 if (history.location.pathname !== '/') store.dispatch(push('/'))

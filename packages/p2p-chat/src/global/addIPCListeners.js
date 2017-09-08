@@ -2,11 +2,11 @@ import { ipcRenderer } from 'electron'
 import replaceable from 'p2p-chat-utils/event-replaceable'
 import ipcListeners from '../side-effects/global-ipc'
 
-export default (store) => {
+export default (...args) => {
   const replace = replaceable({
+    args,
     emitter: ipcRenderer,
     callback: ipcListeners,
-    args: [store],
     disable: !module.hot,
   })
 
