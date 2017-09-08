@@ -15,13 +15,13 @@ $ yarn
 运行
 
 ```
-$ yarn app start
+$ yarn start
 ```
 
 生成安装包
 
 ```
-$ yarn app dist
+$ yarn dist
 ```
 
 ## LICENSE
