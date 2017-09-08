@@ -6,22 +6,22 @@
 
 ## 开发
 
-使用 [npm](https://nodejs.org/en/download/current/) 安装依赖
+使用 [yarn](https://yarnpkg.com) 安装依赖
 
 ```
-$ npm install
+$ yarn
 ```
 
 运行
 
 ```
-$ npm run app -- start
+$ yarn app start
 ```
 
 生成安装包
 
 ```
-$ npm run app -- dist
+$ yarn app dist
 ```
 
 ## LICENSE
