@@ -105,7 +105,8 @@
       "!webpack-config/**",
       "!webpack.config.js",
       "!package-lock.json",
-      "!src/**"
+      "!src/**",
+      "!packages/**"
     ],
     "mac": {
       "category": "public.app-category.social-networking"
