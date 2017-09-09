@@ -3,13 +3,13 @@ import Card from './CustomCard'
 import { formatName, formatSize } from '../../utils/format'
 import './FileReceive.scss'
 
-export default ({ filename, onClick, size, username }) => (
+export default ({ filename, onClick, size, username, waitting }) => (
   <Card>
-    <section>
-      <span styleName="filename">{formatName(filename)}</span>
-      <br />
-      {formatSize(size)} by {formatName(username)}
-    </section>
-    <a onClick={onClick}>Accept</a>
+    <span styleName="filename">{formatName(filename)}</span>
+    <br />
+    {formatSize(size)} by {formatName(username)}
+    <br />
+    <br />
+    {waitting ? 'waiting to receive..' : <a onClick={onClick}>Accept</a>}
   </Card>
 )

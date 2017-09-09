@@ -35,7 +35,11 @@ const file = (filepath, strict, callback) => {
  * @param {(string|Buffer)} data
  * @returns {string}
  */
-const dataSync = data => crypto.createHash('md5').update(data).digest('hex')
+const dataSync = data =>
+  crypto
+    .createHash('md5')
+    .update(data)
+    .digest('hex')
 
 module.exports = {
   dataSync,

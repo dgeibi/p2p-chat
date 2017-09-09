@@ -5,6 +5,15 @@ import FileInfo from './FileInfo'
 import FileReceive from './FileReceive'
 import './FilePanel.scss'
 
+const accept = ({ tag, channel }, id, checksum, acceptFile) => () => {
+  acceptFile({
+    id,
+    tag,
+    channel,
+    checksum,
+  })
+}
+
 class FilePanel extends Component {
   render() {
     const { files, acceptFile } = this.props
@@ -13,7 +22,7 @@ class FilePanel extends Component {
     return (
       <div styleName="filePanel">
         {filesArr.map((msg) => {
-          const { type, errMsg, id, ...payload } = msg
+          const { type, errMsg, id, checksum, key, ...payload } = msg
           if (errMsg) return <Alert type="error" message={errMsg} />
           switch (type) {
             case 'file:receive':
@@ -23,16 +32,7 @@ class FilePanel extends Component {
                 <FileInfo
                   key={id}
                   {...payload}
-                  onClick={() => {
-                    const { tag, channel } = payload
-                    const checksum = id.split('.')[0]
-                    acceptFile({
-                      id,
-                      tag,
-                      channel,
-                      checksum,
-                    })
-                  }}
+                  onClick={accept(payload, id, checksum, acceptFile)}
                 />
               )
             default:

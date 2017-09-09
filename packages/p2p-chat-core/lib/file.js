@@ -51,8 +51,8 @@ function getInfoMsg(filepath, message, callback) {
  * @param {object} options connect options
  * @param {function(?Error, ?string)} callback
  */
-function send(checksum, options, callback) {
-  const fileMsg = Object.assign({}, messages[checksum])
+function send(checksum, payload, options, callback) {
+  const fileMsg = Object.assign({}, payload, messages[checksum])
   if (!fileMsg) {
     callback(Error(`file not loaded from ${checksum}`))
     return

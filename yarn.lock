@@ -4590,10 +4590,6 @@ lodash.toarray@^4.4.0:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/lodash.toarray/-/lodash.toarray-4.4.0.tgz#24c4bfcd6b2fba38bfd0594db1179d8e9b656561"
 
-lodash.unescape@4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/lodash.unescape/-/lodash.unescape-4.0.1.tgz#bf2249886ce514cda112fae9218cdc065211fc9c"
-
 lodash.uniq@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
@@ -5200,6 +5196,19 @@ p-locate@^2.0.0:
 p-map@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/p-map/-/p-map-1.1.1.tgz#05f5e4ae97a068371bc2a5cc86bfbdbc19c4ae7a"
+
+p2p-chat-core@^1.2.5:
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/p2p-chat-core/-/p2p-chat-core-1.2.5.tgz#505031a6eb4737306e7dc8b4a796bc2ef33663e6"
+  dependencies:
+    fs-extra "^4.0.0"
+    ip "^1.1.5"
+    logger "github:dgeibi/logger#305933c"
+    p2p-chat-utils "^1.2.5"
+
+p2p-chat-utils@^1.2.5:
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/p2p-chat-utils/-/p2p-chat-utils-1.2.5.tgz#08bb86fbb84bb79f545fd920e2e5e6174ffc680d"
 
 package-json@^4.0.0:
   version "4.0.1"
@@ -5877,9 +5886,9 @@ preserve@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/preserve/-/preserve-0.2.0.tgz#815ed1f6ebc65926f865b310c0713bcb3315ce4b"
 
-prettier-eslint-cli@^4.3.0:
-  version "4.3.2"
-  resolved "https://registry.yarnpkg.com/prettier-eslint-cli/-/prettier-eslint-cli-4.3.2.tgz#217796ca7bdb9ce12f7299c77e10c700b08abcda"
+prettier-eslint-cli@4.2.3:
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/prettier-eslint-cli/-/prettier-eslint-cli-4.2.3.tgz#0fb6f6d924c2fce5cfa482e4d80a8114571598b1"
   dependencies:
     arrify "^1.0.1"
     babel-runtime "^6.23.0"
@@ -5896,13 +5905,13 @@ prettier-eslint-cli@^4.3.0:
     lodash.memoize "^4.1.2"
     loglevel-colored-level-prefix "^1.0.0"
     messageformat "^1.0.2"
-    prettier-eslint "^8.0.0"
+    prettier-eslint "^6.4.3"
     rxjs "^5.3.0"
     yargs "8.0.2"
 
-prettier-eslint@^8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/prettier-eslint/-/prettier-eslint-8.0.0.tgz#966e966810a7ad5a390416ed3f610d4e5ee7f2b3"
+prettier-eslint@^6.4.3:
+  version "6.4.3"
+  resolved "https://registry.yarnpkg.com/prettier-eslint/-/prettier-eslint-6.4.3.tgz#8335b7a8bd50d01879a9d505bc0b9208caa9ecfc"
   dependencies:
     common-tags "^1.4.0"
     dlv "^1.1.0"
@@ -5913,8 +5922,6 @@ prettier-eslint@^8.0.0:
     prettier "^1.6.0"
     pretty-format "^20.0.3"
     require-relative "^0.8.7"
-    typescript "^2.4.2"
-    typescript-eslint-parser "^7.0.0"
 
 prettier@^1.6.0:
   version "1.6.1"
@@ -6989,10 +6996,6 @@ semver-diff@^2.0.0:
   version "5.4.1"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.4.1.tgz#e059c09d8571f0540823733433505d3a2f00b18e"
 
-semver@5.3.0:
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-5.3.0.tgz#9b2ce5d3de02d17c6012ad326aa6b4d0cf54f94f"
-
 send@0.15.4:
   version "0.15.4"
   resolved "https://registry.yarnpkg.com/send/-/send-0.15.4.tgz#985faa3e284b0273c793364a35c6737bd93905b9"
@@ -7669,17 +7672,6 @@ type-is@~1.6.15:
 typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
-
-typescript-eslint-parser@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/typescript-eslint-parser/-/typescript-eslint-parser-7.0.0.tgz#be57d8768e37707af825e339ea2af18d7393cabb"
-  dependencies:
-    lodash.unescape "4.0.1"
-    semver "5.3.0"
-
-typescript@^2.4.2:
-  version "2.5.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.5.2.tgz#038a95f7d9bbb420b1bf35ba31d4c5c1dd3ffe34"
 
 ua-parser-js@^0.7.9:
   version "0.7.14"

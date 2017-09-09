@@ -45,8 +45,7 @@ const getMessage = () => ({
  * @param {object} message
  */
 function handleFile(socket, message) {
-  const { tag, checksum, username, filepath, channel, size } = message
-  const id = `${checksum}.${process.uptime()}`
+  const { id, checksum, tag, username, filepath, channel, size } = message
   const filename = path.basename(filepath)
   emitter.emit('file-process-start', { id, tag, channel, size, filename, username })
 
@@ -68,13 +67,13 @@ function handleFile(socket, message) {
 
     md5.file(filepath, false, (md5Err, realChecksum) => {
       // 检查checksum
-      if (md5Err || !fileAccepted[realChecksum] || realChecksum !== checksum) {
+      if (md5Err || realChecksum !== checksum) {
         emitter.emit('file-receive-fail', { tag, channel, username, filename, id })
         return
       }
       emitter.emit('file-receiced', { tag, username, filename, filepath, id, channel })
       logger.verbose('file receiced', filepath)
-      fileAccepted[realChecksum] = false
+      fileAccepted[id] = false
     })
   }
 
@@ -110,7 +109,7 @@ function handleSocket(socket, opts = {}) {
     const { tag, type } = session
 
     // 对发送文件的socket特殊处理
-    if (locals.clients[tag] && session.type === 'file' && fileAccepted[session.checksum]) {
+    if (locals.clients[tag] && session.type === 'file' && fileAccepted[session.id]) {
       handleFile(socket, session)
       return
     }
@@ -166,7 +165,7 @@ function bindSocket(socket, session) {
   socket.on('message', (message) => {
     switch (message.type) {
       case 'fileinfo': {
-        message.id = `${message.checksum}.${process.uptime()}`
+        message.id = `${message.checksum}?${Date.now()}`
         emitter.emit('fileinfo', message)
         break
       }
@@ -414,12 +413,13 @@ function sendFileToUsers(opts) {
 
 // 同意接收文件
 function acceptFile(opts) {
-  const { tag, checksum, payload } = opts
+  const { tag, payload } = opts
+  const { id } = payload
   const socket = locals.clients[tag]
   if (socket) {
     const message = Object.assign(getMessage(), payload)
     message.type = 'file-accepted'
-    fileAccepted[checksum] = true
+    fileAccepted[id] = true
     socket.send(message)
   }
 }
@@ -472,8 +472,8 @@ function createChannel(opts) {
 }
 
 function sendFile(message) {
-  const { checksum, port, host } = message
-  fileModule.send(checksum, { port, host }, (e, filename) => {
+  const { checksum, port, host, id } = message
+  fileModule.send(checksum, { id }, { port, host }, (e, filename) => {
     const payload = Object.assign({}, message)
     payload.filename = filename
 

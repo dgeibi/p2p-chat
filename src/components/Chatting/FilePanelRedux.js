@@ -20,8 +20,7 @@ getConstants(TYPES, 'CHATTING_FILE')
 
 export default function filePanel(state = initialState, action) {
   switch (action.type) {
-    case TYPES.FILE_INFO:
-    case TYPES.FILE_START: {
+    case TYPES.FILE_INFO: {
       const { type, key, id } = findPos(action.payload)
       return {
         ...state,
@@ -34,12 +33,8 @@ export default function filePanel(state = initialState, action) {
         },
       }
     }
-    case TYPES.ACCEPT_FILE: {
-      const { type, key, id } = findPos(action.payload)
-      const newState = { ...state }
-      delete newState[type][key][id]
-      return newState
-    }
+    case TYPES.ACCEPT_FILE:
+    case TYPES.FILE_START:
     case TYPES.FILE_END:
     case TYPES.FILE_PROCESSING:
     case TYPES.FILE_FAIL:
@@ -71,7 +66,7 @@ export const fileCome = message => ({
 
 export const fileStart = message => ({
   type: TYPES.FILE_START,
-  payload: { ...message, type: 'file:receive', percent: 0, speed: 0 },
+  payload: { ...message, type: 'file:receive', percent: 0, speed: 0, waitting: false },
 })
 
 export const fileProcessing = message => ({
@@ -98,11 +93,11 @@ export const acceptFile = ({ tag, checksum, channel, id }) => {
   ipcRenderer.send('accept-file', {
     tag,
     checksum,
-    payload: { checksum, channel },
+    payload: { checksum, channel, id },
   })
   return {
     type: TYPES.ACCEPT_FILE,
-    payload: { tag, channel, id },
+    payload: { tag, channel, id, waitting: true },
   }
 }
 
