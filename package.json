@@ -105,6 +105,7 @@
       "!webpack-config/**",
       "!webpack.config.js",
       "!package-lock.json",
+      "!yarn.lock",
       "!src/**",
       "!packages/**"
     ],
