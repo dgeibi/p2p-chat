@@ -4,3 +4,10 @@
   height: 8.5em;
   overflow-x: auto;
 }
+
+.clearWrapper {
+  padding: 0 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

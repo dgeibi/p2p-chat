@@ -1,5 +1,6 @@
 import { ipcRenderer } from 'electron'
 import makeConstants from '../../../utils/constants'
+import getNewState from '../../../utils/getNewState'
 import { fileLoadStates, cardTypes } from './constants'
 
 const initialState = {
@@ -15,6 +16,8 @@ const TYPES = {
   FILE_FAIL: '',
   FILE_DONE: '',
   ACCEPT_FILE: '',
+  CLEAR_PANEL: '',
+  IGNORE_FILE: '',
 }
 
 makeConstants(TYPES, 'CHATTING_FILE')
@@ -54,6 +57,28 @@ export default function filePanel(state = initialState, action) {
           },
         },
       }
+    }
+    case TYPES.CLEAR_PANEL: {
+      const { type, key } = action.payload
+      const newState = getNewState(state, type, key)
+      const panel = newState[type][key]
+      Object.values(panel).forEach(({ status, id }) => {
+        if (
+          status === undefined ||
+          status === fileLoadStates.exception ||
+          status === fileLoadStates.success
+        ) {
+          delete panel[id]
+        }
+      })
+      return newState
+    }
+    case TYPES.IGNORE_FILE: {
+      const { type, key, id } = findPos(action.payload)
+      const newState = getNewState(state, type, key)
+      const panel = newState[type][key]
+      delete panel[id]
+      return newState
     }
     default:
       return state
@@ -111,6 +136,13 @@ export const acceptFile = ({ tag, checksum, channel, id }) => {
     payload: { tag, channel, id, status: fileLoadStates.waitting },
   }
 }
+
+export const ignoreFile = ({ tag, channel, id }) => ({
+  type: TYPES.IGNORE_FILE,
+  payload: { tag, id, channel },
+})
+
+export const clearPanel = ({ type, key }) => ({ type: TYPES.CLEAR_PANEL, payload: { type, key } })
 
 function findPos({ tag, channel, id }) {
   if (channel) {

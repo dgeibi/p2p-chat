@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
+import { Button } from 'antd'
 
-import { Alert } from 'antd'
 import FileInfo from './FileInfo'
 import FileReceive from './FileReceive'
 import './FilePanel.scss'
@@ -15,16 +15,30 @@ const accept = ({ tag, channel }, id, checksum, acceptFile) => () => {
   })
 }
 
+const ignore = ({ tag, channel }, id, ignoreFile) => () => {
+  ignoreFile({
+    id,
+    tag,
+    channel,
+  })
+}
+
 class FilePanel extends Component {
+  clear = () => {
+    const { clearPanel, id } = this.props
+    clearPanel(id)
+  }
   render() {
-    const { files, acceptFile } = this.props
+    const { files, acceptFile, ignoreFile } = this.props
     const filesArr = Object.values(files)
     if (filesArr.length <= 0) return null
     return (
       <div styleName="filePanel">
+        <div styleName="clearWrapper">
+          <Button onClick={this.clear} type="danger" shape="circle" icon="close" />
+        </div>
         {filesArr.map((msg) => {
-          const { type, errMsg, id, checksum, key, ...payload } = msg
-          if (errMsg) return <Alert type="error" message={errMsg} />
+          const { type, id, checksum, key, ...payload } = msg
           switch (type) {
             case cardTypes.RECEIVE:
               return <FileReceive key={id} {...payload} />
@@ -33,7 +47,8 @@ class FilePanel extends Component {
                 <FileInfo
                   key={id}
                   {...payload}
-                  onClick={accept(payload, id, checksum, acceptFile)}
+                  accept={accept(payload, id, checksum, acceptFile)}
+                  ignore={ignore(payload, id, ignoreFile)}
                 />
               )
             default:
