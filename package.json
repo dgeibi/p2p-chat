@@ -10,11 +10,13 @@
   "scripts": {
     "start": "webpack-dev-server",
     "prod": "run-s clean webpack electron",
-    "dist": "run-s clean webpack builder",
+    "dist": "run-s clean webpack dist:*",
+    "dist:win64": "node ./build/build-win-portable.js x64",
+    "dist:win32": "node ./build/build-win-portable.js ia32",
+    "dist:linux": "build -l",
     "clean": "rimraf dist assets",
     "lint:js": "eslint .",
     "lint": "run-p lint:*",
-    "builder": "build -wl",
     "webpack": "webpack --env.production",
     "webpack:report": "webpack --env.production --env.report",
     "electron": "electron .",
@@ -106,34 +108,17 @@
       "!webpack-config/**",
       "!webpack.config.js",
       "!package-lock.json",
-      "!yarn.lock",
       "!src/**",
       "!packages/**"
     ],
     "mac": {
       "category": "public.app-category.social-networking"
     },
-    "win": {
-      "target": [
-        {
-          "target": "portable",
-          "arch": "ia32"
-        }
-      ]
-    },
     "linux": {
       "category": "Network",
       "target": [
         "AppImage"
       ]
-    },
-    "nsis": {
-      "artifactName": "${productName}-installer-${version}.${ext}",
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true
-    },
-    "portable": {
-      "artifactName": "${productName}-portable-${version}.${ext}"
     }
   }
 }
