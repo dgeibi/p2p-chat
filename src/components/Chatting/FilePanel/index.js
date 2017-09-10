@@ -4,6 +4,7 @@ import { Alert } from 'antd'
 import FileInfo from './FileInfo'
 import FileReceive from './FileReceive'
 import './FilePanel.scss'
+import { cardTypes } from './constants'
 
 const accept = ({ tag, channel }, id, checksum, acceptFile) => () => {
   acceptFile({
@@ -25,9 +26,9 @@ class FilePanel extends Component {
           const { type, errMsg, id, checksum, key, ...payload } = msg
           if (errMsg) return <Alert type="error" message={errMsg} />
           switch (type) {
-            case 'file:receive':
+            case cardTypes.RECEIVE:
               return <FileReceive key={id} {...payload} />
-            case 'file:info':
+            case cardTypes.INFO:
               return (
                 <FileInfo
                   key={id}

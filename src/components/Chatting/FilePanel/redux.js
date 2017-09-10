@@ -1,5 +1,6 @@
 import { ipcRenderer } from 'electron'
-import getConstants from '../../utils/constants'
+import makeConstants from '../../../utils/constants'
+import { fileLoadStates, cardTypes } from './constants'
 
 const initialState = {
   user: {},
@@ -16,7 +17,7 @@ const TYPES = {
   ACCEPT_FILE: '',
 }
 
-getConstants(TYPES, 'CHATTING_FILE')
+makeConstants(TYPES, 'CHATTING_FILE')
 
 export default function filePanel(state = initialState, action) {
   switch (action.type) {
@@ -61,12 +62,18 @@ export default function filePanel(state = initialState, action) {
 
 export const fileCome = message => ({
   type: TYPES.FILE_INFO,
-  payload: { ...message, type: 'file:info' },
+  payload: { ...message, type: cardTypes.INFO },
 })
 
 export const fileStart = message => ({
   type: TYPES.FILE_START,
-  payload: { ...message, type: 'file:receive', percent: 0, speed: 0, waitting: false },
+  payload: {
+    ...message,
+    type: cardTypes.RECEIVE,
+    percent: 0,
+    speed: 0,
+    status: fileLoadStates.active,
+  },
 })
 
 export const fileProcessing = message => ({
@@ -81,12 +88,16 @@ export const fileEnd = message => ({
 
 export const fileReceiveError = message => ({
   type: TYPES.FILE_FAIL,
-  payload: { ...message, errMsg: `Fail to receive ${message.filename}` },
+  payload: {
+    ...message,
+    errMsg: `Fail to receive ${message.filename}`,
+    status: fileLoadStates.exception,
+  },
 })
 
 export const fileReceived = message => ({
   type: TYPES.FILE_DONE,
-  payload: { ...message, ok: true },
+  payload: { ...message, status: fileLoadStates.success },
 })
 
 export const acceptFile = ({ tag, checksum, channel, id }) => {
@@ -97,7 +108,7 @@ export const acceptFile = ({ tag, checksum, channel, id }) => {
   })
   return {
     type: TYPES.ACCEPT_FILE,
-    payload: { tag, channel, id, waitting: true },
+    payload: { tag, channel, id, status: fileLoadStates.waitting },
   }
 }
 

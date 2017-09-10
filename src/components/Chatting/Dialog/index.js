@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Input, Button, Form, Upload, Collapse } from 'antd'
-import Messages from './Messages'
-import { formatTag } from '../../utils/format'
+import Messages from '../Messages'
+import { formatTag } from '../../../utils/format'
 import './Dialog.scss'
 
 const { TextArea } = Input

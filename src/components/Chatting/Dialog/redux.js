@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron'
-import constants from '../../utils/constants'
-import getNewState from '../../utils/getNewState'
+import makeConstants from '../../../utils/constants'
+import getNewState from '../../../utils/getNewState'
 
 const initialState = {
   user: {},
@@ -20,7 +20,7 @@ const TYPES = {
   REMOVE_FILE: '',
   SET_TEXT: '',
 }
-constants(TYPES, 'DIALOG')
+makeConstants(TYPES, 'DIALOG')
 
 export default function dialog(state = initialState, action) {
   switch (action.type) {

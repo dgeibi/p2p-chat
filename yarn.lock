@@ -5197,19 +5197,6 @@ p-map@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/p-map/-/p-map-1.1.1.tgz#05f5e4ae97a068371bc2a5cc86bfbdbc19c4ae7a"
 
-p2p-chat-core@^1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/p2p-chat-core/-/p2p-chat-core-1.2.5.tgz#505031a6eb4737306e7dc8b4a796bc2ef33663e6"
-  dependencies:
-    fs-extra "^4.0.0"
-    ip "^1.1.5"
-    logger "github:dgeibi/logger#305933c"
-    p2p-chat-utils "^1.2.5"
-
-p2p-chat-utils@^1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/p2p-chat-utils/-/p2p-chat-utils-1.2.5.tgz#08bb86fbb84bb79f545fd920e2e5e6174ffc680d"
-
 package-json@^4.0.0:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/package-json/-/package-json-4.0.1.tgz#8869a0401253661c4c4ca3da6c2121ed555f5eed"
