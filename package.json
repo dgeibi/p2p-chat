@@ -21,7 +21,8 @@
     "format": "prettier-eslint --write '**/*.js'"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "."
   ],
   "keywords": [
     "electron-app",
