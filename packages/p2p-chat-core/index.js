@@ -293,13 +293,7 @@ function setup(options, callback) {
     })
 
     // receive store from opt
-    if (payload.ipset) {
-      payload.ipset = payload.ipsetMerged
-        ? payload.ipset
-        : payload.ipset.mergeStore(payload.ipsetStore)
-    } else {
-      payload.ipset = IPset(payload.ipsetStore)
-    }
+    ensureMergeIPset(payload)
 
     // 2. start listening
     const { host, port, username, tag, address } = id
@@ -322,13 +316,23 @@ function setup(options, callback) {
   })
 }
 
+function ensureMergeIPset(payload) {
+  if (payload.ipset) {
+    payload.ipset = payload.ipsetMerged
+      ? payload.ipset
+      : payload.ipset.mergeStore(payload.ipsetStore)
+  } else {
+    payload.ipset = IPset(payload.ipsetStore)
+  }
+}
+
 /**
  * 连接其它服务器
  * @param {setupPayload} opts
  */
 function connectServers(opts) {
   if (!locals.server.listening) return
-  opts.ipset = opts.ipset || IPset()
+  ensureMergeIPset(opts)
   // 1. 添加指定范围内的地址/端口
   connectRange(opts)
   // 2. 添加分散的地址/端口
@@ -341,7 +345,7 @@ function connectServers(opts) {
     delete opts.connects
   }
   // 3. 连接 ipset 里的所有服务器地址
-  connect(opts.ipset)
+  if (opts.ipset) connect(opts.ipset)
 }
 
 function connect(ipset, excludes) {

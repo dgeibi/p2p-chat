@@ -19,8 +19,8 @@ module.exports = (locals) => {
   }
 
   const setPath = () => {
-    const { settingsDir, username } = locals
-    const settingsFilePath = path.join(settingsDir, username)
+    const { settingsDir, tag } = locals
+    const settingsFilePath = path.join(settingsDir, tag)
     settings.setPath(settingsFilePath)
   }
 

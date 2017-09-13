@@ -35,7 +35,7 @@ class ChatList extends Component {
       addChannel(channel)
     })
 
-    this.observables.observe('before-setup', (event, { users, channels }) => {
+    this.observables.observe('after-setup', (event, { users, channels }) => {
       setup({ users, channels })
     })
 

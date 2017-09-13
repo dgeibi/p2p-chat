@@ -7,7 +7,6 @@ const EventEmitter = require('events')
 const logger = require('logger')
 const tick = require('./main/count')()
 require('./main/menu.js')
-const fs = require('fs-extra')
 const pkg = require('./package.json')
 const IPset = require('p2p-chat-utils/ipset')
 const each = require('p2p-chat-utils/each')
@@ -53,32 +52,10 @@ function getIPsetStore(users) {
 
 // renderer events
 ipcMain.on('setup', (event, opts) => {
-  const oldName = locals.username
-  const newName = opts.username || 'anonymous'
-
-  locals.username = newName
-  opts.username = newName
+  locals.username = opts.username || 'anonymous'
+  opts.username = locals.username
   opts.downloadDir = locals.downloadDir
 
-  if (!settings) {
-    setWrap = Settings(locals)
-    settings = setWrap.getSettings()
-  }
-
-  if (oldName !== null && newName !== oldName) {
-    fs.copySync(settings.file(), path.join(locals.settingsDir, newName))
-  }
-
-  setWrap.setPath()
-  setWrap.sync()
-  const { users, channels } = locals
-
-  // to renderer
-  event.sender.send('before-setup', { users, channels })
-  opts.payload = opts.payload || {}
-  opts.payload.ipsetStore = getIPsetStore(users)
-
-  // to worker
   worker.send({
     key: 'setup',
     args: [opts],
@@ -145,6 +122,7 @@ workerEE.on('setup-reply', ({ errMsg, id }) => {
     locals.port = port
     locals.tag = tag
     win.setTitle(`${username}[${id.tag.slice(0, 5)}] - ${pkg.name}`)
+    loadSettings(locals)
   }
 })
 
@@ -273,4 +251,24 @@ function getUserFullInfos(tags) {
     },
     tags
   )
+}
+
+function loadSettings(_locals) {
+  setWrap = Settings(_locals)
+  settings = setWrap.getSettings()
+  setWrap.setPath()
+  setWrap.sync()
+
+  const { users, channels } = _locals
+
+  const payload = {
+    ipsetStore: getIPsetStore(users),
+  }
+
+  win.webContents.send('after-setup', { users, channels })
+
+  worker.send({
+    key: 'change-setting',
+    args: [payload],
+  })
 }
