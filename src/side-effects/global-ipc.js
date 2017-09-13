@@ -8,12 +8,14 @@ export default function listen(on, dispatch) {
     if (!errMsg) {
       dispatch(loginActions.updateSettings(id))
       dispatch(chatListActions.show())
+      dispatch(dialogActions.restoreDialog(id.tag))
     } else {
       showError(errMsg)
     }
   })
 
   on('logout-reply', (event, { errMsg }) => {
+    dispatch({ type: 'LOGOUT' })
     if (errMsg) {
       showError(errMsg)
     } else {

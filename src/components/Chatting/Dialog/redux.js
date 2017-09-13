@@ -1,6 +1,7 @@
 import { ipcRenderer } from 'electron'
 import makeConstants from '../../../utils/constants'
 import getNewState from '../../../utils/getNewState'
+import storage from '../../../utils/storage'
 
 const initialState = {
   user: {},
@@ -19,6 +20,7 @@ const TYPES = {
   ADD_FILE: '',
   REMOVE_FILE: '',
   SET_TEXT: '',
+  RESTORE: '',
 }
 makeConstants(TYPES, 'DIALOG')
 
@@ -69,6 +71,10 @@ export default function dialog(state = initialState, action) {
       const newState = getNewState(state, type, key)
       newState[type][key].text = action.payload
       return newState
+    }
+    case TYPES.RESTORE: {
+      if (action.payload) return action.payload
+      return state
     }
     default:
       return state
@@ -173,4 +179,9 @@ export const setText = (id, text) => ({
   type: TYPES.SET_TEXT,
   id,
   payload: text,
+})
+
+export const restoreDialog = tag => ({
+  type: TYPES.RESTORE,
+  payload: storage.get(`dialog-${tag}`),
 })
