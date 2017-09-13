@@ -6,7 +6,7 @@ import sortBy from 'lodash.sortby'
 import isEqual from 'lodash.isequal'
 import EventObservable from 'p2p-chat-utils/EventObservable'
 import { formatTag } from '../../utils/format'
-import { getChannelOnlineMembers } from './chatInfo'
+import { getInfo } from './chatInfo'
 import ListItem from './ListItem'
 import DialogType from './DialogType'
 import './ChatList.scss'
@@ -72,10 +72,26 @@ class ChatList extends Component {
   }
 
   render() {
-    const { users, channels, visible } = this.props
+    const { users: _users, channels: _channels, visible } = this.props
     if (!visible) {
       return null
     }
+
+    const byOnline = key => (x) => {
+      const prefix = x.online ? '0' : '1'
+      return prefix + x[key]
+    }
+
+    const channels = sortBy(
+      Object.keys(_channels).map(key =>
+        getInfo(
+          { users: _users, channels: _channels },
+          { type: DialogType.CHANNEL, key }
+        )),
+      byOnline('name')
+    )
+
+    const users = sortBy(Object.values(_users), byOnline('username'))
 
     return (
       <Menu
@@ -86,24 +102,20 @@ class ChatList extends Component {
         styleName="menu"
         >
         <Menu.SubMenu key={DialogType.CHANNEL} title="Channels">
-          {Object.values(channels).map(({
- key, name, badge, users: members,
-}) =>
-              (getChannelOnlineMembers(members, users).length > 0 ? (
-                <Menu.Item key={key}>
-                  <ListItem
-                    title={`${name}${formatTag(key)}`}
-                    badge={badge || 0}
-                    online
-                  />
-                </Menu.Item>
-              ) : null))}
+          {channels.map(({
+ key, name, badge, online,
+}) => (
+  <Menu.Item key={key}>
+    <ListItem
+      title={`${name}${formatTag(key)}`}
+      badge={badge || 0}
+      online={online}
+              />
+  </Menu.Item>
+          ))}
         </Menu.SubMenu>
         <Menu.SubMenu key={DialogType.USER} title="Users">
-          {sortBy(
-            Object.values(users),
-            ({ online }) => (online ? 0 : 1)
-          ).map(({
+          {users.map(({
  tag: key, username: name, online, badge,
 }) => (
   <Menu.Item key={key}>
