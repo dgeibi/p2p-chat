@@ -45,9 +45,7 @@ const getMessage = () => ({
  * @param {object} message
  */
 function handleFile(socket, message) {
-  const {
-    id, checksum, tag, username, filepath, channel, size,
-  } = message
+  const { id, checksum, tag, username, filepath, channel, size } = message
   const filename = path.basename(filepath)
   emitter.emit('file-process-start', {
     id,
@@ -137,20 +135,13 @@ function handleSocket(socket, opts = {}) {
     const { tag, type } = session
 
     // 对发送文件的socket特殊处理
-    if (
-      locals.clients[tag] &&
-      session.type === 'file' &&
-      fileAccepted[session.id]
-    ) {
+    if (locals.clients[tag] && session.type === 'file' && fileAccepted[session.id]) {
       handleFile(socket, session)
       return
     }
 
     // 不符合预期的报文，或者重复连接 -> 断开连接
-    if (
-      (type !== 'greeting' && type !== 'greeting-reply') ||
-      locals.clients[tag]
-    ) {
+    if ((type !== 'greeting' && type !== 'greeting-reply') || locals.clients[tag]) {
       socket.destroy()
       return
     }
@@ -311,9 +302,7 @@ function setup(options, callback) {
     }
 
     // 2. start listening
-    const {
-      host, port, username, tag, address,
-    } = id
+    const { host, port, username, tag, address } = id
     server.listen({ port, host }, () => {
       locals.server = server
       logger.verbose('>> opened server on', server.address())
@@ -515,9 +504,7 @@ function createChannel(opts) {
 }
 
 function sendFile(message) {
-  const {
-    checksum, port, host, id,
-  } = message
+  const { checksum, port, host, id } = message
   fileModule.send(checksum, { id }, { port, host }, (e, filename) => {
     const payload = Object.assign({}, message)
     payload.filename = filename

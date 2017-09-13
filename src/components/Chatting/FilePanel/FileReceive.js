@@ -4,12 +4,7 @@ import { shell } from 'electron'
 import { dirname } from 'path'
 import Card from '../../Common/CustomCard'
 import { fileLoadStates } from './constants'
-import {
-  formatName,
-  formatSize,
-  formatSpeed,
-  formatPercent,
-} from '../../../utils/format'
+import { formatName, formatSize, formatSpeed, formatPercent } from '../../../utils/format'
 import './FileReceive.scss'
 
 const openFile = filepath => () => {

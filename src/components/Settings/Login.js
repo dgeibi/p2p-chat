@@ -59,7 +59,7 @@ export default class Login extends Component {
         cancelText="Cancel"
         onCancel={this.handleCancel}
         onOk={this.handleCreate}
-        >
+      >
         <Form>
           <FormItem label="Username">
             {getFieldDecorator('username', {

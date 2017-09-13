@@ -35,17 +35,10 @@ class FilePanel extends Component {
     return (
       <div styleName="filePanel">
         <div styleName="clearWrapper">
-          <Button
-            onClick={this.clear}
-            type="danger"
-            shape="circle"
-            icon="close"
-          />
+          <Button onClick={this.clear} type="danger" shape="circle" icon="close" />
         </div>
         {filesArr.map((msg) => {
-          const {
- type, id, checksum, key, ...payload
-} = msg
+          const { type, id, checksum, key, ...payload } = msg
           switch (type) {
             case cardTypes.RECEIVE:
               return <FileReceive key={id} {...payload} />

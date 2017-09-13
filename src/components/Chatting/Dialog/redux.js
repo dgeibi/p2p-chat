@@ -32,10 +32,7 @@ export default function dialog(state = initialState, action) {
       const key = action.payload.channel || action.payload.tag
       const newState = getNewState(state, type, key)
       if (newState[type][key].messages) {
-        newState[type][key].messages = [
-          ...state[type][key].messages,
-          action.payload,
-        ]
+        newState[type][key].messages = [...state[type][key].messages, action.payload]
       } else {
         newState[type][key].messages = [action.payload]
       }
@@ -144,9 +141,7 @@ export const textSent = (msg) => {
 }
 
 export const fileSendError = (info) => {
-  const {
-    filename, username, tag, errMsg,
-  } = info
+  const { filename, username, tag, errMsg } = info
   const message = `Failed to send ${username} '${filename}'`
   const description = errMsg
   const payload = {

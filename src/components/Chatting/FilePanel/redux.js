@@ -125,9 +125,7 @@ export const fileReceived = message => ({
   payload: { ...message, status: fileLoadStates.success },
 })
 
-export const acceptFile = ({
-  tag, checksum, channel, id,
-}) => {
+export const acceptFile = ({ tag, checksum, channel, id }) => {
   ipcRenderer.send('accept-file', {
     tag,
     checksum,

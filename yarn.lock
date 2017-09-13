@@ -2894,15 +2894,9 @@ escope@^3.6.0:
     esrecurse "^4.1.0"
     estraverse "^4.1.1"
 
-eslint-config-airbnb-base@^12.0.0:
-  version "12.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-airbnb-base/-/eslint-config-airbnb-base-12.0.0.tgz#99063aaef4b8698083481a00e165cbe15e82d615"
-  dependencies:
-    eslint-restricted-globals "^0.1.1"
-
-eslint-config-dgeibi@^3.0.4:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/eslint-config-dgeibi/-/eslint-config-dgeibi-3.0.4.tgz#4e9d2380df10cec324b106d3c0b0f76c197dff68"
+eslint-config-dgeibi@^3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/eslint-config-dgeibi/-/eslint-config-dgeibi-3.0.5.tgz#f56876504c18f2697656f3c15fe0a5fbc7d8dd8f"
 
 eslint-config-standard-jsx@^4.0.0:
   version "4.0.2"
@@ -2951,10 +2945,6 @@ eslint-plugin-react@^7.2.0:
     has "^1.0.1"
     jsx-ast-utils "^2.0.0"
     prop-types "^15.5.10"
-
-eslint-restricted-globals@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/eslint-restricted-globals/-/eslint-restricted-globals-0.1.1.tgz#35f0d5cbc64c2e3ed62e93b4b1a7af05ba7ed4d7"
 
 eslint-scope@^3.7.1:
   version "3.7.1"

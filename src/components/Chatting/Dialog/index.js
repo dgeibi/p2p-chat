@@ -16,9 +16,7 @@ class Dialog extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault()
-    const {
-      id, fileList, sendFiles, text, sendMessage, setText,
-    } = this.props
+    const { id, fileList, sendFiles, text, sendMessage, setText } = this.props
     if (text) {
       sendMessage(id, text)
       setText(id, '')
@@ -42,16 +40,13 @@ class Dialog extends Component {
   }
 
   render() {
-    const {
-      messages, username, fileList, text, info,
-    } = this.props
+    const { messages, username, fileList, text, info } = this.props
     return (
       <div styleName="dialog">
         {info.name && (
           <Collapse bordered={false}>
             <Panel
-              header={`${info.name} (${info.onlineCount + 1}/${info.totalCount +
-                1})`}
+              header={`${info.name} (${info.onlineCount + 1}/${info.totalCount + 1})`}
               key="1"
             >
               <p>

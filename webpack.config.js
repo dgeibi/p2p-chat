@@ -46,50 +46,58 @@ module.exports = (env = {}) => {
     },
     externals: [depExternals(pkg.dependencies)],
   })
-    .use(define({
-      'process.env.NODE_ENV': JSON.stringify(getEnv(isDev)),
-    }))
+    .use(
+      define({
+        'process.env.NODE_ENV': JSON.stringify(getEnv(isDev)),
+      })
+    )
     .use(minify(), isProduction)
-    .use(babel({
-      include: defaultInclude,
-    }))
-    .use(css({
-      rule: {
-        test: /\.less$/,
-        use: [
-          {
-            loader: 'css-loader',
-            options: {
-              minimize: true,
-            },
-          },
-          'less-loader',
-        ],
-      },
-      extract: isProduction,
-      extractOptions: 'antd.css',
-    }))
-    .use(css({
-      rule: {
-        test: /\.scss$/,
+    .use(
+      babel({
         include: defaultInclude,
-        use: [
-          {
-            loader: 'css-loader',
-            options: {
-              modules: true,
-              localIdentName: '[path]___[name]__[local]___[hash:base64:5]',
-              importLoaders: 1,
-              minimize: true,
-              sourceMap: true,
+      })
+    )
+    .use(
+      css({
+        rule: {
+          test: /\.less$/,
+          use: [
+            {
+              loader: 'css-loader',
+              options: {
+                minimize: true,
+              },
             },
-          },
-          { loader: 'postcss-loader', options: { sourceMap: true } },
-        ],
-      },
-      extract: isProduction,
-      extractOptions: 'main.css',
-    }))
+            'less-loader',
+          ],
+        },
+        extract: isProduction,
+        extractOptions: 'antd.css',
+      })
+    )
+    .use(
+      css({
+        rule: {
+          test: /\.scss$/,
+          include: defaultInclude,
+          use: [
+            {
+              loader: 'css-loader',
+              options: {
+                modules: true,
+                localIdentName: '[path]___[name]__[local]___[hash:base64:5]',
+                importLoaders: 1,
+                minimize: true,
+                sourceMap: true,
+              },
+            },
+            { loader: 'postcss-loader', options: { sourceMap: true } },
+          ],
+        },
+        extract: isProduction,
+        extractOptions: 'main.css',
+      })
+    )
     .plugin(HtmlWebpackPlugin, [
       {
         title: pkg.name,

@@ -140,9 +140,7 @@ ipcMain.on('logout', () => {
 // worker events
 workerEE.on('setup-reply', ({ errMsg, id }) => {
   if (!errMsg) {
-    const {
-      username, address, port, host, tag,
-    } = id
+    const { username, address, port, host, tag } = id
     locals.host = host || address
     locals.port = port
     locals.tag = tag
@@ -150,9 +148,7 @@ workerEE.on('setup-reply', ({ errMsg, id }) => {
   }
 })
 
-workerEE.on('login', ({
-  tag, username, host, port,
-}) => {
+workerEE.on('login', ({ tag, username, host, port }) => {
   settings.set(`users.${tag}`, {
     tag,
     username,
@@ -192,9 +188,7 @@ function createWorker() {
   worker = fork(`${__dirname}/main/worker.js`, ['--color'])
   logger.debug(`new chat worker ${worker.pid}`)
   worker.on('message', (m) => {
-    const {
-      key, args, act, errMsg,
-    } = m
+    const { key, args, act, errMsg } = m
     if (key) {
       workerEE.emit(key, ...args)
       win.webContents.send(key, ...args)

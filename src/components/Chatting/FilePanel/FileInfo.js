@@ -5,9 +5,7 @@ import { formatName, formatSize } from '../../../utils/format'
 import './FileReceive.scss'
 import { fileLoadStates } from './constants'
 
-export default ({
-  filename, accept, ignore, size, username, status,
-}) => (
+export default ({ filename, accept, ignore, size, username, status }) => (
   <Card>
     <span styleName="filename">{formatName(filename)}</span>
     <br />

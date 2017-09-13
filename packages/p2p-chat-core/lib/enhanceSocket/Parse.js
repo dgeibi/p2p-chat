@@ -71,8 +71,7 @@ class Parse extends EventEmitter {
     let lastLeft = this.bodyLeft
     let pass = process.uptime()
     const fn = () => {
-      const percent =
-        (this.msg.bodyLength - this.bodyLeft) / this.msg.bodyLength
+      const percent = (this.msg.bodyLength - this.bodyLeft) / this.msg.bodyLength
       const now = process.uptime()
       const speed = (lastLeft - this.bodyLeft) / (now - pass)
 

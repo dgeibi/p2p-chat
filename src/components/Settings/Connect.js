@@ -127,7 +127,7 @@ export default class Connect extends Component {
         cancelText="Cancel"
         onCancel={handleCancel}
         onOk={handleCreate}
-        >
+      >
         <Form>
           {formItems}
           <FormItem>

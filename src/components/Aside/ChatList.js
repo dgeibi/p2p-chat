@@ -22,9 +22,7 @@ class ChatList extends Component {
   observables = EventObservable(ipcRenderer)
 
   componentWillMount() {
-    const {
-      addUser, offUser, addChannel, setup, increaseBadge,
-    } = this.props
+    const { addUser, offUser, addChannel, setup, increaseBadge } = this.props
     this.observables.observe('login', (event, message) => {
       addUser(message)
     })
@@ -84,10 +82,8 @@ class ChatList extends Component {
 
     const channels = sortBy(
       Object.keys(_channels).map(key =>
-        getInfo(
-          { users: _users, channels: _channels },
-          { type: DialogType.CHANNEL, key }
-        )),
+        getInfo({ users: _users, channels: _channels }, { type: DialogType.CHANNEL, key })
+      ),
       byOnline('name')
     )
 
@@ -100,31 +96,27 @@ class ChatList extends Component {
         onClick={this.handleClick}
         selectedKeys={[this.props.current.key]}
         styleName="menu"
-        >
+      >
         <Menu.SubMenu key={DialogType.CHANNEL} title="Channels">
-          {channels.map(({
- key, name, badge, online,
-}) => (
-  <Menu.Item key={key}>
-    <ListItem
-      title={`${name}${formatTag(key)}`}
-      badge={badge || 0}
-      online={online}
+          {channels.map(({ key, name, badge, online }) => (
+            <Menu.Item key={key}>
+              <ListItem
+                title={`${name}${formatTag(key)}`}
+                badge={badge || 0}
+                online={online}
               />
-  </Menu.Item>
+            </Menu.Item>
           ))}
         </Menu.SubMenu>
         <Menu.SubMenu key={DialogType.USER} title="Users">
-          {users.map(({
- tag: key, username: name, online, badge,
-}) => (
-  <Menu.Item key={key}>
-    <ListItem
-      title={`${name}${formatTag(key)}`}
-      badge={badge || 0}
-      online={online}
+          {users.map(({ tag: key, username: name, online, badge }) => (
+            <Menu.Item key={key}>
+              <ListItem
+                title={`${name}${formatTag(key)}`}
+                badge={badge || 0}
+                online={online}
               />
-  </Menu.Item>
+            </Menu.Item>
           ))}
         </Menu.SubMenu>
       </Menu>

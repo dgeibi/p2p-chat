@@ -70,8 +70,7 @@
     "electron": "^1.8.0",
     "electron-builder": "^19.27.7",
     "eslint": "^4.6.1",
-    "eslint-config-airbnb-base": "^12.0.0",
-    "eslint-config-dgeibi": "^3.0.4",
+    "eslint-config-dgeibi": "^3.0.5",
     "eslint-config-standard-react": "^5.0.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-react": "^7.2.0",
@@ -114,7 +113,8 @@
   "prettier": {
     "semi": false,
     "singleQuote": true,
-    "trailingComma": "es5"
+    "trailingComma": "es5",
+    "printWidth": 90
   },
   "build": {
     "appId": "xyz.dgeibi.p2pchat",

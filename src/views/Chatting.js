@@ -20,8 +20,7 @@ const fileMapper = filepath => ({
       dialogProps: {
         messages: selectState(dialog, ownProps, 'messages') || [],
         text: selectState(dialog, ownProps, 'text') || '',
-        fileList: (selectState(dialog, ownProps, 'filePaths') || [])
-          .map(fileMapper),
+        fileList: (selectState(dialog, ownProps, 'filePaths') || []).map(fileMapper),
         username: state.settings.login.username,
         info: selectInfo(state, ownProps),
       },
@@ -36,13 +35,7 @@ const fileMapper = filepath => ({
 )
 class Chatting extends Component {
   render() {
-    const {
-      dialogActions,
-      files,
-      filePanelActions,
-      id,
-      dialogProps,
-    } = this.props
+    const { dialogActions, files, filePanelActions, id, dialogProps } = this.props
     return (
       <div>
         <Dialog {...dialogActions} {...dialogProps} id={id}>
