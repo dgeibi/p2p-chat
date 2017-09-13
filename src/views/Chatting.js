@@ -5,7 +5,7 @@ import { basename } from 'path'
 
 import Dialog from '../components/Chatting/Dialog'
 import FilePanel from '../components/Chatting/FilePanel'
-import selectInfo from '../components/Chatting/selectInfo'
+import { selectInfo } from '../selectors/chatInfo'
 import * as actions from './ChattingRedux'
 
 const fileMapper = filepath => ({

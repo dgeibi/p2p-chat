@@ -3,10 +3,10 @@ import pickBy from 'p2p-chat-utils/pickBy'
 
 const pickProps = (stub, src) => pickBy(src, (value, key) => has(stub, key))
 
-export const getChannelOnlineMembers = (members, users) =>
+const getChannelOnlineMembers = (members, users) =>
   Object.values(users ? pickProps(members, users) : members).filter(x => x.online)
 
-export const getInfo = ({ users, channels }, { type, key }) => {
+const getInfo = ({ users, channels }, { type, key }) => {
   if (type === 'user') return users[key]
   if (type === 'channel') {
     const channel = { ...channels[key] }
@@ -17,4 +17,12 @@ export const getInfo = ({ users, channels }, { type, key }) => {
     return channel
   }
   return null
+}
+
+export default getInfo
+
+export const selectInfo = (state, ownProps) => {
+  const { type, key } = ownProps.match.params
+  const { users, channels } = state.aside.chatList
+  return getInfo({ users, channels }, { type, key })
 }
