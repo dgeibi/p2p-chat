@@ -5,19 +5,20 @@ const { resolve, join } = require('path')
 const { shellSync } = require('p2p-chat-utils/shell')
 const commonConfig = require('../package').build
 
-const createConfig = arch => Object.assign({}, commonConfig, {
-  win: {
-    target: [
-      {
-        arch,
-        target: 'portable',
-      },
-    ],
-  },
-  portable: {
-    artifactName: `\${productName}-portable-win-\${version}-${arch}.\${ext}`,
-  },
-})
+const createConfig = arch =>
+  Object.assign({}, commonConfig, {
+    win: {
+      target: [
+        {
+          arch,
+          target: 'portable',
+        },
+      ],
+    },
+    portable: {
+      artifactName: `\${productName}-portable-win-\${version}-${arch}.\${ext}`,
+    },
+  })
 
 const createFile = (arch) => {
   const distDir = resolve(__dirname, '../dist')

@@ -125,7 +125,9 @@ export const fileReceived = message => ({
   payload: { ...message, status: fileLoadStates.success },
 })
 
-export const acceptFile = ({ tag, checksum, channel, id }) => {
+export const acceptFile = ({
+  tag, checksum, channel, id,
+}) => {
   ipcRenderer.send('accept-file', {
     tag,
     checksum,
@@ -133,7 +135,12 @@ export const acceptFile = ({ tag, checksum, channel, id }) => {
   })
   return {
     type: TYPES.ACCEPT_FILE,
-    payload: { tag, channel, id, status: fileLoadStates.waitting },
+    payload: {
+      tag,
+      channel,
+      id,
+      status: fileLoadStates.waitting,
+    },
   }
 }
 
@@ -142,7 +149,10 @@ export const ignoreFile = ({ tag, channel, id }) => ({
   payload: { tag, id, channel },
 })
 
-export const clearPanel = ({ type, key }) => ({ type: TYPES.CLEAR_PANEL, payload: { type, key } })
+export const clearPanel = ({ type, key }) => ({
+  type: TYPES.CLEAR_PANEL,
+  payload: { type, key },
+})
 
 function findPos({ tag, channel, id }) {
   if (channel) {

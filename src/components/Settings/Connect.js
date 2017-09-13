@@ -76,7 +76,11 @@ export default class Connect extends Component {
     const minusCircle = k => ({
       addonAfter:
         keys.length > 1 ? (
-          <Icon type="minus-circle-o" disabled={keys.length === 1} onClick={() => remove(k)} />
+          <Icon
+            type="minus-circle-o"
+            disabled={keys.length === 1}
+            onClick={() => remove(k)}
+          />
         ) : null,
     })
     const formItems = keys.map(k => (
@@ -123,7 +127,7 @@ export default class Connect extends Component {
         cancelText="Cancel"
         onCancel={handleCancel}
         onOk={handleCreate}
-      >
+        >
         <Form>
           {formItems}
           <FormItem>

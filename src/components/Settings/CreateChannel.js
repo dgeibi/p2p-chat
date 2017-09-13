@@ -48,7 +48,8 @@ export default class CreateChannel extends Component {
   onChange = (checkedList) => {
     const { onlineUsers } = this.props
     this.setState({
-      indeterminate: checkedList.length > 0 && checkedList.length < onlineUsers.length,
+      indeterminate:
+        checkedList.length > 0 && checkedList.length < onlineUsers.length,
       checkAll: checkedList.length === onlineUsers.length,
     })
   }
@@ -115,7 +116,11 @@ export default class CreateChannel extends Component {
         </Button>
       )
       props.children = (
-        <Alert message="You can't create channels when nobody onlines." type="warning" showIcon />
+        <Alert
+          message="You can't create channels when nobody onlines."
+          type="warning"
+          showIcon
+        />
       )
     } else {
       props.children = this.renderForm()

@@ -12,7 +12,7 @@ function ipSet(initalStore) {
   function add(host, port) {
     if (typeof host !== 'string') throw TypeError('host should be a string')
     const portnum = Math.trunc(port)
-    if (isNaN(portnum)) {
+    if (Number.isNaN(portnum)) {
       throw TypeError('port should be a integer')
     }
     if (store[host] === undefined) store[host] = {}

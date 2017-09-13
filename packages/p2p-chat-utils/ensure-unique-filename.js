@@ -19,7 +19,7 @@ const ensureUnique = (filepath) => {
         arr.push(1)
       } else if (arr.length === 2) {
         const n = Number(arr[1])
-        if (isNaN(n)) {
+        if (Number.isNaN(n)) {
           arr.splice(1, 0, '1')
         } else {
           arr[1] = n + 1
@@ -27,12 +27,12 @@ const ensureUnique = (filepath) => {
       } else {
         let idx = arr.length - 2
         let n = Number(arr[idx])
-        if (!isNaN(n)) {
+        if (!Number.isNaN(n)) {
           arr[idx] = n + 1
         } else {
           idx += 1
           n = Number(arr[idx])
-          if (!isNaN(n)) {
+          if (!Number.isNaN(n)) {
             arr[idx] = n + 1
           } else {
             arr.splice(arr.length - 1, 0, '1')

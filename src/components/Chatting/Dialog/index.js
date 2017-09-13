@@ -5,7 +5,7 @@ import { formatTag } from '../../../utils/format'
 import './Dialog.scss'
 
 const { TextArea } = Input
-const Panel = Collapse.Panel
+const { Panel } = Collapse
 
 class Dialog extends Component {
   handleTextChange = (e) => {
@@ -16,7 +16,9 @@ class Dialog extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault()
-    const { id, fileList, sendFiles, text, sendMessage, setText } = this.props
+    const {
+      id, fileList, sendFiles, text, sendMessage, setText,
+    } = this.props
     if (text) {
       sendMessage(id, text)
       setText(id, '')
@@ -40,12 +42,18 @@ class Dialog extends Component {
   }
 
   render() {
-    const { messages, username, fileList, text, info } = this.props
+    const {
+      messages, username, fileList, text, info,
+    } = this.props
     return (
       <div styleName="dialog">
         {info.name && (
           <Collapse bordered={false}>
-            <Panel header={`${info.name} (${info.onlineCount + 1}/${info.totalCount + 1})`} key="1">
+            <Panel
+              header={`${info.name} (${info.onlineCount + 1}/${info.totalCount +
+                1})`}
+              key="1"
+            >
               <p>
                 onlines:{' '}
                 {Object.values(info.users)
@@ -77,7 +85,12 @@ class Dialog extends Component {
           <Button shape="circle" icon="paper-clip" />
         </Upload>
         <Form onSubmit={this.handleSubmit}>
-          <TextArea rows={4} value={text} onChange={this.handleTextChange} styleName="text" />
+          <TextArea
+            rows={4}
+            value={text}
+            onChange={this.handleTextChange}
+            styleName="text"
+          />
           <div styleName="send-btn-div">
             <Button
               type="primary"

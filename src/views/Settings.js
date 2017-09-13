@@ -49,8 +49,19 @@ export default class Settings extends Component {
           <ModalBtn id="login" visibleDefault>
             {({ show, hide, visible }) => (
               <span>
-                <Button onClick={show} ghost type="primary" icon="setting" size="large" />
-                <Login hide={hide} visible={visible} {...login} {...this.props.loginActions} />
+                <Button
+                  onClick={show}
+                  ghost
+                  type="primary"
+                  icon="setting"
+                  size="large"
+                />
+                <Login
+                  hide={hide}
+                  visible={visible}
+                  {...login}
+                  {...this.props.loginActions}
+                />
               </span>
             )}
           </ModalBtn>
@@ -77,7 +88,11 @@ export default class Settings extends Component {
               {({ show, hide, visible }) => (
                 <span>
                   <Button onClick={show} icon="usergroup-add" />
-                  <CreateChannel hide={hide} visible={visible} onlineUsers={onlineUsers} />
+                  <CreateChannel
+                    hide={hide}
+                    visible={visible}
+                    onlineUsers={onlineUsers}
+                  />
                 </span>
               )}
             </ModalBtn>{' '}

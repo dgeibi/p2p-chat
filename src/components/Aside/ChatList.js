@@ -22,7 +22,9 @@ class ChatList extends Component {
   observables = EventObservable(ipcRenderer)
 
   componentWillMount() {
-    const { addUser, offUser, addChannel, setup, increaseBadge } = this.props
+    const {
+      addUser, offUser, addChannel, setup, increaseBadge,
+    } = this.props
     this.observables.observe('login', (event, message) => {
       addUser(message)
     })
@@ -82,25 +84,35 @@ class ChatList extends Component {
         onClick={this.handleClick}
         selectedKeys={[this.props.current.key]}
         styleName="menu"
-      >
+        >
         <Menu.SubMenu key={DialogType.CHANNEL} title="Channels">
-          {Object.values(channels).map(
-            ({ key, name, badge, users: members }) =>
+          {Object.values(channels).map(({
+ key, name, badge, users: members,
+}) =>
               (getChannelOnlineMembers(members, users).length > 0 ? (
                 <Menu.Item key={key}>
-                  <ListItem title={`${name}${formatTag(key)}`} badge={badge || 0} online />
+                  <ListItem
+                    title={`${name}${formatTag(key)}`}
+                    badge={badge || 0}
+                    online
+                  />
                 </Menu.Item>
-              ) : null)
-          )}
+              ) : null))}
         </Menu.SubMenu>
         <Menu.SubMenu key={DialogType.USER} title="Users">
           {sortBy(
             Object.values(users),
             ({ online }) => (online ? 0 : 1)
-          ).map(({ tag: key, username: name, online, badge }) => (
-            <Menu.Item key={key}>
-              <ListItem title={`${name}${formatTag(key)}`} badge={badge || 0} online={online} />
-            </Menu.Item>
+          ).map(({
+ tag: key, username: name, online, badge,
+}) => (
+  <Menu.Item key={key}>
+    <ListItem
+      title={`${name}${formatTag(key)}`}
+      badge={badge || 0}
+      online={online}
+              />
+  </Menu.Item>
           ))}
         </Menu.SubMenu>
       </Menu>

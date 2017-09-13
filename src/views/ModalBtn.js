@@ -20,7 +20,9 @@ export default class ModalBtn extends Component {
   }
 
   render() {
-    const { show, hide, visible, children } = this.props
+    const {
+      show, hide, visible, children,
+    } = this.props
     return children({ show, hide, visible })
   }
 }

@@ -10,7 +10,7 @@ class Messages extends Component {
   }
 
   scrollToBottom() {
-    const scrollHeight = this.messageList.scrollHeight
+    const { scrollHeight } = this.messageList
     const height = this.messageList.clientHeight
     const maxScrollTop = scrollHeight - height
     this.messageList.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0
@@ -33,7 +33,13 @@ class Messages extends Component {
           if (msg.alert) {
             const { message, description, alert } = msg
             return (
-              <Alert message={message} description={description} type={alert} showIcon {...props} />
+              <Alert
+                message={message}
+                description={description}
+                type={alert}
+                showIcon
+                {...props}
+              />
             )
           }
           if (msg.text) {

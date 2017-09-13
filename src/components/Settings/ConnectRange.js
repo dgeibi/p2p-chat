@@ -45,7 +45,7 @@ export default class ConnectRange extends Component {
         cancelText="Cancel"
         onCancel={this.handleCancel}
         onOk={this.handleCreate}
-      >
+        >
         <Form>
           <FormItem label="Least address">
             {getFieldDecorator('hostStart', {

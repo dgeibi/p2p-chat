@@ -19,7 +19,7 @@ function getInfoMsg(filepath, message, callback) {
       callback(Error(`${filepath} is not a file`))
       return
     }
-    const size = stats.size
+    const { size } = stats
     if (size === 0) {
       callback(Error(`${filepath} is empty file`))
       return

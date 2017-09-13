@@ -13,18 +13,14 @@ export default (store, history) => {
     // eslint-disable-next-line global-require
     const { AppContainer } = require('react-hot-loader')
 
-    render(
-      <AppContainer>
-        <Root />
-      </AppContainer>
-    )
+    render(<AppContainer>
+      <Root />
+    </AppContainer>)
 
     module.hot.accept('../layouts/App', () => {
-      render(
-        <AppContainer>
-          <Root />
-        </AppContainer>
-      )
+      render(<AppContainer>
+        <Root />
+      </AppContainer>)
     })
   } else {
     render(<Root />)

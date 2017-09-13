@@ -11,7 +11,7 @@ const msgSocket = {
 }
 
 const enhance = (opts) => {
-  const socket = opts.socket
+  const { socket } = opts
   if (opts.parse) {
     const parse = new Parse(opts)
     socket.on('data', (chunk) => {

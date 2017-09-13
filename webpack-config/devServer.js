@@ -16,11 +16,15 @@ module.exports = options => (config) => {
         children: false,
       },
       setup() {
-        spawn('electron', ['.', '--devServer', '--port', config.config.devServer.port], {
-          shell: true,
-          env: process.env,
-          stdio: 'inherit',
-        })
+        spawn(
+          'electron',
+          ['.', '--devServer', '--port', config.config.devServer.port],
+          {
+            shell: true,
+            env: process.env,
+            stdio: 'inherit',
+          }
+        )
           .on('close', () => process.exit(0))
           .on('error', spawnError => logger.error(spawnError))
       },

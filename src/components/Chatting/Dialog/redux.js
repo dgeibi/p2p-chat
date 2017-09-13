@@ -32,7 +32,10 @@ export default function dialog(state = initialState, action) {
       const key = action.payload.channel || action.payload.tag
       const newState = getNewState(state, type, key)
       if (newState[type][key].messages) {
-        newState[type][key].messages = [...state[type][key].messages, action.payload]
+        newState[type][key].messages = [
+          ...state[type][key].messages,
+          action.payload,
+        ]
       } else {
         newState[type][key].messages = [action.payload]
       }
@@ -76,10 +79,11 @@ export default function dialog(state = initialState, action) {
 }
 
 export const newMessage = (msg) => {
+  const now = Date.now()
   const payload = {
     ...msg,
-    uid: msg.tag + performance.now(),
-    date: new Date(),
+    uid: now + msg.tag,
+    date: now,
   }
   return {
     type: TYPES.NEW_MESSAGE,
@@ -126,11 +130,12 @@ export const fileSentNotice = (info) => {
 }
 
 export const textSent = (msg) => {
+  const uid = Date.now()
   const payload = {
     ...msg,
-    uid: performance.now(),
+    uid,
     self: true,
-    date: new Date(),
+    date: uid,
   }
   return {
     type: TYPES.MESSAGE_SENT,
@@ -139,12 +144,14 @@ export const textSent = (msg) => {
 }
 
 export const fileSendError = (info) => {
-  const { filename, username, tag, errMsg } = info
+  const {
+    filename, username, tag, errMsg,
+  } = info
   const message = `Failed to send ${username} '${filename}'`
   const description = errMsg
   const payload = {
     ...info,
-    uid: filename + tag + performance.now(),
+    uid: filename + tag + Date.now(),
     alert: 'error',
     message,
     description,

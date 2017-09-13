@@ -20,7 +20,17 @@
     "webpack": "webpack --env.production",
     "webpack:report": "webpack --env.production --env.report",
     "electron": "electron .",
-    "format": "prettier-eslint --write '**/*.js'"
+    "prettier": "prettier --write '**/*.js' --ignore-path .eslintignore",
+    "fix": "eslint --fix .",
+    "format": "run-s prettier fix",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write",
+      "eslint --fix",
+      "git add"
+    ]
   },
   "workspaces": [
     "packages/*",
@@ -55,32 +65,32 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
-    "classnames": "^2.2.5",
     "css-loader": "^0.28.4",
     "dateformat": "^2.0.0",
     "electron": "^1.8.0",
     "electron-builder": "^19.27.7",
-    "eslint": "^4.4.1",
-    "eslint-config-airbnb-base": "^11.3.1",
-    "eslint-config-dgeibi": "^3.0.3",
+    "eslint": "^4.6.1",
+    "eslint-config-airbnb-base": "^12.0.0",
+    "eslint-config-dgeibi": "^3.0.4",
     "eslint-config-standard-react": "^5.0.0",
     "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-no-async-without-await": "^1.2.0",
     "eslint-plugin-react": "^7.2.0",
     "extract-text-webpack-plugin": "^3.0.0",
     "history": "^4.6.3",
     "html-webpack-plugin": "^2.30.1",
+    "husky": "^0.14.3",
     "ip-regex": "^2.1.0",
     "lerna": "^2.1.2",
     "less": "^2.7.2",
     "less-loader": "^4.0.5",
+    "lint-staged": "^4.1.3",
     "lodash.isequal": "^4.5.0",
     "lodash.sortby": "^4.7.0",
     "npm-run-all": "^4.0.2",
     "postcss-loader": "^2.0.6",
     "postcss-scss": "^1.0.2",
     "precss": "^2.0.0",
-    "prettier-eslint-cli": "4.2.3",
+    "prettier": "^1.6.1",
     "prop-types": "^15.5.10",
     "react": "^16.0.0-rc.1",
     "react-dom": "^16.0.0-rc.1",
@@ -100,6 +110,11 @@
     "webpack-bundle-analyzer": "^2.9.0",
     "webpack-dev-server": "^2.6.1",
     "wtf-webpack-config": "^0.1.3"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "es5"
   },
   "build": {
     "appId": "xyz.dgeibi.p2pchat",

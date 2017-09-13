@@ -45,13 +45,28 @@ const getMessage = () => ({
  * @param {object} message
  */
 function handleFile(socket, message) {
-  const { id, checksum, tag, username, filepath, channel, size } = message
+  const {
+    id, checksum, tag, username, filepath, channel, size,
+  } = message
   const filename = path.basename(filepath)
-  emitter.emit('file-process-start', { id, tag, channel, size, filename, username })
+  emitter.emit('file-process-start', {
+    id,
+    tag,
+    channel,
+    size,
+    filename,
+    username,
+  })
 
   const processing = (check, percent, speed) => {
     if (check !== checksum) return
-    emitter.emit('file-processing', { tag, channel, id, percent, speed })
+    emitter.emit('file-processing', {
+      tag,
+      channel,
+      id,
+      percent,
+      speed,
+    })
   }
 
   const done = (check) => {
@@ -68,10 +83,23 @@ function handleFile(socket, message) {
     md5.file(filepath, false, (md5Err, realChecksum) => {
       // 检查checksum
       if (md5Err || realChecksum !== checksum) {
-        emitter.emit('file-receive-fail', { tag, channel, username, filename, id })
+        emitter.emit('file-receive-fail', {
+          tag,
+          channel,
+          username,
+          filename,
+          id,
+        })
         return
       }
-      emitter.emit('file-receiced', { tag, username, filename, filepath, id, channel })
+      emitter.emit('file-receiced', {
+        tag,
+        username,
+        filename,
+        filepath,
+        id,
+        channel,
+      })
       logger.verbose('file receiced', filepath)
       fileAccepted[id] = false
     })
@@ -109,13 +137,20 @@ function handleSocket(socket, opts = {}) {
     const { tag, type } = session
 
     // 对发送文件的socket特殊处理
-    if (locals.clients[tag] && session.type === 'file' && fileAccepted[session.id]) {
+    if (
+      locals.clients[tag] &&
+      session.type === 'file' &&
+      fileAccepted[session.id]
+    ) {
       handleFile(socket, session)
       return
     }
 
     // 不符合预期的报文，或者重复连接 -> 断开连接
-    if ((type !== 'greeting' && type !== 'greeting-reply') || locals.clients[tag]) {
+    if (
+      (type !== 'greeting' && type !== 'greeting-reply') ||
+      locals.clients[tag]
+    ) {
       socket.destroy()
       return
     }
@@ -241,7 +276,7 @@ function setup(options, callback) {
 
   const opts = Object.assign({}, defaultOpts, options)
   opts.port = Math.trunc(opts.port)
-  if (isNaN(opts.port) || opts.port < 2000 || opts.port > 59999) {
+  if (Number.isNaN(opts.port) || opts.port < 2000 || opts.port > 59999) {
     callback(TypeError('port should be a integer (2000~59999)'))
     return
   }
@@ -276,7 +311,9 @@ function setup(options, callback) {
     }
 
     // 2. start listening
-    const { host, port, username, tag, address } = id
+    const {
+      host, port, username, tag, address,
+    } = id
     server.listen({ port, host }, () => {
       locals.server = server
       logger.verbose('>> opened server on', server.address())
@@ -285,7 +322,13 @@ function setup(options, callback) {
       // 3. connect to other servers
       connectServers(payload)
       locals.active = true
-      callback(null, { host, port, username, tag, address })
+      callback(null, {
+        host,
+        port,
+        username,
+        tag,
+        address,
+      })
     })
   })
 }
@@ -303,7 +346,7 @@ function connectServers(opts) {
   if (opts.connects) {
     opts.connects.forEach((conn) => {
       const host = conn.host || locals.address
-      const port = conn.port
+      const { port } = conn
       opts.ipset.add(host, port)
     })
     delete opts.connects
@@ -472,7 +515,9 @@ function createChannel(opts) {
 }
 
 function sendFile(message) {
-  const { checksum, port, host, id } = message
+  const {
+    checksum, port, host, id,
+  } = message
   fileModule.send(checksum, { id }, { port, host }, (e, filename) => {
     const payload = Object.assign({}, message)
     payload.filename = filename
