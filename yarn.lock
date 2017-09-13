@@ -5039,6 +5039,10 @@ node-libs-browser@^2.0.0:
     util "^0.10.3"
     vm-browserify "0.0.4"
 
+node-machine-id@^1.1.9:
+  version "1.1.9"
+  resolved "https://registry.yarnpkg.com/node-machine-id/-/node-machine-id-1.1.9.tgz#811016b02a20c78cc461d37167d5c1deabe6aa05"
+
 node-pre-gyp@^0.6.36:
   version "0.6.37"
   resolved "https://registry.yarnpkg.com/node-pre-gyp/-/node-pre-gyp-0.6.37.tgz#3c872b236b2e266e4140578fe1ee88f693323a05"

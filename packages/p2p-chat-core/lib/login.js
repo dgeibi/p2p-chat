@@ -13,7 +13,7 @@ function login(opts, callback) {
       const id = Object.assign({}, opts)
       id.port = port
       id.address = opts.host || ip.address() // lan ip address
-      id.tag = getTag(port, id.address, opts.username)
+      id.tag = getTag(port, opts.username)
       callback(null, id)
     } else {
       callback(e)
