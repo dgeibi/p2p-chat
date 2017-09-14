@@ -54,8 +54,8 @@ export default class Login extends Component {
     return (
       <Modal
         visible={visible}
-        title="Settings/Login"
-        okText="OK"
+        title="Login"
+        okText="Login"
         cancelText="Cancel"
         onCancel={this.handleCancel}
         onOk={this.handleCreate}
