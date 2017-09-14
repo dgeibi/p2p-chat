@@ -16,6 +16,10 @@ class Messages extends Component {
     this.messageList.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0
   }
 
+  componentDidMount() {
+    this.scrollToBottom()
+  }
+
   componentDidUpdate() {
     this.scrollToBottom()
   }
