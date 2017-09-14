@@ -1,4 +1,6 @@
 /* eslint-disable no-param-reassign */
+process.on('uncaughtException', handleError)
+
 const electron = require('electron')
 const path = require('path')
 const url = require('url')
@@ -271,4 +273,19 @@ function loadSettings(_locals) {
     key: 'change-setting',
     args: [payload],
   })
+}
+
+function handleError(err) {
+  electron.dialog.showErrorBox(
+    'A JavaScript error occurred in the main process',
+    err.stack
+  )
+  if (worker && !worker.killed) {
+    worker.on('close', () => {
+      process.exit()
+    })
+    worker.kill()
+  } else {
+    process.exit()
+  }
 }
