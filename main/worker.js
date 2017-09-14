@@ -1,5 +1,5 @@
 const chat = require('p2p-chat-core')
-const logger = require('logger')
+const logger = require('p2p-chat-logger')
 
 const send = (key, ...args) => {
   process.send({

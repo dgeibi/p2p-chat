@@ -1,6 +1,6 @@
 const { spawn } = require('child_process')
 const webpack = require('webpack')
-const logger = require('logger')
+const logger = require('p2p-chat-logger')
 
 module.exports = options => (config) => {
   config.plugin(new webpack.HotModuleReplacementPlugin())

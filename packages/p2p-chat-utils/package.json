@@ -2,10 +2,11 @@
   "name": "p2p-chat-utils",
   "version": "1.4.0",
   "description": "",
+  "private": true,
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "dgeibi",
-  "license": "ISC"
+  "license": "MIT"
 }

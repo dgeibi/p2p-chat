@@ -6,7 +6,7 @@ const EventEmitter = require('events')
 const emitter = new EventEmitter()
 module.exports = emitter
 
-const logger = require('logger')
+const logger = require('p2p-chat-logger')
 
 const enhanceSocket = require('./lib/enhanceSocket')
 const md5 = require('p2p-chat-utils/md5')

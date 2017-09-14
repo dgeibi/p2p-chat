@@ -1,0 +1,12 @@
+{
+  "name": "p2p-chat-logger",
+  "version": "1.2.0",
+  "description": "logger",
+  "private": true,
+  "main": "index.js",
+  "author": "dgeibi",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^2.0.1"
+  }
+}

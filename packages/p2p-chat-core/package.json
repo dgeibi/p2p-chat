@@ -2,6 +2,7 @@
   "name": "p2p-chat-core",
   "version": "1.4.0",
   "license": "MIT",
+  "private": true,
   "description": "a p2p chat app",
   "main": "index.js",
   "author": "dgeibi <png.inside@gmail.com> (blog.dgeibi.xyz)",
@@ -16,8 +17,8 @@
   "dependencies": {
     "fs-extra": "^4.0.0",
     "ip": "^1.1.5",
-    "logger": "github:dgeibi/logger#305933c",
     "node-machine-id": "^1.1.9",
+    "p2p-chat-logger": "^1.2.0",
     "p2p-chat-utils": "^1.4.0"
   }
 }
