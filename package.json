@@ -1,6 +1,6 @@
 {
   "name": "p2p-chat",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "license": "MIT",
   "description": "a p2p chat app",
   "main": "index.js",
