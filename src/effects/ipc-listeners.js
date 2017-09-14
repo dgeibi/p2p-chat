@@ -3,7 +3,7 @@ import { chatListActions } from '../views/AsideRedux'
 import { dialogActions, filePanelActions } from '../views/ChattingRedux'
 import { showError, showInfo } from '../utils/message'
 
-export default function listen(on, dispatch) {
+export default function listeners(on, dispatch) {
   on('setup-reply', (event, { errMsg, id }) => {
     if (!errMsg) {
       dispatch(loginActions.updateSettings(id))

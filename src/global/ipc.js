@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron'
 import replaceable from 'p2p-chat-utils/event-replaceable'
-import ipcListeners from '../side-effects/global-ipc'
+import ipcListeners from '../effects/ipc-listeners'
 
 export default (...args) => {
   const replace = replaceable({
@@ -11,7 +11,7 @@ export default (...args) => {
   })
 
   if (module.hot) {
-    module.hot.accept('../side-effects/global-ipc', () => {
+    module.hot.accept('../effects/ipc-listeners', () => {
       replace(ipcListeners)
     })
   }

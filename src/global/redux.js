@@ -1,7 +1,7 @@
 import { createStore, applyMiddleware, compose } from 'redux'
 import { routerMiddleware as createRouterMiddleware } from 'react-router-redux'
 import createHistory from 'history/createHashHistory'
-import rootReducer from './reducer'
+import rootReducer from '../effects/reducer'
 
 const history = createHistory()
 const RouterMiddleware = createRouterMiddleware(history)
@@ -20,7 +20,7 @@ const configureStore = (initialState) => {
   const store = finalCreateStore(rootReducer, initialState)
 
   if (module.hot) {
-    module.hot.accept('./reducer', () => {
+    module.hot.accept('../effects/reducer', () => {
       store.replaceReducer(rootReducer)
     })
   }
