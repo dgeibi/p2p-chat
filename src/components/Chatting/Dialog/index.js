@@ -47,10 +47,9 @@ class Dialog extends Component {
           <Collapse bordered={false}>
             <Panel
               header={`${info.name} (${info.onlineCount + 1}/${info.totalCount + 1})`}
-              key="1"
             >
               <p>
-                onlines:{' '}
+                onlines: <span>{username}[me]</span>{' '}
                 {Object.values(info.users)
                   .filter(x => x.online)
                   .map(x => (
