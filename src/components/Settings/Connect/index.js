@@ -1,8 +1,8 @@
 import { Form, Input, Icon, Button, Col } from 'antd'
 import React, { Component } from 'react'
 import { ipcRenderer } from 'electron'
-import Modal from '../Common/Modal'
-import { validAddress, validPort } from './validators'
+import Modal from '../../Common/Modal'
+import { validAddress, validPort } from '../validators'
 
 const InputGroup = Input.Group
 const FormItem = Form.Item

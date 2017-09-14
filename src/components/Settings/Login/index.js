@@ -3,8 +3,8 @@ import { Input, Form } from 'antd'
 import { ipcRenderer } from 'electron'
 import PropTypes from 'prop-types'
 
-import { validPort, validName } from './validators'
-import Modal from '../Common/Modal'
+import { validPort, validName } from '../validators'
+import Modal from '../../Common/Modal'
 
 function FormItem(props) {
   const formItemLayout = {

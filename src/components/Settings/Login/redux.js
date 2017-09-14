@@ -1,7 +1,7 @@
 import { ipcRenderer } from 'electron'
 import { push } from 'react-router-redux'
 
-import getConstants from '../../utils/constants'
+import getConstants from '../../../utils/constants'
 
 const TYPES = {
   UPDATE_SETTINGS: '',

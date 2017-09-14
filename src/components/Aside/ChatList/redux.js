@@ -1,5 +1,5 @@
 import { push } from 'react-router-redux'
-import constants from '../../utils/constants'
+import constants from '../../../utils/constants'
 
 const TYPES = {
   SETUP: '',

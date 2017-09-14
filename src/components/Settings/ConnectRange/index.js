@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { ipcRenderer } from 'electron'
 import { Input, Form } from 'antd'
-import { validAddress, validPort } from './validators'
-import Modal from '../Common/Modal'
+import { validAddress, validPort } from '../validators'
+import Modal from '../../Common/Modal'
 
 const FormItem = Form.Item
 

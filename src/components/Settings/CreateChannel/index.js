@@ -2,8 +2,8 @@ import { Form, Input, Checkbox, Button, Alert } from 'antd'
 import React, { Component } from 'react'
 import { ipcRenderer } from 'electron'
 
-import Modal from '../Common/Modal'
-import { validName } from './validators'
+import Modal from '../../Common/Modal'
+import { validName } from '../validators'
 
 const CheckboxGroup = Checkbox.Group
 const FormItem = Form.Item

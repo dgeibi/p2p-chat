@@ -1,5 +1,5 @@
 import React from 'react'
-import { formatTag } from '../../utils/format'
+import { formatTag } from '../../../utils/format'
 import './MyInfo.scss'
 
 export default ({ logined, tag, address, port, username }) =>

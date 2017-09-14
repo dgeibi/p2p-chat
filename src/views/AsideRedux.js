@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 import { matchPath } from 'react-router'
 
-import chatList, * as chatListActions from '../components/Aside/ChatListRedux'
+import chatList, * as chatListActions from '../components/Aside/ChatList/redux'
 
 const selectors = {
   selectChattingID({ routing: { location } }) {
