@@ -38,6 +38,7 @@ class Messages extends Component {
             const { message, description, alert } = msg
             return (
               <Alert
+                styleName="alert"
                 message={message}
                 description={description}
                 type={alert}
