@@ -18,7 +18,7 @@ const FileReceive = ({
   username,
   size,
   filename,
-  errMsg,
+  error,
   speed,
   percent,
   status,
@@ -34,7 +34,7 @@ const FileReceive = ({
       {formatSize(size)} by {formatName(username)}
       <br />
       {status === active && <span>{formatSpeed(speed)}</span>}
-      {status === exception && <div>{errMsg}</div>}
+      {status === exception && <div>{error.message}</div>}
       <br />
       {status !== success && (
         <Progress percent={formatPercent(percent)} status={status} />

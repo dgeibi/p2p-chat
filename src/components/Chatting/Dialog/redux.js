@@ -147,9 +147,9 @@ export const textSent = (msg) => {
 }
 
 export const fileSendError = (info) => {
-  const { filename, username, tag, errMsg } = info
+  const { filename, username, tag, error } = info
   const message = `Failed to send ${username} '${filename}'`
-  const description = errMsg
+  const description = error.message
   const payload = {
     ...info,
     uid: filename + tag + Date.now(),

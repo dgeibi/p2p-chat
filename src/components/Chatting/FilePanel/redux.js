@@ -115,7 +115,6 @@ export const fileReceiveError = message => ({
   type: TYPES.FILE_FAIL,
   payload: {
     ...message,
-    errMsg: `Fail to receive ${message.filename}`,
     status: fileLoadStates.exception,
   },
 })

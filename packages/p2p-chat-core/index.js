@@ -56,8 +56,8 @@ function handleFile(socket, message) {
     username,
   })
 
-  const processing = (check, percent, speed) => {
-    if (check !== checksum) return
+  const processing = (_checksum, percent, speed) => {
+    if (_checksum !== checksum) return
     emitter.emit('file-processing', {
       tag,
       channel,
@@ -67,22 +67,24 @@ function handleFile(socket, message) {
     })
   }
 
-  const done = (check) => {
-    if (check !== checksum) return
+  const done = (_checksum) => {
+    if (_checksum !== checksum) return
     socket.removeListener('file-processing', processing)
     socket.removeListener('file-done', done)
     emitter.emit('file-process-done', { id, tag, channel })
   }
 
-  const close = (check) => {
-    if (check !== checksum) return
+  const close = (_checksum) => {
+    if (_checksum !== checksum) return
     socket.removeListener('file-close', close)
 
     md5.file(filepath, false, (md5Err, realChecksum) => {
       // 检查checksum
       if (md5Err || realChecksum !== checksum) {
+        const error = md5Err || Error(`\`${filename}\` validation fail`)
         emitter.emit('file-receive-fail', {
           tag,
+          error,
           channel,
           username,
           filename,
@@ -435,10 +437,10 @@ function sendFileToUsers(opts) {
   const { tags, filepath, payload } = opts
   const msg = Object.assign(getMessage(), payload)
 
-  fileModule.getInfoMsg(filepath, msg, (err, message) => {
-    if (err) {
-      logger.err(err)
-      emitter.emit('file-unable-to-send', { errMsg: err.message })
+  fileModule.getInfoMsg(filepath, msg, (error, message) => {
+    if (error) {
+      logger.err('file-unable-to-send', error)
+      emitter.emit('file-unable-to-send', { error })
       return
     }
     each(locals.clients, tags, (socket) => {
@@ -509,13 +511,13 @@ function createChannel(opts) {
 
 function sendFile(message) {
   const { checksum, port, host, id } = message
-  fileModule.send(checksum, { id }, { port, host }, (e, filename) => {
+  fileModule.send(checksum, { id }, { port, host }, (error, filename) => {
     const payload = Object.assign({}, message)
     payload.filename = filename
 
-    if (e) {
-      payload.errMsg = e.message
-      logger.err('file-send-fail', filename, payload.errMsg)
+    if (error) {
+      payload.error = error
+      logger.err('file-send-fail', filename, error.message)
       emitter.emit('file-send-fail', payload)
     } else {
       emitter.emit('file-sent', payload)

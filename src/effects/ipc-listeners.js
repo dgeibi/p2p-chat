@@ -4,27 +4,27 @@ import { dialogActions, filePanelActions } from '../views/ChattingRedux'
 import { showError, showInfo } from '../utils/message'
 
 export default function listeners(on, dispatch) {
-  on('setup-reply', (event, { errMsg, id }) => {
-    if (!errMsg) {
+  on('setup-reply', (event, { error, id }) => {
+    if (!error) {
       dispatch(loginActions.updateSettings(id))
       dispatch(chatListActions.show())
       dispatch(dialogActions.restoreDialog(id.tag))
     } else {
-      showError(errMsg)
+      showError(error)
     }
   })
 
-  on('logout-reply', (event, { errMsg }) => {
+  on('logout-reply', (event, { error }) => {
     dispatch({ type: 'LOGOUT' })
-    if (errMsg) {
-      showError(errMsg)
+    if (error) {
+      showError(error)
     } else {
       showInfo('Logouted.')
     }
   })
 
-  on('bg-err', (event, { errMsg }) => {
-    showError(errMsg)
+  on('bg-err', (event, { error }) => {
+    showError(error)
   })
 
   on('text', (event, message) => {
@@ -44,8 +44,8 @@ export default function listeners(on, dispatch) {
     dispatch(dialogActions.fileSendError(info))
   })
 
-  on('file-unable-to-send', (event, { errMsg }) => {
-    showError(errMsg)
+  on('file-unable-to-send', (event, { error }) => {
+    showError(error)
   })
 
   // file receive

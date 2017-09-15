@@ -18,6 +18,7 @@ const pickByMap = require('p2p-chat-utils/pickByMap')
 const getDir = require('./main/getDir')
 const Settings = require('./main/Settings')
 const setContextMenu = require('./main/setContextMenu')
+const makePlainError = require('./main/makePlainError')
 
 const { app, BrowserWindow, ipcMain } = electron
 
@@ -30,8 +31,13 @@ let setWrap
 const locals = {
   users: null,
   channels: null,
-  settingsDir: null,
   username: null,
+  tag: null,
+  host: null,
+  port: null,
+  settingsDir: null,
+  downloadDir: null,
+  devPort: null,
 }
 
 // webpack-dev-server port
@@ -113,18 +119,29 @@ ipcMain.on('logout', () => {
   locals.username = null
   locals.channels = null
   locals.users = null
+  locals.host = null
+  locals.port = null
+  locals.tag = null
   win.setTitle(pkg.name)
 })
 
 // worker events
-workerEE.on('setup-reply', ({ errMsg, id }) => {
-  if (!errMsg) {
+workerEE.on('setup-reply', ({ error, id }) => {
+  if (!error) {
     const { username, address, port, host, tag } = id
     locals.host = host || address
     locals.port = port
     locals.tag = tag
     win.setTitle(`${username}[${id.tag.slice(0, 5)}] - ${pkg.name}`)
     loadSettings(locals)
+  } else {
+    logger.err('setup failed\n', error)
+  }
+})
+
+workerEE.on('logout-reply', ({ error }) => {
+  if (error) {
+    logger.err('logout failed\n', error)
   }
 })
 
@@ -148,7 +165,9 @@ process.on('exit', () => {
 
 app.on('ready', () => {
   createWindow()
-  Object.assign(locals, getDir())
+  const { settingsDir, downloadDir } = getDir()
+  locals.settingsDir = settingsDir
+  locals.downloadDir = downloadDir
 })
 
 app.on('window-all-closed', () => {
@@ -163,26 +182,28 @@ app.on('activate', () => {
   }
 })
 
+function handleWorkerError(err) {
+  win.webContents.send('bg-err', { error: makePlainError(err) })
+  logger.error(err)
+  if (worker && !worker.killed) worker.kill()
+  createWorker()
+}
+
 function createWorker() {
   if (!tick()) return
   worker = fork(`${__dirname}/main/worker.js`, ['--color'])
   logger.debug(`new chat worker ${worker.pid}`)
   worker.on('message', (m) => {
-    const { key, args, act, errMsg } = m
+    const { key, args, act, error } = m
     if (key) {
       workerEE.emit(key, ...args)
       win.webContents.send(key, ...args)
     } else if (act === 'suicide') {
-      win.webContents.send('bg-err', { errMsg })
-      createWorker()
+      handleWorkerError(error)
     }
   })
 
-  worker.on('error', (err) => {
-    win.webContents.send('bg-err', { errMsg: err.message })
-    logger.error(err)
-    createWorker()
-  })
+  worker.on('error', handleWorkerError)
 
   worker.on('exit', () => {
     logger.debug(`chat worker ${worker.pid} exits`)

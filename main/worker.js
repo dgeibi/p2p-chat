@@ -1,5 +1,5 @@
 const chat = require('p2p-chat-core')
-const logger = require('p2p-chat-logger')
+const makePlainError = require('./makePlainError')
 
 const send = (key, ...args) => {
   process.send({
@@ -9,8 +9,7 @@ const send = (key, ...args) => {
 }
 
 process.on('uncaughtException', (err) => {
-  logger.err(err)
-  process.send({ act: 'suicide', errMsg: err.message })
+  process.send({ act: 'suicide', error: makePlainError(err) })
 
   chat.exit(() => {
     process.exit(1)
@@ -32,17 +31,13 @@ process.on('message', (message) => {
     }
     case 'setup': {
       chat.setup(opts, (err, id) => {
-        if (err) logger.err(err, 'setup fail')
-        const errMsg = err ? err.message : null
-        send('setup-reply', { errMsg, id })
+        send('setup-reply', { error: makePlainError(err), id })
       })
       break
     }
     case 'logout': {
       chat.exit((err) => {
-        if (err) logger.err(err, 'exit fail')
-        const errMsg = err ? err.message : null
-        send('logout-reply', { errMsg })
+        send('logout-reply', { error: makePlainError(err) })
       })
       break
     }
@@ -68,8 +63,12 @@ process.on('message', (message) => {
 })
 
 const bypassChatToMain = (key) => {
-  chat.on(key, (...args) => {
-    send(key, ...args)
+  chat.on(key, (payload, ...rest) => {
+    if (payload && typeof payload === 'object' && payload.error) {
+      // eslint-disable-next-line no-param-reassign
+      payload.error = makePlainError(payload.error)
+    }
+    send(key, payload, ...rest)
   })
 }
 
