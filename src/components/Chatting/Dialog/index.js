@@ -100,7 +100,7 @@ class Dialog extends Component {
           beforeUpload={this.handleFileAdd}
           fileList={fileList}
         >
-          <Button shape="circle" icon="paper-clip" />
+          <Button shape="circle" icon="paper-clip" title="Send files" />
         </Upload>
         <Form onSubmit={this.handleSubmit}>
           <TextArea

@@ -64,16 +64,13 @@ export default class Settings extends Component {
       <div styleName="settings">
         {!logined && (
           <ModalBtn id="login" visibleDefault>
-            {({ show, hide, visible }) => (
-              <span>
-                <Button onClick={show} ghost type="primary" icon="setting" size="large" />
-                <Login
-                  hide={hide}
-                  visible={visible}
-                  {...login}
-                  {...this.props.loginActions}
-                />
-              </span>
+            {({ hide, visible }) => (
+              <Login
+                hide={hide}
+                visible={visible}
+                {...login}
+                {...this.props.loginActions}
+              />
             )}
           </ModalBtn>
         )}
@@ -82,7 +79,7 @@ export default class Settings extends Component {
             <ModalBtn id="connect">
               {({ show, hide, visible }) => (
                 <span>
-                  <Button onClick={show} icon="cloud-o" />
+                  <Button onClick={show} icon="cloud-o" title="Connect clients" />
                   <Connect hide={hide} visible={visible} />
                 </span>
               )}
@@ -90,7 +87,7 @@ export default class Settings extends Component {
             <ModalBtn id="connect-range">
               {({ show, hide, visible }) => (
                 <span>
-                  <Button onClick={show} icon="plus" />
+                  <Button onClick={show} icon="plus" title="Connect clients from range" />
                   <ConnectRange hide={hide} visible={visible} />
                 </span>
               )}
@@ -98,7 +95,7 @@ export default class Settings extends Component {
             <ModalBtn id="create-channel">
               {({ show, hide, visible }) => (
                 <span>
-                  <Button onClick={show} icon="usergroup-add" />
+                  <Button onClick={show} icon="usergroup-add" title="Create a channel" />
                   <CreateChannel
                     hide={hide}
                     visible={visible}
@@ -107,7 +104,12 @@ export default class Settings extends Component {
                 </span>
               )}
             </ModalBtn>{' '}
-            <Button type="danger" onClick={this.logout} icon="disconnect" />
+            <Button
+              type="danger"
+              onClick={this.logout}
+              icon="disconnect"
+              title="Logout"
+            />
           </div>
         )}
         <MyInfo {...login} />

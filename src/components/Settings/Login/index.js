@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Input, Form } from 'antd'
+import { Input, Form, Button } from 'antd'
 import { ipcRenderer } from 'electron'
 import PropTypes from 'prop-types'
 
@@ -52,15 +52,18 @@ export default class Login extends Component {
   render() {
     const { getFieldDecorator } = this.props.form
     const { visible } = this.props
-
+    const footer = (
+      <Button size="large" type="primary" onClick={this.handleCreate}>
+        Login
+      </Button>
+    )
     return (
       <Modal
         visible={visible}
         title="Login"
-        okText="Login"
-        cancelText="Cancel"
-        onCancel={this.handleCancel}
-        onOk={this.handleCreate}
+        closable={false}
+        maskClosable={false}
+        footer={footer}
       >
         <Form>
           <FormItem label="Username">
