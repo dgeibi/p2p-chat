@@ -17,25 +17,45 @@ class ChatList extends Component {
       type: PropTypes.string,
       key: PropTypes.string,
     }),
+    addUser: PropTypes.func.isRequired,
+    offUser: PropTypes.func.isRequired,
+    addChannel: PropTypes.func.isRequired,
+    setup: PropTypes.func.isRequired,
+    increaseBadge: PropTypes.func.isRequired,
+    clearBadge: PropTypes.func.isRequired,
+    changeDialog: PropTypes.func.isRequired,
+    users: PropTypes.objectOf(
+      PropTypes.shape({
+        username: PropTypes.string,
+        tag: PropTypes.string,
+      })
+    ).isRequired,
+    channels: PropTypes.objectOf(
+      PropTypes.shape({
+        users: PropTypes.object,
+      })
+    ).isRequired,
+    visible: PropTypes.bool.isRequired,
   }
 
   observables = EventObservable(ipcRenderer)
 
   componentWillMount() {
     const { addUser, offUser, addChannel, setup, increaseBadge } = this.props
-    this.observables.observe('login', (event, message) => {
+    const { observe } = this.observables
+    observe('login', (event, message) => {
       addUser(message)
     })
 
-    this.observables.observe('logout', (event, message) => {
+    observe('logout', (event, message) => {
       offUser(message)
     })
 
-    this.observables.observe('channel-create', (events, { channel }) => {
+    observe('channel-create', (events, { channel }) => {
       addChannel(channel)
     })
 
-    this.observables.observe('after-setup', (event, { users, channels }) => {
+    observe('after-setup', (event, { users, channels }) => {
       setup({ users, channels })
     })
 
@@ -47,8 +67,8 @@ class ChatList extends Component {
       }
     }
 
-    this.observables.observe('fileinfo', handleIncome)
-    this.observables.observe('text', handleIncome)
+    observe('fileinfo', handleIncome)
+    observe('text', handleIncome)
   }
 
   componentWillUnmount() {

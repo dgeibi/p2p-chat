@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+
 import ChatList from '../components/Aside/ChatList'
 import { chatListActions, selectors } from './AsideRedux'
 
@@ -14,6 +16,11 @@ import { chatListActions, selectors } from './AsideRedux'
   })
 )
 class Aside extends Component {
+  static propTypes = {
+    chatList: PropTypes.object.isRequired,
+    chatListActions: PropTypes.object.isRequired,
+    chattingID: PropTypes.object.isRequired,
+  }
   render() {
     const { chatList, chatListActions: actions } = this.props
     const { chattingID } = this.props

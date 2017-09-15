@@ -2,6 +2,7 @@ import React from 'react'
 import { Provider } from 'react-redux'
 import { Route, Switch } from 'react-router-dom'
 import { ConnectedRouter as Router } from 'react-router-redux'
+import PropTypes from 'prop-types'
 
 import Frame from './Frame'
 import Chatting from '../views/Chatting'
@@ -27,5 +28,10 @@ const App = ({ store, history }) => (
     </Frame>
   </Provider>
 )
+
+App.propTypes = {
+  store: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired,
+}
 
 export default App

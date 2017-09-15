@@ -1,10 +1,16 @@
 import React, { Component } from 'react'
-
 import { Alert } from 'antd'
+import PropTypes from 'prop-types'
+
 import Text from './Text'
 import './Messages.scss'
 
 class Messages extends Component {
+  static propTypes = {
+    messages: PropTypes.array.isRequired,
+    username: PropTypes.string.isRequired,
+  }
+
   saveMessageList = (div) => {
     this.messageList = div
   }

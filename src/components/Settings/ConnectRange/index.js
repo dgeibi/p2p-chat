@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { ipcRenderer } from 'electron'
 import { Input, Form } from 'antd'
+import PropTypes from 'prop-types'
+
 import { validAddress, validPort } from '../validators'
 import Modal from '../../Common/Modal'
 
@@ -19,6 +21,12 @@ const validForm = (form, callback) => {
 
 @Form.create()
 export default class ConnectRange extends Component {
+  static propTypes = {
+    hide: PropTypes.func.isRequired,
+    visible: PropTypes.bool.isRequired,
+    form: PropTypes.object.isRequired,
+  }
+
   handleCancel = () => {
     this.props.hide()
   }

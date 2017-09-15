@@ -31,6 +31,8 @@ export default class Login extends Component {
     hide: PropTypes.func.isRequired,
     visible: PropTypes.bool.isRequired,
     form: PropTypes.object.isRequired,
+    port: PropTypes.number.isRequired,
+    username: PropTypes.string.isRequired,
   }
 
   handleCancel = () => {

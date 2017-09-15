@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { Input, Button, Form, Upload, Collapse } from 'antd'
 import Messages from '../Messages'
 import { formatTag } from '../../../utils/format'
@@ -8,6 +9,29 @@ const { TextArea } = Input
 const { Panel } = Collapse
 
 class Dialog extends Component {
+  static propTypes = {
+    setText: PropTypes.func.isRequired,
+    id: PropTypes.object.isRequired,
+    fileList: PropTypes.arrayOf(PropTypes.object).isRequired,
+    sendFiles: PropTypes.func.isRequired,
+    text: PropTypes.string.isRequired,
+    sendMessage: PropTypes.func.isRequired,
+    removeFile: PropTypes.func.isRequired,
+    addFile: PropTypes.func.isRequired,
+    messages: PropTypes.array.isRequired,
+    username: PropTypes.string.isRequired,
+    info: PropTypes.shape({
+      online: PropTypes.bool,
+      username: PropTypes.string,
+      name: PropTypes.string,
+      users: PropTypes.object,
+    }).isRequired,
+    children: PropTypes.oneOfType([
+      PropTypes.element,
+      PropTypes.arrayOf(PropTypes.element),
+    ]),
+  }
+
   handleTextChange = (e) => {
     const { setText, id } = this.props
     const text = e.target.value

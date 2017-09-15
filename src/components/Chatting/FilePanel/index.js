@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Button } from 'antd'
+import PropTypes from 'prop-types'
 
 import FileInfo from './FileInfo'
 import FileReceive from './FileReceive'
@@ -24,6 +25,13 @@ const ignore = ({ tag, channel }, id, ignoreFile) => () => {
 }
 
 class FilePanel extends Component {
+  static propTypes = {
+    id: PropTypes.object.isRequired,
+    clearPanel: PropTypes.func.isRequired,
+    acceptFile: PropTypes.func.isRequired,
+    ignoreFile: PropTypes.func.isRequired,
+    files: PropTypes.object.isRequired,
+  }
   clear = () => {
     const { clearPanel, id } = this.props
     clearPanel(id)

@@ -1,5 +1,6 @@
 import { Form, Input, Checkbox, Button, Alert } from 'antd'
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { ipcRenderer } from 'electron'
 
 import Modal from '../../Common/Modal'
@@ -26,6 +27,12 @@ const validForm = (form, callback) => {
 @Form.create()
 export default class CreateChannel extends Component {
   static checkboxsField = 'tags'
+  static propTypes = {
+    hide: PropTypes.func.isRequired,
+    form: PropTypes.object.isRequired,
+    visible: PropTypes.bool.isRequired,
+    onlineUsers: PropTypes.arrayOf(PropTypes.object).isRequired,
+  }
   state = {
     indeterminate: false,
     checkAll: false,

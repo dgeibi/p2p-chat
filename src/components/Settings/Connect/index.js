@@ -1,6 +1,8 @@
 import { Form, Input, Icon, Button, Col } from 'antd'
 import React, { Component } from 'react'
 import { ipcRenderer } from 'electron'
+import PropTypes from 'prop-types'
+
 import Modal from '../../Common/Modal'
 import { validAddress, validPort } from '../validators'
 
@@ -32,6 +34,12 @@ const validForm = (form, callback) => {
 
 @Form.create()
 export default class Connect extends Component {
+  static propTypes = {
+    hide: PropTypes.func.isRequired,
+    visible: PropTypes.bool.isRequired,
+    form: PropTypes.object.isRequired,
+  }
+
   remove = (k) => {
     const { form } = this.props
     const keys = form.getFieldValue('keys')

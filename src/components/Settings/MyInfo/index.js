@@ -1,8 +1,10 @@
 import React from 'react'
+import PropTypes from 'prop-types'
+
 import { formatTag } from '../../../utils/format'
 import './MyInfo.scss'
 
-export default ({ logined, tag, address, port, username }) =>
+const MyInfo = ({ logined, tag, address, port, username }) =>
   (logined ? (
     <p styleName="my-info">
       {username}
@@ -11,3 +13,13 @@ export default ({ logined, tag, address, port, username }) =>
       {address}:{port}
     </p>
   ) : null)
+
+MyInfo.propTypes = {
+  logined: PropTypes.bool.isRequired,
+  tag: PropTypes.string,
+  address: PropTypes.string,
+  port: PropTypes.number,
+  username: PropTypes.string,
+}
+
+export default MyInfo

@@ -17,6 +17,7 @@ export default class ModalBtn extends Component {
     show: PropTypes.func.isRequired,
     hide: PropTypes.func.isRequired,
     visible: PropTypes.bool.isRequired,
+    children: PropTypes.func.isRequired,
   }
 
   render() {

@@ -1,5 +1,6 @@
 import React from 'react'
 import dateFormat from 'dateformat'
+import PropTypes from 'prop-types'
 
 import { formatTag } from '../../../utils/format'
 
@@ -12,5 +13,14 @@ const Text = ({ username, text, myName, self, date, tag }) => (
     <footer styleName="text__footer">{dateFormat(date, 'yyyy-mm-dd HH:MM')}</footer>
   </div>
 )
+
+Text.propTypes = {
+  text: PropTypes.string.isRequired,
+  date: PropTypes.number.isRequired,
+  username: PropTypes.string,
+  self: PropTypes.bool,
+  myName: PropTypes.string,
+  tag: PropTypes.string,
+}
 
 export default Text

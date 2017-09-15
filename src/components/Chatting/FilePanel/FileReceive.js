@@ -2,6 +2,8 @@ import React from 'react'
 import { Progress } from 'antd'
 import { shell } from 'electron'
 import { dirname } from 'path'
+import PropTypes from 'prop-types'
+
 import Card from '../../Common/CustomCard'
 import { fileLoadStates } from './constants'
 import { formatName, formatSize, formatSpeed, formatPercent } from '../../../utils/format'
@@ -46,6 +48,17 @@ const FileReceive = ({
       )}
     </Card>
   )
+}
+
+FileReceive.propTypes = {
+  username: PropTypes.string.isRequired,
+  size: PropTypes.number.isRequired,
+  filename: PropTypes.string.isRequired,
+  error: PropTypes.object,
+  speed: PropTypes.number,
+  percent: PropTypes.number,
+  status: PropTypes.string,
+  filepath: PropTypes.string,
 }
 
 export default FileReceive

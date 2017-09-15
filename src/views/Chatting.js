@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { basename } from 'path'
+import PropTypes from 'prop-types'
 
 import Dialog from '../components/Chatting/Dialog'
 import FilePanel from '../components/Chatting/FilePanel'
@@ -34,6 +35,13 @@ const fileMapper = filepath => ({
   })
 )
 class Chatting extends Component {
+  static propTypes = {
+    dialogActions: PropTypes.object.isRequired,
+    files: PropTypes.object.isRequired,
+    filePanelActions: PropTypes.object.isRequired,
+    id: PropTypes.object.isRequired,
+    dialogProps: PropTypes.object.isRequired,
+  }
   render() {
     const { dialogActions, files, filePanelActions, id, dialogProps } = this.props
     return (

@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { Button } from 'antd'
+import PropTypes from 'prop-types'
 
 import { loginActions } from './SettingsRedux'
 import { chatListActions } from './AsideRedux'
@@ -34,6 +35,22 @@ const selectOnlineUsers = chatListState =>
   })
 )
 export default class Settings extends Component {
+  static propTypes = {
+    loginActions: PropTypes.shape({
+      logout: PropTypes.func.isRequired,
+      backToRoot: PropTypes.func.isRequired,
+    }),
+    resetChatList: PropTypes.func.isRequired,
+    onlineUsers: PropTypes.arrayOf(
+      PropTypes.shape({
+        label: PropTypes.string.isRequired,
+        value: PropTypes.string.isRequired,
+      })
+    ).isRequired,
+    login: PropTypes.shape({
+      logined: PropTypes.bool.isRequired,
+    }).isRequired,
+  }
   logout = () => {
     this.props.loginActions.logout()
     this.props.resetChatList()
