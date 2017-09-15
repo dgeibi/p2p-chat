@@ -18,8 +18,12 @@ export function formatPercent(percent) {
 }
 
 export function formatName(str) {
-  if (str.length > 20) {
-    return `${str.slice(0, 8)}..${str.slice(-8)}`
+  // non-ASCII character may be wider
+  if (str.length > 14 && /[^\x00-\x7F]/.test(str)) {
+    return `${str.slice(0, 6)}..${str.slice(-7)}`
+  }
+  if (str.length > 22) {
+    return `${str.slice(0, 9)}..${str.slice(-9)}`
   }
   return str
 }

@@ -29,7 +29,7 @@ const FileReceive = ({
   const name = formatName(filename)
   return (
     <Card>
-      <span styleName="filename">
+      <span styleName="filename" title={filename}>
         {status === success ? <a onClick={openFile(filepath)}>{name}</a> : name}
       </span>
       <br />

@@ -9,7 +9,9 @@ import { fileLoadStates } from './constants'
 
 const FileInfo = ({ filename, accept, ignore, size, username, status }) => (
   <Card>
-    <span styleName="filename">{formatName(filename)}</span>
+    <span styleName="filename" title={filename}>
+      {formatName(filename)}
+    </span>
     <br />
     {formatSize(size)} by {formatName(username)}
     <br />
