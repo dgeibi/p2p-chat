@@ -1,28 +1,33 @@
 # p2p-chat
 
-一个局域网P2P聊天工具
+a P2P LAN chatting and file sharing tool
 
-下载：https://github.com/dgeibi/p2p-chat/releases
+[Releases](https://github.com/dgeibi/p2p-chat/releases)
 
-## 开发
+## Development
 
-使用 [yarn](https://yarnpkg.com) 安装依赖
+Use [yarn](https://yarnpkg.com) to install dependencies
 
 ```
 $ yarn
 ```
 
-运行
+Run the current application in development mode
 
 ```
 $ yarn start
 ```
 
-生成安装包
+Create packages
 
+``` sh
+$ yarn dist       # build for linux, win32, win64
+$ yarn dist:linux # build for linux
+$ yarn dist:win32 # build for win32
+$ yarn dist:win64 # build for win64
 ```
-$ yarn dist
-```
+
+Then check out the output in `dist/`.
 
 ## LICENSE
 

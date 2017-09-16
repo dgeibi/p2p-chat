@@ -2,7 +2,7 @@
   "name": "p2p-chat",
   "version": "1.4.3",
   "license": "MIT",
-  "description": "a p2p chat app",
+  "description": "a P2P LAN chatting and file sharing tool",
   "main": "index.js",
   "output": "assets",
   "author": "dgeibi <png.inside@gmail.com> (blog.dgeibi.xyz)",
