@@ -1,6 +1,6 @@
 {
   "name": "p2p-chat-core",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "license": "MIT",
   "private": true,
   "description": "a p2p chat app",
