@@ -211,16 +211,13 @@ function createWorker() {
 }
 
 function createWindow() {
-  const {
-    workAreaSize: { width, height },
-    scaleFactor: zoomFactor,
-  } = electron.screen.getPrimaryDisplay()
+  const { scaleFactor: zoomFactor } = electron.screen.getPrimaryDisplay()
 
   win = new BrowserWindow({
     minWidth: 800,
     minHeight: 600,
-    width,
-    height,
+    width: 800,
+    height: 600,
     title: pkg.name,
     webPreferences: {
       zoomFactor,
