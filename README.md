@@ -6,28 +6,28 @@ a P2P LAN chatting and file sharing tool
 
 ## Development
 
-Use [yarn](https://yarnpkg.com) to install dependencies
+Use [npm](https://nodejs.org/) to install dependencies
 
 ```
-$ yarn
+$ npm install
 ```
 
 Run the current application in development mode
 
 ```
-$ yarn start
+$ npm run app -- start
 ```
 
 Create packages
 
 ``` sh
-$ yarn dist       # build for linux, win32, win64
-$ yarn dist:linux # build for linux
-$ yarn dist:win32 # build for win32
-$ yarn dist:win64 # build for win64
+$ npm run app -- dist       # build for linux, win32, win64
+$ npm run app -- dist:linux # build for linux
+$ npm run app -- dist:win32 # build for win32
+$ npm run app -- dist:win64 # build for win64
 ```
 
-Then check out the output in `dist/`.
+Then check out the output in `packages/p2p-chat/dist`.
 
 ## LICENSE
 

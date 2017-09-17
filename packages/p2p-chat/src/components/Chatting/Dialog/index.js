@@ -89,11 +89,9 @@ class Dialog extends Component {
         {info.username && (
           <section styleName="user-info">
             {info.username}
-            {formatTag(info.tag)} ({info.online ? (
-              `${info.host}:${info.port}`
-            ) : (
-              'Offline'
-            )})
+            {formatTag(info.tag)} ({info.online
+              ? `${info.host}:${info.port}`
+              : 'Offline'})
           </section>
         )}
         <Messages messages={messages} username={username} />
