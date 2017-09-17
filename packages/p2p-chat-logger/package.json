@@ -1,6 +1,6 @@
 {
   "name": "p2p-chat-logger",
-  "version": "1.4.3",
+  "version": "1.4.5",
   "description": "logger",
   "private": true,
   "main": "index.js",
