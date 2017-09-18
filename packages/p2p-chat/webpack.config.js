@@ -28,7 +28,9 @@ module.exports = (env = {}) => {
   process.env.BABEL_ENV = getEnv(isDev)
   const config = new Config({
     devtool: isProduction ? 'source-map' : 'cheap-module-eval-source-map',
-    entry: { app: `${SRC_DIR}/index.js` },
+    entry: {
+      app: `${SRC_DIR}/index.js`,
+    },
     output: {
       path: OUTPUT_DIR,
       filename: '[name].bundle.js',
@@ -106,7 +108,7 @@ module.exports = (env = {}) => {
       },
     ])
     .plugin(webpack.NamedModulesPlugin, null, isDev)
-    .use(reactHMR, isDev)
+    .use(reactHMR('app'), isDev)
     .use(
       devServer({
         contentBase: OUTPUT_DIR,
