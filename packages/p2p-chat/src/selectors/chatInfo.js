@@ -32,6 +32,4 @@ const selectInfo = createSelector(
   getInfo
 )
 
-const getInfoMemoized = defaultMemoize(getInfo)
-
-export { getInfo, selectInfo, getInfoMemoized }
+export { getInfo, selectInfo }

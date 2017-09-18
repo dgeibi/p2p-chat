@@ -1,17 +1,15 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { Menu } from 'antd'
 import { ipcRenderer } from 'electron'
 import PropTypes from 'prop-types'
-import sortBy from 'lodash.sortby'
 import isEqual from 'lodash.isequal'
 import EventObservable from 'p2p-chat-utils/EventObservable'
 import { formatTag } from '../../../utils/format'
-import { getInfoMemoized } from '../../../selectors/chatInfo'
 import ListItem from '../ListItem'
 import DialogType from './DialogType'
 import './ChatList.scss'
 
-class ChatList extends Component {
+class ChatList extends PureComponent {
   static propTypes = {
     current: PropTypes.shape({
       type: PropTypes.string,
@@ -24,13 +22,13 @@ class ChatList extends Component {
     increaseBadge: PropTypes.func.isRequired,
     clearBadge: PropTypes.func.isRequired,
     changeDialog: PropTypes.func.isRequired,
-    users: PropTypes.objectOf(
+    users: PropTypes.arrayOf(
       PropTypes.shape({
         username: PropTypes.string,
         tag: PropTypes.string,
       })
     ).isRequired,
-    channels: PropTypes.objectOf(
+    channels: PropTypes.arrayOf(
       PropTypes.shape({
         users: PropTypes.object,
       })
@@ -90,24 +88,10 @@ class ChatList extends Component {
   }
 
   render() {
-    const { users: _users, channels: _channels, visible } = this.props
+    const { users, channels, visible } = this.props
     if (!visible) {
       return null
     }
-
-    const byOnline = key => (x) => {
-      const prefix = x.online ? '0' : '1'
-      return prefix + x[key]
-    }
-
-    const channels = sortBy(
-      Object.keys(_channels).map(key =>
-        getInfoMemoized(_users, _channels, DialogType.CHANNEL, key)
-      ),
-      byOnline('name')
-    )
-
-    const users = sortBy(Object.values(_users), byOnline('username'))
 
     return (
       <Menu
