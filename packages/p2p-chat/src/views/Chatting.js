@@ -10,6 +10,9 @@ import FilePanel from '../components/Chatting/FilePanel'
 import { selectInfo } from '../selectors/chatInfo'
 import * as actions from './ChattingRedux'
 
+const emptyArray = []
+const emptyObject = {}
+
 function select(state, ownProps, fleid) {
   const { type, key } = ownProps.match.params
   if (!type) return null
@@ -56,7 +59,7 @@ const fileMapper = filepath => ({
 const selectFilePaths = (state, props) =>
   select(state.chatting.dialog, props, 'filePaths')
 const selectFileList = createSelector([selectFilePaths], (filePaths) => {
-  if (!filePaths) return []
+  if (!filePaths) return emptyArray
   return filePaths.map(fileMapper)
 })
 
@@ -66,13 +69,13 @@ const selectFileList = createSelector([selectFilePaths], (filePaths) => {
     return {
       dialogProps: {
         username: state.settings.login.username,
-        messages: select(dialog, ownProps, 'messages') || [],
+        messages: select(dialog, ownProps, 'messages') || emptyArray,
         text: select(dialog, ownProps, 'text') || '',
         fileList: selectFileList(state, ownProps),
         info: selectInfo(state, ownProps),
       },
       id: selectID(state, ownProps),
-      files: select(filePanel, ownProps) || {},
+      files: select(filePanel, ownProps) || emptyObject,
     }
   },
   dispatch => ({
