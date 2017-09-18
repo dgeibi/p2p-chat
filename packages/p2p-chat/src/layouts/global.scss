@@ -18,3 +18,13 @@ $radius: 5px;
   background: rgba(180, 180, 180, 0.89);
   border-radius: $radius;
 }
+
+.col {
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.col-1 {
+  border-right: .6px solid #eee;
+}

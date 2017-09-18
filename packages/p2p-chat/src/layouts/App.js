@@ -1,10 +1,12 @@
 import React from 'react'
 import { Provider } from 'react-redux'
-import { Route, Switch } from 'react-router-dom'
-import { ConnectedRouter as Router } from 'react-router-redux'
 import PropTypes from 'prop-types'
+import { Row, Col } from 'antd'
+import { Route } from 'react-router-dom'
+import { ConnectedRouter as Router } from 'react-router-redux'
 
-import Frame from './Frame'
+import SettingNav from '../views/Settings'
+import Aside from '../views/Aside'
 import Chatting from '../views/Chatting'
 import './global.scss'
 
@@ -18,14 +20,23 @@ function getDevTool() {
 
 const App = ({ store, history }) => (
   <Provider store={store}>
-    <Frame>
-      <Router history={history}>
-        <Switch>
-          <Route path="/chat/:type/:key" component={Chatting} />
-        </Switch>
-      </Router>
-      {getDevTool()}
-    </Frame>
+    <Router history={history}>
+      <main>
+        <Row>
+          <Col span={6} styleName="col col-1">
+            <SettingNav />
+            <Aside />
+          </Col>
+          <Col span={18} styleName="col">
+            <Route
+              path="/chat/:type/:key"
+              render={({ component: Component, ...rest }) => <Chatting {...rest} />}
+            />
+            {getDevTool()}
+          </Col>
+        </Row>
+      </main>
+    </Router>
   </Provider>
 )
 
