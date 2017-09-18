@@ -12,6 +12,7 @@ getConstants(TYPES, 'LOGIN')
 const initialState = {
   username: 'anonymous',
   port: 8087,
+  logined: false,
 }
 
 export default (state = initialState, action) => {
