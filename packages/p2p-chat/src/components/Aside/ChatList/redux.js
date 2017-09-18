@@ -92,6 +92,7 @@ export default (state = initalState, action) => {
     case TYPES.CLEAR_BADGE: {
       const { type, key } = action.id
       const types = `${type}s`
+      if (!state[types][key].badge) return state
       return {
         ...state,
         [types]: {

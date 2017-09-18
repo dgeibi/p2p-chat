@@ -1,28 +1,37 @@
-import has from 'p2p-chat-utils/has'
+import { createSelector, defaultMemoize } from 'reselect'
 import pickBy from 'p2p-chat-utils/pickBy'
+import has from 'p2p-chat-utils/has'
 
 const pickProps = (stub, src) => pickBy(src, (value, key) => has(stub, key))
 
 const getChannelOnlineMembers = (members, users) =>
   Object.values(users ? pickProps(members, users) : members).filter(x => x.online)
 
-const getInfo = ({ users, channels }, { type, key }) => {
+const getChannelInfo = defaultMemoize((channels, users, key) => {
+  const channel = { ...channels[key] }
+  channel.users = pickProps(channel.users, users)
+  channel.onlineCount = getChannelOnlineMembers(channel.users).length
+  channel.online = channel.onlineCount > 0
+  channel.totalCount = Object.keys(channel.users).length
+  return channel
+})
+
+const getInfo = (users, channels, type, key) => {
   if (type === 'user') return users[key]
-  if (type === 'channel') {
-    const channel = { ...channels[key] }
-    channel.users = pickProps(channel.users, users)
-    channel.onlineCount = getChannelOnlineMembers(channel.users).length
-    channel.online = channel.onlineCount > 0
-    channel.totalCount = Object.keys(channel.users).length
-    return channel
-  }
+  if (type === 'channel') return getChannelInfo(channels, users, key)
   return null
 }
 
-export default getInfo
+const usersSelector = state => state.aside.chatList.users
+const channelsSelector = state => state.aside.chatList.channels
+const typeSelector = (state, ownProps) => ownProps.match.params.type
+const keySelector = (state, ownProps) => ownProps.match.params.key
 
-export const selectInfo = (state, ownProps) => {
-  const { type, key } = ownProps.match.params
-  const { users, channels } = state.aside.chatList
-  return getInfo({ users, channels }, { type, key })
-}
+const selectInfo = createSelector(
+  [usersSelector, channelsSelector, typeSelector, keySelector],
+  getInfo
+)
+
+const getInfoMemoized = defaultMemoize(getInfo)
+
+export { getInfo, selectInfo, getInfoMemoized }

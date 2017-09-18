@@ -6,7 +6,7 @@ import sortBy from 'lodash.sortby'
 import isEqual from 'lodash.isequal'
 import EventObservable from 'p2p-chat-utils/EventObservable'
 import { formatTag } from '../../../utils/format'
-import getInfo from '../../../selectors/chatInfo'
+import { getInfoMemoized } from '../../../selectors/chatInfo'
 import ListItem from '../ListItem'
 import DialogType from './DialogType'
 import './ChatList.scss'
@@ -102,7 +102,7 @@ class ChatList extends Component {
 
     const channels = sortBy(
       Object.keys(_channels).map(key =>
-        getInfo({ users: _users, channels: _channels }, { type: DialogType.CHANNEL, key })
+        getInfoMemoized(_users, _channels, DialogType.CHANNEL, key)
       ),
       byOnline('name')
     )

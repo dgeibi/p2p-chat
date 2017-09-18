@@ -13,7 +13,8 @@
     "format": "run-s prettier fix",
     "precommit": "lint-staged",
     "pub": "lerna publish",
-    "postinstall": "lerna bootstrap"
+    "bootstrap": "lerna bootstrap",
+    "postinstall": "npm run bootstrap"
   },
   "lint-staged": {
     "*.js": [

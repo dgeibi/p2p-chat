@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { Button } from 'antd'
 import PropTypes from 'prop-types'
+import { createSelector } from 'reselect'
 
 import { loginActions } from './SettingsRedux'
 import { chatListActions } from './AsideRedux'
@@ -16,18 +17,21 @@ import ModalBtn from './ModalBtn'
 import { formatTag } from '../utils/format'
 import './Settings.scss'
 
-const selectOnlineUsers = chatListState =>
-  Object.values(chatListState.users)
-    .filter(({ online }) => online)
+const selectUsers = state => state.aside.chatList.users
+
+const selectOnlineUsers = createSelector(selectUsers, users =>
+  Object.values(users)
+    .filter(({ online }) => Boolean(online))
     .map(({ tag, username }) => ({
       label: username + formatTag(tag),
       value: tag,
     }))
+)
 
 @connect(
   state => ({
     login: state.settings.login,
-    onlineUsers: selectOnlineUsers(state.aside.chatList),
+    onlineUsers: selectOnlineUsers(state),
   }),
   dispatch => ({
     resetChatList: () => dispatch(chatListActions.reset()),
