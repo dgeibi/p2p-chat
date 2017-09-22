@@ -4,17 +4,20 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const webpack = require('webpack')
 
 const define = require('wtf-webpack-config/plugins/define')
-const babel = require('wtf-webpack-config/rules/js/babel')
 const minify = require('wtf-webpack-config/plugins/babel-minify')
 
-const devServer = require('./webpack-config/devServer')
-const css = require('./webpack-config/css')
-const reactHMR = require('./webpack-config/react-hmr')
-const depExternals = require('./webpack-config/dep-externals')
-const analyzer = require('./webpack-config/analyzer')
+const devServer = require('./config/devServer')
+const css = require('./config/css')
+const reactHMR = require('./config/react-hmr')
+const depExternals = require('./config/dep-externals')
+const analyzer = require('./config/analyzer')
+const generateScopedName = require('./config/generateScopedName')
 const pkg = require('./package.json')
 
 const getEnv = isDev => (isDev ? 'developement' : 'production')
+
+const getLocalIdent = (context, localIdentName, localName) =>
+  generateScopedName(localName, context.resourcePath)
 
 module.exports = (env = {}) => {
   const isProduction = env.production === true
@@ -26,10 +29,12 @@ module.exports = (env = {}) => {
   const defaultInclude = [SRC_DIR]
 
   process.env.BABEL_ENV = getEnv(isDev)
+
   const config = new Config({
     devtool: isProduction ? 'source-map' : 'cheap-module-eval-source-map',
     entry: {
       app: `${SRC_DIR}/index.js`,
+      vendor: `${SRC_DIR}/vendor.js`,
     },
     output: {
       path: OUTPUT_DIR,
@@ -54,11 +59,28 @@ module.exports = (env = {}) => {
       })
     )
     .use(minify(), isProduction)
-    .use(
-      babel({
-        include: defaultInclude,
-      })
-    )
+    .rule({
+      test: /\.js$/,
+      include: defaultInclude,
+      loader: 'babel-loader',
+      options: {
+        plugins: [
+          [
+            'react-css-modules',
+            {
+              generateScopedName,
+              webpackHotModuleReloading: isDev,
+              filetypes: {
+                '.scss': {
+                  syntax: 'postcss-scss',
+                  plugins: ['postcss-nested'],
+                },
+              },
+            },
+          ],
+        ],
+      },
+    })
     .use(
       css({
         rule: {
@@ -86,8 +108,8 @@ module.exports = (env = {}) => {
             {
               loader: 'css-loader',
               options: {
+                getLocalIdent,
                 modules: true,
-                localIdentName: '[path]___[name]__[local]___[hash:base64:5]',
                 importLoaders: 1,
                 minimize: true,
                 sourceMap: true,
@@ -115,6 +137,12 @@ module.exports = (env = {}) => {
       }),
       isDev
     )
+    .plugin(webpack.optimize.CommonsChunkPlugin, [
+      {
+        name: 'vendor',
+        minChunks: Infinity,
+      },
+    ])
     .use(analyzer, Boolean(env.report))
 
   return config.toConfig()

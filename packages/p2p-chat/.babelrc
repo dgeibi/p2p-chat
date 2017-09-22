@@ -16,20 +16,6 @@
   "plugins": [
     "transform-decorators-legacy",
     [
-      "react-css-modules",
-      {
-        "filetypes": {
-          ".scss": {
-            "syntax": "postcss-scss",
-            "plugins": [
-              "postcss-nested"
-            ]
-          }
-        },
-        "webpackHotModuleReloading": true
-      }
-    ],
-    [
       "import",
       {
         "libraryName": "antd",
