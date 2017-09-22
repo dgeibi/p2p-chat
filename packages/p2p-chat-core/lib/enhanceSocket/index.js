@@ -1,7 +1,4 @@
 /* eslint-disable no-param-reassign */
-// eslint-disable-next-line no-unused-vars
-const { Socket } = require('net')
-
 const Parse = require('./Parse')
 
 const msgSocket = {
