@@ -52,11 +52,11 @@ function getInfoMsg(filepath, message, callback) {
  * @param {function(?Error, ?string)} callback
  */
 function send(checksum, payload, options, callback) {
-  const fileMsg = Object.assign({}, payload, messages[checksum])
-  if (!fileMsg) {
+  if (!messages[checksum]) {
     callback(Error(`file not loaded from ${checksum}`))
     return
   }
+  const fileMsg = Object.assign({}, payload, messages[checksum])
   const { filepath, filename } = fileMsg
   fs.stat(filepath, (err) => {
     if (err) {
