@@ -1,3 +1,3 @@
-const has = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key)
-
+const hasOwn = Object.prototype.hasOwnProperty
+const has = (obj, key) => hasOwn.call(obj, key)
 module.exports = has
