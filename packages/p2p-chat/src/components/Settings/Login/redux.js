@@ -1,6 +1,7 @@
 import { ipcRenderer } from 'electron'
 import { push } from 'react-router-redux'
 
+import createReducer from '../../../utils/createReducer'
 import getConstants from '../../../utils/constants'
 
 const TYPES = {
@@ -15,25 +16,23 @@ const initialState = {
   logined: false,
 }
 
-export default (state = initialState, action) => {
-  switch (action.type) {
-    case TYPES.UPDATE_SETTINGS: {
-      return {
-        ...state,
-        ...action.payload,
-        logined: true,
-      }
+const reducerMap = {
+  [TYPES.UPDATE_SETTINGS](state, action) {
+    return {
+      ...state,
+      ...action.payload,
+      logined: true,
     }
-    case TYPES.LOGOUT: {
-      return {
-        ...state,
-        logined: false,
-      }
+  },
+  [TYPES.LOGOUT](state) {
+    return {
+      ...state,
+      logined: false,
     }
-    default:
-      return state
-  }
+  },
 }
+
+export default createReducer(reducerMap, initialState)
 
 export const logout = () => {
   ipcRenderer.send('logout')

@@ -1,6 +1,8 @@
 import { ipcRenderer } from 'electron'
 import makeConstants from '../../../utils/constants'
 import getNewState from '../../../utils/getNewState'
+import createReducer from '../../../utils/createReducer'
+
 import { fileLoadStates, cardTypes } from './constants'
 
 const initialState = {
@@ -22,68 +24,71 @@ const TYPES = {
 
 makeConstants(TYPES, 'CHATTING_FILE')
 
-export default function filePanel(state = initialState, action) {
-  switch (action.type) {
-    case TYPES.FILE_INFO: {
-      const { type, key, id } = findPos(action.payload)
-      return {
-        ...state,
-        [type]: {
-          ...state[type],
-          [key]: {
-            [id]: action.payload,
-            ...state[type][key],
-          },
+const updateFileInfo = (state, action) => {
+  const { type, key, id } = findPos(action.payload)
+  return {
+    ...state,
+    [type]: {
+      ...state[type],
+      [key]: {
+        ...state[type][key],
+        [id]: {
+          ...state[type][key][id],
+          ...action.payload,
         },
-      }
-    }
-    case TYPES.ACCEPT_FILE:
-    case TYPES.FILE_START:
-    case TYPES.FILE_END:
-    case TYPES.FILE_PROCESSING:
-    case TYPES.FILE_FAIL:
-    case TYPES.FILE_DONE: {
-      const { type, key, id } = findPos(action.payload)
-      return {
-        ...state,
-        [type]: {
-          ...state[type],
-          [key]: {
-            ...state[type][key],
-            [id]: {
-              ...state[type][key][id],
-              ...action.payload,
-            },
-          },
-        },
-      }
-    }
-    case TYPES.CLEAR_PANEL: {
-      const { type, key } = action.payload
-      const newState = getNewState(state, type, key)
-      const panel = newState[type][key]
-      Object.values(panel).forEach(({ status, id }) => {
-        if (
-          status === undefined ||
-          status === fileLoadStates.exception ||
-          status === fileLoadStates.success
-        ) {
-          delete panel[id]
-        }
-      })
-      return newState
-    }
-    case TYPES.IGNORE_FILE: {
-      const { type, key, id } = findPos(action.payload)
-      const newState = getNewState(state, type, key)
-      const panel = newState[type][key]
-      delete panel[id]
-      return newState
-    }
-    default:
-      return state
+      },
+    },
   }
 }
+
+const reducerMap = {
+  [TYPES.ACCEPT_FILE]: updateFileInfo,
+  [TYPES.FILE_START]: updateFileInfo,
+  [TYPES.FILE_END]: updateFileInfo,
+  [TYPES.FILE_PROCESSING]: updateFileInfo,
+  [TYPES.FILE_FAIL]: updateFileInfo,
+  [TYPES.FILE_DONE]: updateFileInfo,
+
+  [TYPES.FILE_INFO](state, action) {
+    const { type, key, id } = findPos(action.payload)
+    return {
+      ...state,
+      [type]: {
+        ...state[type],
+        [key]: {
+          [id]: action.payload,
+          ...state[type][key],
+        },
+      },
+    }
+  },
+
+  [TYPES.CLEAR_PANEL](state, action) {
+    const { type, key } = action.payload
+    const newState = getNewState(state, type, key)
+    const panel = newState[type][key]
+    Object.values(panel).forEach(({ status, id }) => {
+      if (
+        status === undefined ||
+        status === fileLoadStates.exception ||
+        status === fileLoadStates.success
+      ) {
+        delete panel[id]
+      }
+    })
+    return newState
+  },
+
+  [TYPES.IGNORE_FILE](state, action) {
+    const { type, key, id } = findPos(action.payload)
+    const newState = getNewState(state, type, key)
+    const panel = newState[type][key]
+    delete panel[id]
+    return newState
+  },
+}
+
+export default createReducer(reducerMap, initialState)
 
 export const fileCome = message => ({
   type: TYPES.FILE_INFO,

@@ -1,5 +1,6 @@
 import { push } from 'react-router-redux'
 import constants from '../../../utils/constants'
+import createReducer from '../../../utils/createReducer'
 
 const TYPES = {
   SETUP: '',
@@ -21,96 +22,95 @@ const initalState = {
   visible: false,
 }
 
-export default (state = initalState, action) => {
-  switch (action.type) {
-    case TYPES.SETUP:
-      return {
-        ...state,
-        ...action.payload,
-      }
-    case TYPES.OFF_USER: {
-      return {
-        ...state,
-        users: {
-          ...state.users,
-          [action.payload.tag]: {
-            ...state.users[action.payload.tag],
-            ...action.payload,
-            online: false,
-          },
+const reducerMap = {
+  [TYPES.SETUP](state, action) {
+    return {
+      ...state,
+      ...action.payload,
+    }
+  },
+  [TYPES.OFF_USER](state, action) {
+    return {
+      ...state,
+      users: {
+        ...state.users,
+        [action.payload.tag]: {
+          ...state.users[action.payload.tag],
+          ...action.payload,
+          online: false,
         },
-      }
+      },
     }
-    case TYPES.ADD_USER: {
-      return {
-        ...state,
-        users: {
-          ...state.users,
-          [action.payload.tag]: {
-            ...state.users[action.payload.tag],
-            ...action.payload,
-            online: true,
-          },
+  },
+  [TYPES.ADD_USER](state, action) {
+    return {
+      ...state,
+      users: {
+        ...state.users,
+        [action.payload.tag]: {
+          ...state.users[action.payload.tag],
+          ...action.payload,
+          online: true,
         },
-      }
+      },
     }
-    case TYPES.ADD_CHANNLE: {
-      return {
-        ...state,
-        channels: {
-          ...state.channels,
-          [action.payload.key]: action.payload,
+  },
+  [TYPES.ADD_CHANNLE](state, action) {
+    return {
+      ...state,
+      channels: {
+        ...state.channels,
+        [action.payload.key]: action.payload,
+      },
+    }
+  },
+  [TYPES.SHOW_LIST](state) {
+    return {
+      ...state,
+      visible: true,
+    }
+  },
+  [TYPES.HIDE_LIST](state) {
+    return {
+      ...state,
+      visible: false,
+    }
+  },
+  [TYPES.INCREASE_BADGE](state, action) {
+    const { type, key } = action.id
+    const types = `${type}s`
+    return {
+      ...state,
+      [types]: {
+        ...state[types],
+        [key]: {
+          ...state[types][key],
+          badge: (state[types][key].badge || 0) + 1,
         },
-      }
+      },
     }
-    case TYPES.SHOW_LIST: {
-      return {
-        ...state,
-        visible: true,
-      }
-    }
-    case TYPES.HIDE_LIST: {
-      return {
-        ...state,
-        visible: false,
-      }
-    }
-    case TYPES.INCREASE_BADGE: {
-      const { type, key } = action.id
-      const types = `${type}s`
-      return {
-        ...state,
-        [types]: {
-          ...state[types],
-          [key]: {
-            ...state[types][key],
-            badge: (state[types][key].badge || 0) + 1,
-          },
+  },
+  [TYPES.CLEAR_BADGE](state, action) {
+    const { type, key } = action.id
+    const types = `${type}s`
+    if (!state[types][key].badge) return state
+    return {
+      ...state,
+      [types]: {
+        ...state[types],
+        [key]: {
+          ...state[types][key],
+          badge: 0,
         },
-      }
+      },
     }
-    case TYPES.CLEAR_BADGE: {
-      const { type, key } = action.id
-      const types = `${type}s`
-      if (!state[types][key].badge) return state
-      return {
-        ...state,
-        [types]: {
-          ...state[types],
-          [key]: {
-            ...state[types][key],
-            badge: 0,
-          },
-        },
-      }
-    }
-    case TYPES.RESET: {
-      return { ...initalState }
-    }
-    default:
-      return state
-  }
+  },
+  [TYPES.RESET]() {
+    return { ...initalState }
+  },
 }
+
+export default createReducer(reducerMap, initalState)
 
 export const setup = ({ users, channels }) => ({
   type: TYPES.SETUP,

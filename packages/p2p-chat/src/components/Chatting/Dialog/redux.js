@@ -1,4 +1,5 @@
 import { ipcRenderer } from 'electron'
+import createReducer from '../../../utils/createReducer'
 import makeConstants from '../../../utils/constants'
 import getNewState from '../../../utils/getNewState'
 import storage from '../../../utils/storage'
@@ -24,62 +25,62 @@ const TYPES = {
 }
 makeConstants(TYPES, 'DIALOG')
 
-export default function dialog(state = initialState, action) {
-  switch (action.type) {
-    case TYPES.FILE_SENT:
-    case TYPES.FILE_SEND_ERROR:
-    case TYPES.MESSAGE_SENT:
-    case TYPES.NEW_MESSAGE: {
-      const type = action.payload.channel ? 'channel' : 'user'
-      const key = action.payload.channel || action.payload.tag
-      const newState = getNewState(state, type, key)
-      if (newState[type][key].messages) {
-        newState[type][key].messages = [...state[type][key].messages, action.payload]
-      } else {
-        newState[type][key].messages = [action.payload]
-      }
-      return newState
-    }
-    case TYPES.ADD_FILE: {
-      const { type, key } = action.id
-      const newState = getNewState(state, type, key)
-      const s = newState[type][key]
-      if (s.filePaths) {
-        s.filePaths = [...new Set([...s.filePaths, action.payload])]
-      } else {
-        s.filePaths = [action.payload]
-      }
-      return newState
-    }
-    case TYPES.REMOVE_FILE: {
-      const { type, key } = action.id
-      const newState = getNewState(state, type, key)
-      const s = newState[type][key]
-      s.filePaths = s.filePaths.slice()
-      const index = s.filePaths.indexOf(action.payload)
-      s.filePaths.splice(index, 1)
-      return newState
-    }
-    case TYPES.SEND_FILES: {
-      const { type, key } = action.id
-      const newState = getNewState(state, type, key)
-      newState[type][key].filePaths = []
-      return newState
-    }
-    case TYPES.SET_TEXT: {
-      const { type, key } = action.id
-      const newState = getNewState(state, type, key)
-      newState[type][key].text = action.payload
-      return newState
-    }
-    case TYPES.RESTORE: {
-      if (action.payload) return action.payload
-      return state
-    }
-    default:
-      return state
+function updateMessage(state, action) {
+  const type = action.payload.channel ? 'channel' : 'user'
+  const key = action.payload.channel || action.payload.tag
+  const newState = getNewState(state, type, key)
+  if (newState[type][key].messages) {
+    newState[type][key].messages = [...state[type][key].messages, action.payload]
+  } else {
+    newState[type][key].messages = [action.payload]
   }
+  return newState
 }
+
+const reducerMap = {
+  [TYPES.FILE_SENT]: updateMessage,
+  [TYPES.FILE_SEND_ERROR]: updateMessage,
+  [TYPES.MESSAGE_SENT]: updateMessage,
+  [TYPES.NEW_MESSAGE]: updateMessage,
+  [TYPES.ADD_FILE](state, action) {
+    const { type, key } = action.id
+    const newState = getNewState(state, type, key)
+    const s = newState[type][key]
+    if (s.filePaths) {
+      s.filePaths = [...new Set([...s.filePaths, action.payload])]
+    } else {
+      s.filePaths = [action.payload]
+    }
+    return newState
+  },
+  [TYPES.REMOVE_FILE](state, action) {
+    const { type, key } = action.id
+    const newState = getNewState(state, type, key)
+    const s = newState[type][key]
+    s.filePaths = s.filePaths.slice()
+    const index = s.filePaths.indexOf(action.payload)
+    s.filePaths.splice(index, 1)
+    return newState
+  },
+  [TYPES.SEND_FILES](state, action) {
+    const { type, key } = action.id
+    const newState = getNewState(state, type, key)
+    newState[type][key].filePaths = []
+    return newState
+  },
+  [TYPES.SET_TEXT](state, action) {
+    const { type, key } = action.id
+    const newState = getNewState(state, type, key)
+    newState[type][key].text = action.payload
+    return newState
+  },
+  [TYPES.RESTORE](state, action) {
+    if (action.payload) return action.payload
+    return state
+  },
+}
+
+export default createReducer(reducerMap, initialState)
 
 export const newMessage = (msg) => {
   const now = Date.now()
