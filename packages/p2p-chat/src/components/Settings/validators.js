@@ -1,8 +1,8 @@
 import ipRegex from 'ip-regex'
 
 export const validPort = (rule, value, callback) => {
-  const port = Math.floor(value)
-  if (port < 2000 || port > 59999) {
+  const port = Number(value)
+  if (isNaN(port) || !Number.isInteger(port) || port < 2000 || port > 59999) {
     callback(Error('Port should be a integer (2000~59999)'))
     return
   }
