@@ -116,6 +116,8 @@ class Dialog extends Component {
               type="primary"
               htmlType="submit"
               disabled={!info.online || (!text && fileList.length <= 0)}
+              title="Hit `Alt + s` to send"
+              accessKey="s"
             >
               Send
             </Button>
