@@ -1,26 +1,48 @@
-/* eslint-disable no-param-reassign */
+/* eslint-disable no-param-reassign, no-underscore-dangle */
 
-const parseChunks = require('./parseChunks')
-const fs = require('fs-extra')
-const ensureUnique = require('p2p-chat-utils/ensure-unique-filename')
+const parseChunks = require('p2p-chat-utils/parse-chunks')
+const ensureUniqueFile = require('p2p-chat-utils/ensure-unique-file')
+const { createWriteStream } = require('fs')
 const { EventEmitter } = require('events')
 const { resolve } = require('path')
 
 class Parse extends EventEmitter {
+  /**
+   * @param {Object} options
+   * @param {net.Socket} options.socket
+   * @param {string} [options.delimiter]
+   * @param {Object} [options.speedMeter]
+   * @param {number} [options.speedMeter.gap]
+   * @param {boolean} [options.speedMeter.enable]
+   */
   constructor(options) {
     super()
-    this.opts = options
+    this.opts = Object.assign(
+      {
+        delimiter: '\n',
+        speedMeter: {
+          gap: 400,
+          enable: true,
+        },
+      },
+      options
+    )
     this.socket = options.socket
     this.headCaches = []
-    this.bodyLeft = 0
-    this.msg = null
-    this.writeStream = null
+    this.resetState()
   }
 
-  submitMsg() {
+  resetState() {
+    this.writeStream = null
+    this.interval = null
+    this.msg = null
+    this.bodyLeft = 0
+  }
+
+  submitMsg(reset = true) {
     if (!this.msg) throw Error('message not found')
     this.socket.emit('message', this.msg)
-    this.msg = null
+    if (reset) this.msg = null
   }
 
   write(data) {
@@ -35,12 +57,10 @@ class Parse extends EventEmitter {
   transformBody(buffer) {
     if (buffer.byteLength > this.bodyLeft) {
       // has head start
-      const data = buffer.slice(0, this.bodyLeft)
-      this.write(data)
-      const left = buffer.slice(this.bodyLeft)
-      this.bodyLeft = 0
+      const pos = this.bodyLeft
+      this.write(buffer.slice(0, pos))
       this.processDone()
-      this.transform(left)
+      this.transform(buffer.slice(pos))
     } else {
       // cache the whole buffer
       this.write(buffer)
@@ -52,33 +72,52 @@ class Parse extends EventEmitter {
   }
 
   processStart() {
-    const path = ensureUnique(resolve(this.opts.dirname, this.msg.filename))
-    fs.ensureFileSync(path) // create stub
-    this.msg.filepath = path
-    this.socket.emit('message', this.msg) // file msg emit
+    const pathname = ensureUniqueFile(resolve(this.opts.dirname, this.msg.filename))
+    this.submitFileMsg(pathname)
+    this.createWriteStream(pathname)
+    this.openSpeedMeter()
+  }
 
-    // create writeStream
-    this.writeStream = fs.createWriteStream(path)
-    this.writeStream.checksum = this.msg.checksum
-    const self = this
-    this.writeStream.once('close', function onclose() {
-      self.socket.emit('file-close', this.checksum)
+  createWriteStream(pathname) {
+    const { socket, msg: { checksum } } = this
+    const writeStream = createWriteStream(pathname)
+    writeStream.once('close', () => {
+      socket.emit('file-close', checksum)
     })
-    this.interval = setInterval(this.processing(), 400)
+    this.writeStream = writeStream
+  }
+
+  submitFileMsg(pathname) {
+    this.msg.filepath = pathname
+    this.submitMsg(false)
+  }
+
+  openSpeedMeter() {
+    if (!this.opts.speedMeter || !this.opts.speedMeter.enable) return
+    this.interval = setInterval(this.processing(), this.opts.speedMeter.gap)
+  }
+
+  closeSpeedMeter() {
+    if (this.interval) {
+      clearInterval(this.interval)
+      this.interval = null
+    }
   }
 
   processing() {
     let lastLeft = this.bodyLeft
     let pass = process.uptime()
     const fn = () => {
-      const percent = (this.msg.bodyLength - this.bodyLeft) / this.msg.bodyLength
       const now = process.uptime()
-      const speed = (lastLeft - this.bodyLeft) / (now - pass)
+      const { bodyLeft, msg: { bodyLength, checksum } } = this
 
-      lastLeft = this.bodyLeft
+      const percent = (bodyLength - bodyLeft) / bodyLength
+      const speed = (lastLeft - bodyLeft) / (now - pass)
+
+      lastLeft = bodyLeft
       pass = now
 
-      this.socket.emit('file-processing', this.msg.checksum, percent, speed)
+      this.socket.emit('file-processing', checksum, percent, speed)
     }
     return fn
   }
@@ -86,20 +125,17 @@ class Parse extends EventEmitter {
   processDone() {
     // write and emit event
     this.writeStream.end()
-    this.writeStream = null
     this.socket.emit('file-done', this.msg.checksum)
 
     // reset state
-    clearInterval(this.interval)
-    this.interval = null
-    this.msg = null
-    this.bodyLeft = 0
+    this.closeSpeedMeter()
+    this.resetState()
   }
 
   transform(chunk) {
     if (this.bodyLeft <= 0) {
       // receive head first
-      const idx = chunk.indexOf('\n')
+      const idx = chunk.indexOf(this.opts.delimiter)
       if (idx >= 0) this.transformHead(chunk, idx)
       else this.headCaches.push(chunk)
     } else {
@@ -109,26 +145,29 @@ class Parse extends EventEmitter {
   }
 
   transformHead(chunk, index) {
-    const first = chunk.slice(0, index)
-    this.headCaches.push(first)
+    const headData = chunk.slice(0, index)
+    this.headCaches.push(headData)
     this.msg = parseChunks(this.headCaches)
-    this.headCaches = [] // empty cache
     if (!this.msg) throw Error('fail to parse chunks')
 
+    this.headCaches = [] // empty cache
     this.bodyLeft = this.msg.bodyLength || 0
-    const notHaveBody = this.bodyLeft === 0
 
-    if (notHaveBody) this.submitMsg()
+    const isPlainMsg = this.bodyLeft === 0
+    if (isPlainMsg) this.submitMsg()
 
-    /* nothing left */
-    if (index + 1 >= chunk.byteLength) return
+    const startPos = index + this.opts.delimiter.length
+    const left = startPos < chunk.byteLength ? chunk.slice(startPos) : null
 
-    const left = chunk.slice(index + 1)
-    if (notHaveBody) {
-      this.transform(left)
+    if (left) this.transformHeadLeft(left, isPlainMsg)
+  }
+
+  transformHeadLeft(chunk, isPlainMsg) {
+    if (isPlainMsg) {
+      this.transform(chunk)
     } else {
       this.processStart()
-      this.transformBody(left)
+      this.transformBody(chunk)
     }
   }
 }
