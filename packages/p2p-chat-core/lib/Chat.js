@@ -3,17 +3,20 @@ const net = require('net')
 const logger = require('p2p-chat-logger')
 const each = require('p2p-chat-utils/each')
 
-const SocketHandler = require('./SocketHandler')
 const login = require('./login')
 const ensureMergeIPset = require('./ensureMergeIPset')
 const { connectRange, connectScatter } = require('./connect')
+const Store = require('./Store')
+const { EventEmitter } = require('events')
+const socketHandler = require('./socketHandler')
+const actions = require('./actions')
 
 const defaultOpts = {
   username: 'anonymous',
   port: 8087,
 }
 
-class Chat extends SocketHandler {
+class Chat extends actions(socketHandler(EventEmitter)) {
   constructor() {
     super()
     this.fileAccepted = {}
@@ -23,6 +26,8 @@ class Chat extends SocketHandler {
     this.port = null
     this.address = null
     this.username = null
+    this.files = new Store()
+
     this.downloadDir = 'Downloads'
   }
 
@@ -58,7 +63,7 @@ class Chat extends SocketHandler {
     login(opts, this._login(callback))
   }
 
-  setID({ port, username, tag, address, downloadDir }) {
+  _setID({ port, username, tag, address, downloadDir }) {
     this.username = username
     this.port = port
     this.address = address
@@ -75,7 +80,7 @@ class Chat extends SocketHandler {
       }
 
       // id has props from opts
-      this.setID(id)
+      this._setID(id)
 
       // 1. create server, sending data
       const server = net.createServer(this.handleSocket)

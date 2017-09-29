@@ -8,14 +8,14 @@ const msgSocket = {
 }
 
 const enhance = (opts) => {
-  const { socket } = opts
+  const { socket, mixins } = opts
   if (opts.parse) {
     const parse = new Parse(opts)
     socket.on('data', (chunk) => {
       parse.transform(chunk)
     })
   }
-  Object.assign(socket, msgSocket)
+  Object.assign(socket, msgSocket, mixins)
   return socket
 }
 

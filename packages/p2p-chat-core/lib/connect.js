@@ -14,14 +14,10 @@ function connectScatter(opts, fallbackHost) {
   }
 }
 
-function connectIPset(ipset, handleSocket) {
-  // ipset.remove(this.address, this.port)
+const noop = () => {}
+function connectIPset(ipset, handler) {
   ipset.forEach((host, port) => {
-    const socket = net
-      .connect(port, host, () => {
-        handleSocket(socket)
-      })
-      .on('error', () => {})
+    net.connect(port, host, handler).on('error', noop)
   })
 }
 
