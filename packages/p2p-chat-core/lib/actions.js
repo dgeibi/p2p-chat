@@ -2,6 +2,8 @@ const logger = require('p2p-chat-logger')
 const each = require('p2p-chat-utils/each')
 const pickByMap = require('p2p-chat-utils/pickByMap')
 
+const ensureMergeIPset = require('./ensureMergeIPset')
+const { connectRange, connectScatter } = require('./connect')
 const fileInfoPool = require('./fileInfoPool')
 const msgTypes = require('./msgTypes')
 
@@ -76,5 +78,18 @@ module.exports = superClass =>
       each(this.clients, tags, (socket) => {
         socket.send(message)
       })
+    }
+
+    /**
+     * 连接其它服务器
+     * @param {setupPayload} opts
+     */
+    connectServers(opts) {
+      if (!this.server.listening) return
+
+      ensureMergeIPset(opts)
+      connectRange(opts, this.address)
+      connectScatter(opts, this.address)
+      this.connectIPset(opts.ipset)
     }
   }

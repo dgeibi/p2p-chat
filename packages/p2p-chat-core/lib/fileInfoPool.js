@@ -5,7 +5,7 @@ const net = require('net')
 const md5 = require('p2p-chat-utils/md5')
 const enhanceSocket = require('./enhanceSocket')
 
-const messages = {}
+let messages = {}
 
 /**
  * Get `fileinfo` message
@@ -64,11 +64,14 @@ function send(checksum, payload, options, callback) {
       return
     }
     delete fileMsg.filepath
-    const socket = net
-      .connect(options, () => {
+    net
+      .connect(options, function handler() {
+        const socket = this
+
         enhanceSocket({ socket })
         fileMsg.bodyLength = fileMsg.size
         socket.send(fileMsg)
+
         const readStream = fs.createReadStream(filepath)
         readStream.pipe(socket)
         readStream.once('end', () => {
@@ -84,7 +87,12 @@ function send(checksum, payload, options, callback) {
   })
 }
 
+function destory() {
+  messages = {}
+}
+
 module.exports = {
   getInfoMsg,
   send,
+  destory,
 }

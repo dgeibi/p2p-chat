@@ -22,7 +22,7 @@ module.exports = class Store {
   }
 
   destory() {
-    this.store = null
+    this.store = {}
   }
 
   each(keys, callback) {

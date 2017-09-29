@@ -1,25 +1,20 @@
 /* eslint-disable no-param-reassign, no-continue, no-underscore-dangle */
 const net = require('net')
+const { EventEmitter } = require('events')
 const logger = require('p2p-chat-logger')
 const each = require('p2p-chat-utils/each')
 
 const login = require('./login')
 const ensureMergeIPset = require('./ensureMergeIPset')
-const { connectRange, connectScatter } = require('./connect')
 const Store = require('./Store')
-const { EventEmitter } = require('events')
 const socketHandler = require('./socketHandler')
 const actions = require('./actions')
-
-const defaultOpts = {
-  username: 'anonymous',
-  port: 8087,
-}
+const fileInfoPool = require('./fileInfoPool')
+const defaultOpts = require('./defaultOpts')
 
 class Chat extends actions(socketHandler(EventEmitter)) {
   constructor() {
     super()
-    this.fileAccepted = {}
     this.clients = null
     this.active = false
     this.tag = null
@@ -108,36 +103,27 @@ class Chat extends actions(socketHandler(EventEmitter)) {
     }
   }
 
-  exit(callback) {
-    if (this.active) {
-      each(this.clients, (client) => {
-        client.end()
-        client.destroy()
-      })
+  destory(callback) {
+    this.files.destory()
+    fileInfoPool.destory()
 
-      this.server.close(() => {
-        this.active = false
-        logger.verbose(`>> Bye! ${this.username}[${this.tag}]`)
-        setImmediate(callback) // when reloading, why process.nextTick make the app slow
-      })
-    } else {
-      callback()
-    }
+    each(this.clients, (client) => {
+      client.end()
+      client.destroy()
+    })
+
+    this.server.close(() => {
+      this.active = false
+      logger.verbose(`>> Bye! ${this.username}[${this.tag}]`)
+      setImmediate(callback) // when reloading, why process.nextTick make the app slow
+    })
   }
 
-  /**
-   * 连接其它服务器
-   * @param {setupPayload} opts
-   */
-  connectServers(opts) {
-    if (!this.server.listening) return
-
-    ensureMergeIPset(opts)
-    connectRange(opts, this.address)
-    connectScatter(opts, this.address)
-    if (opts.ipset) {
-      // 3. 连接 ipset 里的所有服务器地址
-      this.connectIPset(opts.ipset)
+  exit(callback) {
+    if (this.active) {
+      this.destory(callback)
+    } else {
+      callback()
     }
   }
 }
