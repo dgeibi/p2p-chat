@@ -10,10 +10,10 @@ const msgTypes = require('./msgTypes')
 module.exports = superClass =>
   class Actions extends superClass {
     /**
-   * 发送文本
-   * @param {Array<string>} tags
-   * @param {string} text
-   */
+     * 发送文本
+     * @param {Array<string>} tags
+     * @param {string} text
+     */
     textToUsers(opts) {
       const { tags, payload } = opts
       const message = Object.assign(this.getMessage(), payload)
@@ -25,10 +25,10 @@ module.exports = superClass =>
     }
 
     /**
-   * 发送文件
-   * @param {Array<string>} tags
-   * @param {string} filepath
-   */
+     * 发送文件
+     * @param {Array<string>} tags
+     * @param {string} filepath
+     */
     sendFileToUsers(opts) {
       const { tags, filepath, payload } = opts
       const msg = Object.assign(this.getMessage(), payload)

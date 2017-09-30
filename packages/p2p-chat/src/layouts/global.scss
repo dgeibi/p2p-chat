@@ -4,14 +4,14 @@ body {
 
 $barWidth: 7px;
 ::-webkit-scrollbar {
-    width: $barWidth;
-    height: $barWidth;
+  width: $barWidth;
+  height: $barWidth;
 }
 
 $radius: 5px;
 ::-webkit-scrollbar-track {
-    background: rgba(243, 243, 243, 0.43);
-    border-radius: $radius;
+  background: rgba(243, 243, 243, 0.43);
+  border-radius: $radius;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -26,5 +26,5 @@ $radius: 5px;
 }
 
 .col-1 {
-  border-right: .6px solid #eee;
+  border-right: 0.6px solid #eee;
 }

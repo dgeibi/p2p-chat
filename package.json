@@ -9,17 +9,15 @@
     "app": "cd packages/p2p-chat && npm run",
     "lint": "eslint .",
     "fix": "eslint . --fix",
-    "prettier": "prettier --write '**/*.js' --ignore-path .eslintignore",
-    "format": "run-s prettier fix",
+    "format": "prettier-eslint --write '**/*.{js,scss}'",
     "precommit": "lint-staged",
     "pub": "lerna publish",
     "bootstrap": "lerna bootstrap",
     "postinstall": "npm run bootstrap"
   },
   "lint-staged": {
-    "*.js": [
-      "prettier --write",
-      "eslint --fix",
+    "*.{scss,js}": [
+      "prettier-eslint --write",
       "git add"
     ]
   },
@@ -34,7 +32,7 @@
     "husky": "^0.14.3",
     "lerna": "2.2.0",
     "npm-run-all": "^4.0.2",
-    "prettier": "^1.6.1",
+    "prettier-eslint-cli": "^4.4.0",
     "lint-staged": "^4.2.1"
   },
   "prettier": {
