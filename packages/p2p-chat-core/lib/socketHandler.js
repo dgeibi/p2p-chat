@@ -202,6 +202,7 @@ module.exports = superClass =>
     }
 
     connectIPset(ipset) {
+      if (!ipset) throw Error('ipset should be passed')
       const { address, port, handleSocket } = this
       ipset.remove(address, port)
 

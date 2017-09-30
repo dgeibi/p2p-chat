@@ -4,6 +4,17 @@
 function IPset(initalStore) {
   let store = initalStore || {}
 
+  const self = {
+    add,
+    remove,
+    has,
+    reset,
+    forEach,
+    getStore,
+    mergeStore,
+    excludeStore,
+  }
+
   /**
    * add address to ipset
    * @param {string} host
@@ -17,6 +28,7 @@ function IPset(initalStore) {
     }
     if (store[host] === undefined) store[host] = {}
     store[host][portnum] = true
+    return self
   }
 
   /**
@@ -25,8 +37,10 @@ function IPset(initalStore) {
    * @param {number} port
    */
   function remove(host, port) {
-    if (store[host] === undefined) return
-    store[host][port] = false
+    if (store[host] !== undefined) {
+      store[host][port] = false
+    }
+    return self
   }
 
   /**
@@ -45,6 +59,7 @@ function IPset(initalStore) {
    */
   function reset(s) {
     store = s || {}
+    return self
   }
 
   /**
@@ -62,6 +77,7 @@ function IPset(initalStore) {
         }
       })
     })
+    return self
   }
 
   function getStore() {
@@ -73,6 +89,7 @@ function IPset(initalStore) {
     ipset.forEach((host, port) => {
       add(host, port)
     })
+    return self
   }
 
   function excludeStore(s) {
@@ -82,18 +99,10 @@ function IPset(initalStore) {
         remove(host, port)
       }
     })
+    return self
   }
 
-  return {
-    add,
-    remove,
-    has,
-    reset,
-    forEach,
-    getStore,
-    mergeStore,
-    excludeStore,
-  }
+  return self
 }
 
 module.exports = IPset
