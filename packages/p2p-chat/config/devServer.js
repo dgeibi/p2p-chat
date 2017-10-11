@@ -15,7 +15,7 @@ module.exports = options => (config) => {
         chunks: false,
         children: false,
       },
-      setup() {
+      before() {
         spawn('electron', ['.', '--devServer', '--port', config.config.devServer.port], {
           shell: true,
           env: process.env,
