@@ -115,7 +115,10 @@ class Chat extends actions(socketHandler(EventEmitter)) {
     this.server.close(() => {
       this.active = false
       logger.verbose(`>> Bye! ${this.username}[${this.tag}]`)
-      setImmediate(callback) // when reloading, why process.nextTick make the app slow
+      setImmediate(callback)
+      // when reloading, why process.nextTick make the app slow
+      // https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/#process-nexttick
+      // process.nextTick create a microtask, close event callback is also a microtask
     })
   }
 
