@@ -7,7 +7,7 @@ function getport(opts, callback) {
   opts = opts || { start: 2000, end: 50000 }
   opts.start |= 0
   opts.end |= 0
-  opts.start = opts.start < 2000 ? 20000 : opts.start
+  opts.start = opts.start < 2000 ? 2000 : opts.start
   opts.end = opts.end < 2000 ? 50000 : opts.end
 
   const { start, end } = opts
