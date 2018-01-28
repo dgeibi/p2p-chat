@@ -2,9 +2,9 @@ const path = require('path')
 const Config = require('wtf-webpack-config')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const webpack = require('webpack')
+const Uglifyjs = require('uglifyjs-webpack-plugin')
 
 const define = require('wtf-webpack-config/plugins/define')
-const minify = require('wtf-webpack-config/plugins/babel-minify')
 
 const devServer = require('./config/devServer')
 const css = require('./config/css')
@@ -31,7 +31,7 @@ module.exports = (env = {}) => {
   process.env.BABEL_ENV = getEnv(isDev)
 
   const config = new Config({
-    devtool: isProduction ? 'source-map' : 'cheap-module-eval-source-map',
+    devtool: isProduction ? 'source-map' : 'cheap-module-source-map',
     entry: {
       app: `${SRC_DIR}/index.js`,
       vendor: `${SRC_DIR}/vendor.js`,
@@ -58,7 +58,24 @@ module.exports = (env = {}) => {
         'process.env.NODE_ENV': JSON.stringify(getEnv(isDev)),
       })
     )
-    .use(minify(), isProduction)
+    .plugin(
+      Uglifyjs,
+      [
+        {
+          parallel: true,
+          uglifyOptions: {
+            ie8: false,
+            ecma: 8,
+            output: {
+              comments: false,
+              beautify: false,
+            },
+            warnings: false,
+          },
+        },
+      ],
+      isProduction
+    )
     .rule({
       test: /\.js$/,
       include: defaultInclude,
@@ -81,6 +98,13 @@ module.exports = (env = {}) => {
         ],
       },
     })
+    .rule({
+      test: /\.(woff|woff2|eot|ttf|svg)(\?v=\d+\.\d+\.\d+)?$/,
+      loader: 'file-loader',
+      options: {
+        name: '[name].[ext]',
+      },
+    })
     .use(
       css({
         rule: {
@@ -92,7 +116,14 @@ module.exports = (env = {}) => {
                 minimize: true,
               },
             },
-            'less-loader',
+            {
+              loader: 'less-loader',
+              options: {
+                modifyVars: {
+                  'icon-url': '"../../../../../public/fonts/iconfont"',
+                },
+              },
+            },
           ],
         },
         extract: isProduction,
