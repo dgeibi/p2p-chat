@@ -52,7 +52,7 @@
     "css-loader": "^0.28.4",
     "dateformat": "^2.0.0",
     "electron": "^1.8.2-beta.4",
-    "electron-builder": "^18.8.1",
+    "electron-builder": "^19.56.2",
     "extract-text-webpack-plugin": "^3.0.0",
     "history": "^4.6.3",
     "html-webpack-plugin": "^2.30.1",

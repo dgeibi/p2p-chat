@@ -120,7 +120,9 @@ module.exports = (env = {}) => {
               loader: 'less-loader',
               options: {
                 modifyVars: {
-                  'icon-url': '"../../../../../public/fonts/iconfont"',
+                  'icon-url': require('./config/fromAntdStyle')(
+                    `${__dirname}/public/fonts/iconfont`
+                  ),
                 },
               },
             },
