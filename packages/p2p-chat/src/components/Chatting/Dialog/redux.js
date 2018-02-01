@@ -82,7 +82,7 @@ const reducerMap = {
 
 export default createReducer(reducerMap, initialState)
 
-export const newMessage = (msg) => {
+export const newMessage = msg => {
   const now = Date.now()
   const payload = {
     ...msg,
@@ -108,7 +108,7 @@ export const sendMessage = (id, text) => {
 export const sendFiles = (id, paths) => {
   const { tags, channel } = id
 
-  paths.forEach((filepath) => {
+  paths.forEach(filepath => {
     ipcRenderer.send('local-file', { tags, filepath, payload: { channel } })
   })
 
@@ -118,7 +118,7 @@ export const sendFiles = (id, paths) => {
   }
 }
 
-export const fileSentNotice = (info) => {
+export const fileSentNotice = info => {
   const { filename, username } = info
   const message = `sent ${username} '${filename}' successfully.`
   const payload = {
@@ -133,7 +133,7 @@ export const fileSentNotice = (info) => {
   }
 }
 
-export const textSent = (msg) => {
+export const textSent = msg => {
   const uid = Date.now()
   const payload = {
     ...msg,
@@ -147,7 +147,7 @@ export const textSent = (msg) => {
   }
 }
 
-export const fileSendError = (info) => {
+export const fileSendError = info => {
   const { filename, username, tag, error } = info
   const message = `Failed to send ${username} '${filename}'`
   const description = error.message

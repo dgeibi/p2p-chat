@@ -7,7 +7,7 @@ const path = require('path')
  * @return {string}
  * @param {string} filepath
  */
-const ensureUnique = (filepath) => {
+const ensureUnique = filepath => {
   do {
     if (fs.existsSync(filepath)) {
       const dirname = path.dirname(filepath)

@@ -10,7 +10,7 @@ import { getInfo } from '../selectors/chatInfo'
 import ChatList from '../components/Aside/ChatList'
 import { chatListActions } from './AsideRedux'
 
-const byOnline = key => (x) => {
+const byOnline = key => x => {
   const prefix = x.online ? '0' : '1'
   return prefix + x[key]
 }
@@ -29,7 +29,7 @@ const selectSortedUsers = createSelector([selectUsers], users =>
 )
 
 const selectLocation = state => state.routing.location
-const selectCurrent = createSelector([selectLocation], (location) => {
+const selectCurrent = createSelector([selectLocation], location => {
   if (!location) return {}
   const match = matchPath(location.pathname, {
     path: '/chat/:type/:key',

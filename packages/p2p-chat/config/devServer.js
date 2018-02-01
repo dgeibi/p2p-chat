@@ -2,7 +2,7 @@ const { spawn } = require('child_process')
 const webpack = require('webpack')
 const logger = require('p2p-chat-logger')
 
-module.exports = options => (config) => {
+module.exports = options => config => {
   config.plugin(new webpack.HotModuleReplacementPlugin())
   // eslint-disable-next-line no-param-reassign
   config.config.devServer = Object.assign(

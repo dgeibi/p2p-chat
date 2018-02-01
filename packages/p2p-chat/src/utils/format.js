@@ -19,6 +19,7 @@ export function formatPercent(percent) {
 
 export function formatName(str) {
   // non-ASCII character may be wider
+  // eslint-disable-next-line
   if (str.length > 14 && /[^\x00-\x7F]/.test(str)) {
     return `${str.slice(0, 6)}..${str.slice(-7)}`
   }

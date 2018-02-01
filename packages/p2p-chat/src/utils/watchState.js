@@ -8,7 +8,7 @@ const safeValue = (obj, path) =>
 
 const watchState = (path, callback) => {
   let cache
-  return (obj) => {
+  return obj => {
     const value = safeValue(obj, path)
     if (value !== undefined && cache !== value) {
       cache = value

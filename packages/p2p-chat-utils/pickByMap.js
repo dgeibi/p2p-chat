@@ -6,7 +6,7 @@ module.exports = function pickByMap(object, props, keys) {
     const value = object[key]
     if (!value) return obj
     obj[key] = {}
-    Object.keys(props).forEach((propKey) => {
+    Object.keys(props).forEach(propKey => {
       obj[key][propKey] = getValue(object[key], props[propKey])
     })
     return obj

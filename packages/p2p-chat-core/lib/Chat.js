@@ -35,7 +35,7 @@ class Chat extends actions(socketHandler(EventEmitter)) {
       opts.payload = opts.payload || {}
 
       // 退出后启动
-      this.exit((err) => {
+      this.exit(err => {
         if (!err) {
           this.setup(options, callback)
         } else {
@@ -107,7 +107,7 @@ class Chat extends actions(socketHandler(EventEmitter)) {
     this.files.destory()
     fileInfoPool.destory()
 
-    each(this.clients, (client) => {
+    each(this.clients, client => {
       client.end()
       client.destroy()
     })

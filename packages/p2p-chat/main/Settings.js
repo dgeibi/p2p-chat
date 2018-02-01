@@ -2,13 +2,13 @@
 /* eslint-disable global-require */
 const path = require('path')
 
-module.exports = (locals) => {
+module.exports = locals => {
   const settings = require('electron-settings')
 
-  settings.watch('users', (v) => {
+  settings.watch('users', v => {
     locals.users = v
   })
-  settings.watch('channels', (v) => {
+  settings.watch('channels', v => {
     locals.channels = v
   })
 

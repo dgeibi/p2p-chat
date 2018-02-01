@@ -82,7 +82,7 @@ class ChatList extends PureComponent {
     }
   }
 
-  handleClick = (e) => {
+  handleClick = e => {
     const [key, type] = e.keyPath
     this.props.changeDialog(type, key)
   }

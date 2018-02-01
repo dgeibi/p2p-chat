@@ -34,9 +34,9 @@ module.exports = superClass =>
     }
 
     /**
-   * @param {net.Socket} socket
-   * @param {{greeting: boolean, reGreeting: boolean}} opts
-   */
+     * @param {net.Socket} socket
+     * @param {{greeting: boolean, reGreeting: boolean}} opts
+     */
     handleSocket(socket, opts = {}) {
       const { greeting } = opts
 
@@ -54,7 +54,7 @@ module.exports = superClass =>
       socket.on('error', socket.logout)
 
       // 收到第一个报文，一个会话开始
-      socket.once('message', (session) => {
+      socket.once('message', session => {
         const { tag, type } = session
 
         // 对发送文件的socket特殊处理
@@ -111,7 +111,7 @@ module.exports = superClass =>
     }
 
     _waitReply(socket, preSession) {
-      socket.once('message', (session) => {
+      socket.once('message', session => {
         const { type, tag } = session
         if (type !== msgTypes.GREETING_REPLY || preSession.tag !== tag) {
           socket.destroy()
@@ -142,9 +142,9 @@ module.exports = superClass =>
     }
 
     /**
-   * 连接断开/出错，下线
-   * @param {{info: {localTag: string, tag: string, username: string}}} socket
-   */
+     * 连接断开/出错，下线
+     * @param {{info: {localTag: string, tag: string, username: string}}} socket
+     */
     handleLogout(socket) {
       const { username, tag, localTag } = socket.info || {}
       if (localTag === this.tag) {

@@ -5,7 +5,7 @@ const isIPLarger = require('p2p-chat-utils/is-ip-larger')
 
 function connectScatter(opts, fallbackHost) {
   if (opts.connects) {
-    opts.connects.forEach((conn) => {
+    opts.connects.forEach(conn => {
       const host = conn.host || fallbackHost
       const { port } = conn
       opts.ipset.add(host, port)

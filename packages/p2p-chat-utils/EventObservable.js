@@ -1,4 +1,4 @@
-module.exports = (emitter) => {
+module.exports = emitter => {
   const observables = []
   return {
     observe(type, listener) {
@@ -10,7 +10,7 @@ module.exports = (emitter) => {
       return destory
     },
     removeAllObservables() {
-      observables.forEach((x) => {
+      observables.forEach(x => {
         x()
       })
       observables.splice(0)

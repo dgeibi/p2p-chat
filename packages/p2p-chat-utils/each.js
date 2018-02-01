@@ -1,4 +1,4 @@
-const fn = (object, callback) => (key) => {
+const fn = (object, callback) => key => {
   const value = object[key]
   if (value !== undefined) {
     callback(value)

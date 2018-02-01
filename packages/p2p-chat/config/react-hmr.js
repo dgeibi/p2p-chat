@@ -12,7 +12,7 @@ const addEntry = (obj, _key) => {
   }
 }
 
-const hmr = key => (conf) => {
+const hmr = key => conf => {
   const { entry } = conf.config
   if (key && entry && typeof entry === 'object' && !Array.isArray(entry)) {
     addEntry(entry, key)

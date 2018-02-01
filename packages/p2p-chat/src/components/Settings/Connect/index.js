@@ -18,7 +18,7 @@ const validForm = (form, callback) => {
       return
     }
 
-    const connects = values.keys.map((i) => {
+    const connects = values.keys.map(i => {
       const port = Math.floor(values[`port-${i}`])
       const host = values[`address-${i}`]
       return { port, host }
@@ -40,7 +40,7 @@ export default class Connect extends Component {
     form: PropTypes.object.isRequired,
   }
 
-  remove = (k) => {
+  remove = k => {
     const { form } = this.props
     const keys = form.getFieldValue('keys')
     if (keys.length === 1) return
@@ -66,7 +66,7 @@ export default class Connect extends Component {
 
   handleCreate = () => {
     const { form, hide } = this.props
-    validForm(form, (err) => {
+    validForm(form, err => {
       if (!err) {
         form.resetFields()
         hide()

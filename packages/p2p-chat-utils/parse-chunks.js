@@ -3,7 +3,7 @@
  * @param {Array<Buffer>} chunks - array of buffers
  * @returns {?object}
  */
-const parseChunks = (chunks) => {
+const parseChunks = chunks => {
   const buffer = Buffer.concat(chunks)
   try {
     return JSON.parse(buffer.toString())

@@ -33,7 +33,7 @@ export default class ConnectRange extends Component {
 
   handleCreate = () => {
     const { form, hide } = this.props
-    validForm(form, (err) => {
+    validForm(form, err => {
       if (!err) {
         form.resetFields()
         hide()

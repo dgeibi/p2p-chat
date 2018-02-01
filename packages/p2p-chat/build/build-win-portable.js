@@ -3,7 +3,7 @@
 const commonConfig = require('../package').build
 const builder = require('electron-builder')
 
-const Platform = builder.Platform
+const { Platform } = builder
 
 const createConfig = arch =>
   Object.assign({}, commonConfig, {

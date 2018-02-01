@@ -22,7 +22,7 @@ const makeProcessing = (chat, { checksum, tag, channel, id }) => (
 }
 
 const makeDone = (chat, socket, { checksum, id, tag, channel }, { processing }) => {
-  const done = (currentChecksum) => {
+  const done = currentChecksum => {
     if (currentChecksum !== checksum) return
     socket.removeListener('file-processing', processing)
     socket.removeListener('file-done', done)
@@ -36,7 +36,7 @@ const makeClose = (
   socket,
   { id, checksum, tag, username, filename, filepath, channel }
 ) => {
-  const close = (currentChecksum) => {
+  const close = currentChecksum => {
     if (currentChecksum !== checksum) return
     socket.removeListener('file-close', close)
     md5.file(filepath, false, (md5Err, realChecksum) => {

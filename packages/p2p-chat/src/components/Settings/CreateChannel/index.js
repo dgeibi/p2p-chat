@@ -44,7 +44,7 @@ export default class CreateChannel extends Component {
 
   handleCreate = () => {
     const { form, hide } = this.props
-    validForm(form, (err) => {
+    validForm(form, err => {
       if (!err) {
         form.resetFields()
         hide()
@@ -52,7 +52,7 @@ export default class CreateChannel extends Component {
     })
   }
 
-  onChange = (checkedList) => {
+  onChange = checkedList => {
     const { onlineUsers } = this.props
     this.setState({
       indeterminate: checkedList.length > 0 && checkedList.length < onlineUsers.length,
@@ -60,7 +60,7 @@ export default class CreateChannel extends Component {
     })
   }
 
-  onCheckAllChange = (e) => {
+  onCheckAllChange = e => {
     const values = this.props.onlineUsers.map(x => x.value)
     this.props.form.setFieldsValue({
       [CreateChannel.checkboxsField]: e.target.checked ? values : [],

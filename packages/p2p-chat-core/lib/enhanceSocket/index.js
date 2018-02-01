@@ -7,11 +7,11 @@ const msgSocket = {
   },
 }
 
-const enhance = (opts) => {
+const enhance = opts => {
   const { socket, mixins } = opts
   if (opts.parse) {
     const parse = new Parse(opts)
-    socket.on('data', (chunk) => {
+    socket.on('data', chunk => {
       parse.transform(chunk)
     })
   }

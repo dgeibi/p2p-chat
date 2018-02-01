@@ -67,9 +67,9 @@ function IPset(initalStore) {
    * @param {function(string, number)} fn
    */
   function forEach(fn) {
-    Object.keys(store).forEach((host) => {
+    Object.keys(store).forEach(host => {
       const portStore = store[host]
-      Object.keys(portStore).forEach((portStr) => {
+      Object.keys(portStore).forEach(portStr => {
         const port = +portStr
         const exists = portStore[portStr]
         if (exists) {

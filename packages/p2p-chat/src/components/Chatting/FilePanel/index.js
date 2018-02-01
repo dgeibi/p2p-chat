@@ -45,7 +45,7 @@ class FilePanel extends Component {
         <div styleName="clearWrapper">
           <Button onClick={this.clear} type="danger" shape="circle" icon="close" />
         </div>
-        {filesArr.map((msg) => {
+        {filesArr.map(msg => {
           const { type, id, checksum, key, ...payload } = msg
           switch (type) {
             case cardTypes.RECEIVE:

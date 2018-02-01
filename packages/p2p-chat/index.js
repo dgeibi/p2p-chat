@@ -193,7 +193,7 @@ function createWorker() {
   if (!tick()) return
   worker = fork(`${__dirname}/main/worker.js`, ['--color'])
   logger.debug(`new chat worker ${worker.pid}`)
-  worker.on('message', (m) => {
+  worker.on('message', m => {
     const { key, args, act, error } = m
     if (key) {
       workerEE.emit(key, ...args)
@@ -231,14 +231,14 @@ function createWindow() {
     },
     locals.devPort
       ? {
-        protocol: 'http:',
-        host: `localhost:${locals.devPort}`,
-        pathname: 'index.html',
-      }
+          protocol: 'http:',
+          host: `localhost:${locals.devPort}`,
+          pathname: 'index.html',
+        }
       : {
-        pathname: path.join(__dirname, pkg.output, 'index.html'),
-        protocol: 'file:',
-      }
+          pathname: path.join(__dirname, pkg.output, 'index.html'),
+          protocol: 'file:',
+        }
   )
 
   const indexPath = url.format(urlObj)

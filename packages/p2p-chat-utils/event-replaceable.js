@@ -20,7 +20,7 @@ module.exports = ({ emitter, callback, args, disable }) => {
 
   if (disable) return noop
 
-  return (newCallback) => {
+  return newCallback => {
     obs.removeAllObservables()
     newCallback(on, ...args)
   }

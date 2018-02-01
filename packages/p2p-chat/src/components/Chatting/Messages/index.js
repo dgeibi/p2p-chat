@@ -11,7 +11,7 @@ class Messages extends Component {
     username: PropTypes.string.isRequired,
   }
 
-  saveMessageList = (div) => {
+  saveMessageList = div => {
     this.messageList = div
   }
 
@@ -38,7 +38,7 @@ class Messages extends Component {
     const { messages, username } = this.props
     return (
       <div styleName="messages" ref={this.saveMessageList}>
-        {messages.map((msg) => {
+        {messages.map(msg => {
           const props = { key: msg.uid }
           if (msg.alert) {
             const { message, description, alert } = msg

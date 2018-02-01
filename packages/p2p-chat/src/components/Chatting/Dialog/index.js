@@ -32,13 +32,13 @@ class Dialog extends Component {
     ]),
   }
 
-  handleTextChange = (e) => {
+  handleTextChange = e => {
     const { setText, id } = this.props
     const text = e.target.value
     setText(id, text)
   }
 
-  handleSubmit = (e) => {
+  handleSubmit = e => {
     e.preventDefault()
     const { id, fileList, sendFiles, text, sendMessage, setText } = this.props
     if (text) {
@@ -51,12 +51,12 @@ class Dialog extends Component {
     }
   }
 
-  handleFileRemove = (file) => {
+  handleFileRemove = file => {
     const { removeFile, id } = this.props
     removeFile(id, file.path)
   }
 
-  handleFileAdd = (file) => {
+  handleFileAdd = file => {
     const { addFile, id } = this.props
     addFile(id, file.path)
 
@@ -89,9 +89,7 @@ class Dialog extends Component {
         {info.username && (
           <section styleName="user-info">
             {info.username}
-            {formatTag(info.tag)} ({info.online
-              ? `${info.host}:${info.port}`
-              : 'Offline'})
+            {formatTag(info.tag)} ({info.online ? `${info.host}:${info.port}` : 'Offline'})
           </section>
         )}
         <Messages messages={messages} username={username} />

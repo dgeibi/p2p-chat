@@ -1,4 +1,4 @@
-module.exports = ({ rule, extractOptions, extract }) => (config) => {
+module.exports = ({ rule, extractOptions, extract }) => config => {
   if (!rule || !rule.use) {
     throw Error('rule and rule.use required')
   }

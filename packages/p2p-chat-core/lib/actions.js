@@ -18,7 +18,7 @@ module.exports = superClass =>
       const { tags, payload } = opts
       const message = Object.assign(this.getMessage(), payload)
       message.type = msgTypes.TEXT
-      each(this.clients, tags, (socket) => {
+      each(this.clients, tags, socket => {
         socket.send(message)
       })
       this.emit('text-sent', Object.assign({ tag: tags[0] }, payload))
@@ -39,7 +39,7 @@ module.exports = superClass =>
           this.emit('file-unable-to-send', { error })
           return
         }
-        each(this.clients, tags, (socket) => {
+        each(this.clients, tags, socket => {
           socket.send(message)
         })
       })
@@ -75,7 +75,7 @@ module.exports = superClass =>
       const message = Object.assign(this.getMessage(), payload)
       message.type = msgTypes.CHANNEL_CREATE
 
-      each(this.clients, tags, (socket) => {
+      each(this.clients, tags, socket => {
         socket.send(message)
       })
     }

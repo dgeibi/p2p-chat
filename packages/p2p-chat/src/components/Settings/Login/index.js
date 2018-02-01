@@ -41,7 +41,7 @@ export default class Login extends Component {
 
   handleCreate = () => {
     const { form } = this.props
-    validForm(form, (err) => {
+    validForm(form, err => {
       if (!err) {
         this.props.form.resetFields()
         this.props.hide()

@@ -1,6 +1,6 @@
 import subscribes from '../effects/subscribes'
 
-export default (store) => {
+export default store => {
   const listener = () => {
     const state = store.getState()
     subscribes.forEach(x => x && x(state))

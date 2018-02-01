@@ -28,11 +28,11 @@ const log = color => (...args) => {
 
 const logger = {}
 
-Object.keys(colors).forEach((x) => {
+Object.keys(colors).forEach(x => {
   logger[x] = log(colors[x])
 })
 
-Object.keys(aliases).forEach((x) => {
+Object.keys(aliases).forEach(x => {
   logger[x] = logger[aliases[x]]
 })
 

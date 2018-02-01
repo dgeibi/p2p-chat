@@ -16,7 +16,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const finalCreateStore = compose(...middlewares)(createStore)
 
-const configureStore = (initialState) => {
+const configureStore = initialState => {
   const store = finalCreateStore(rootReducer, initialState)
 
   if (module.hot) {

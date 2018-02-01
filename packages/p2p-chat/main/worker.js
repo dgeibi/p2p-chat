@@ -8,7 +8,7 @@ const send = (key, ...args) => {
   })
 }
 
-process.on('uncaughtException', (err) => {
+process.on('uncaughtException', err => {
   process.send({ act: 'suicide', error: makePlainError(err) })
 
   chat.exit(() => {
@@ -21,7 +21,7 @@ process.on('uncaughtException', (err) => {
 })
 
 // front to back
-process.on('message', (message) => {
+process.on('message', message => {
   const { key, args } = message
   const [opts] = args
   switch (key) {
@@ -36,7 +36,7 @@ process.on('message', (message) => {
       break
     }
     case 'logout': {
-      chat.exit((err) => {
+      chat.exit(err => {
         send('logout-reply', { error: makePlainError(err) })
       })
       break
@@ -62,7 +62,7 @@ process.on('message', (message) => {
   }
 })
 
-const bypassChatToMain = (key) => {
+const bypassChatToMain = key => {
   chat.on(key, (payload, ...rest) => {
     if (payload && typeof payload === 'object' && payload.error) {
       // eslint-disable-next-line no-param-reassign

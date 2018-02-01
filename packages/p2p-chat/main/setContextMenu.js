@@ -13,7 +13,7 @@ const inputMenu = Menu.buildFromTemplate([
   { role: 'selectall' },
 ])
 
-module.exports = (window) => {
+module.exports = window => {
   window.webContents.on('context-menu', (e, props) => {
     const { selectionText, isEditable } = props
     if (isEditable) {

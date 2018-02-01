@@ -58,7 +58,7 @@ function send(checksum, payload, options, callback) {
   }
   const fileMsg = Object.assign({}, payload, messages[checksum])
   const { filepath, filename } = fileMsg
-  fs.stat(filepath, (err) => {
+  fs.stat(filepath, err => {
     if (err) {
       callback(Error(`fail to read file ${filepath}`), filename)
       return
@@ -81,7 +81,7 @@ function send(checksum, payload, options, callback) {
           })
         })
       })
-      .on('error', (e) => {
+      .on('error', e => {
         callback(e, filename)
       })
   })

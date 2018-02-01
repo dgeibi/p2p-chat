@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import App from '../layouts/App'
 
-const render = (ele) => {
+const render = ele => {
   ReactDOM.render(ele, document.getElementById('root'))
 }
 
