@@ -51,7 +51,10 @@ module.exports = superClass =>
       if (greeting) socket.send(this.getGreetingMsg())
 
       // 连接出错，进行下线处理
-      socket.on('error', socket.logout)
+      socket.on('error', e => {
+        this.emit('error', e)
+        socket.logout()
+      })
 
       // 收到第一个报文，一个会话开始
       socket.once('message', session => {
@@ -142,7 +145,7 @@ module.exports = superClass =>
     }
 
     /**
-     * 连接断开/出错，下线
+     * 连接断开/出错 | 下线
      * @param {{info: {localTag: string, tag: string, username: string}}} socket
      */
     handleLogout(socket) {
@@ -154,6 +157,12 @@ module.exports = superClass =>
         this.clients[tag] = undefined
         logger.verbose(`${username}[${tag}] logout.`)
         this.emit('logout', { tag, username })
+      } else if (
+        socket &&
+        socket.destroyed === false &&
+        typeof socket.destroy === 'function'
+      ) {
+        socket.destroy()
       }
     }
 

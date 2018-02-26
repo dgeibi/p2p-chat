@@ -12,7 +12,13 @@ const enhance = opts => {
   if (opts.parse) {
     const parse = new Parse(opts)
     socket.on('data', chunk => {
-      parse.transform(chunk)
+      try {
+        parse.transform(chunk)
+      } catch (e) {
+        parse.destory()
+        socket.emit('error', e)
+        socket.destory()
+      }
     })
   }
   Object.assign(socket, msgSocket, mixins)

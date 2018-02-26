@@ -170,6 +170,14 @@ class Parse extends EventEmitter {
       this.transformBody(chunk)
     }
   }
+
+  destory() {
+    this.closeSpeedMeter()
+    if (this.writeStream) {
+      this.writeStream.removeAllListeners()
+      this.writeStream.destroy()
+    }
+  }
 }
 
 module.exports = Parse

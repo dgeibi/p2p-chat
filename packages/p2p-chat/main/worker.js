@@ -72,9 +72,12 @@ const bypassChatToMain = key => {
   })
 }
 
+chat.on('error', e => {
+  send('error', makePlainError(e))
+})
+
 bypassChatToMain('logout')
 bypassChatToMain('login')
-
 bypassChatToMain('text')
 bypassChatToMain('text-sent')
 bypassChatToMain('fileinfo')
