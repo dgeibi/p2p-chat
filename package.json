@@ -11,13 +11,11 @@
     "fix": "eslint . --fix",
     "format": "prettier --write '**/*.{js,scss}'",
     "precommit": "lint-staged",
-    "pub": "lerna publish"
+    "pub": "lerna publish",
+    "postinstall": "cd packages/p2p-chat && yarn"
   },
   "lint-staged": {
-    "*.{scss,js}": [
-      "prettier --write",
-      "git add"
-    ]
+    "*.{scss,js}": ["prettier --write", "git add"]
   },
   "devDependencies": {
     "eslint": "^4.16.0",
@@ -28,7 +26,11 @@
     "prettier": "^1.10.2",
     "lint-staged": "^6.1.0"
   },
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/p2p-chat-core",
+    "packages/p2p-chat-logger",
+    "packages/p2p-chat-utils"
+  ],
   "prettier": {
     "semi": false,
     "singleQuote": true,

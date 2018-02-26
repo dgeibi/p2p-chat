@@ -1,7 +1,0 @@
-import 'react'
-import 'react-dom'
-import 'redux'
-import 'react-redux'
-import 'react-router-redux'
-import 'react-router-dom'
-import 'reselect'

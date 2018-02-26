@@ -1,9 +1,9 @@
 /* eslint-disable global-require */
-const { join } = require('path')
-const { existsSync, mkdirSync } = require('fs')
+import { join } from 'path'
+import { existsSync, mkdirSync } from 'fs'
+import { app } from 'electron'
 
-module.exports = () => {
-  const { app } = require('electron')
+export default () => {
   const settingsDir = join(app.getPath('appData'), app.getName(), 'ChatSettings')
   if (!existsSync(settingsDir)) mkdirSync(settingsDir)
   const downloadDir = join(app.getPath('downloads'), app.getName())

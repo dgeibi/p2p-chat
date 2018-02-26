@@ -1,4 +1,4 @@
-module.exports = function count(limit = 4) {
+export default function count(limit = 4) {
   let tick = 0
   return () => {
     if (tick > limit) return false

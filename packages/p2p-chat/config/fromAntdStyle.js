@@ -1,4 +1,4 @@
 const from = require.resolve('antd/lib/style/index.less')
-const { relative } = require('path')
+const { relative, normalize } = require('path')
 
-module.exports = dir => relative(from, dir)
+module.exports = dir => relative(from, normalize(dir))

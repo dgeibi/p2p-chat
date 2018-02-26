@@ -5,6 +5,7 @@
   "rules": {
     "import/no-extraneous-dependencies": "off",
     "class-methods-use-this": "off",
-    "global-require": "off"
+    "global-require": "off",
+    "import/first": "off"
   }
 }

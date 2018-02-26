@@ -1,5 +1,5 @@
-const chat = require('p2p-chat-core')
-const makePlainError = require('./makePlainError')
+import chat from 'p2p-chat-core'
+import makePlainError from './makePlainError'
 
 const send = (key, ...args) => {
   process.send({

@@ -1,24 +1,28 @@
 /* eslint-disable no-param-reassign */
+import './handleError'
+import path from 'path'
+import url from 'url'
+import { fork } from 'child_process'
+import EventEmitter from 'events'
+import logger from 'p2p-chat-logger'
+import electron from 'electron'
+import IPset from 'p2p-chat-utils/ipset'
+import count from './count'
+import './menu'
+import pkg from '../package.json'
+
 process.on('uncaughtException', handleError)
 
-const electron = require('electron')
-const path = require('path')
-const url = require('url')
-const { fork } = require('child_process')
-const EventEmitter = require('events')
-const logger = require('p2p-chat-logger')
-const tick = require('./main/count')()
-require('./main/menu.js')
-const pkg = require('./package.json')
-const IPset = require('p2p-chat-utils/ipset')
-const each = require('p2p-chat-utils/each')
-const md5 = require('p2p-chat-utils/md5')
-const pickByMap = require('p2p-chat-utils/pickByMap')
+const tick = count()
 
-const getDir = require('./main/getDir')
-const Settings = require('./main/Settings')
-const setContextMenu = require('./main/setContextMenu')
-const makePlainError = require('./main/makePlainError')
+import each from 'p2p-chat-utils/each'
+import md5 from 'p2p-chat-utils/md5'
+import pickByMap from 'p2p-chat-utils/pickByMap'
+
+import getDir from './getDir'
+import Settings from './Settings'
+import setContextMenu from './setContextMenu'
+import makePlainError from './makePlainError'
 
 const { app, BrowserWindow, ipcMain } = electron
 
@@ -191,7 +195,7 @@ function handleWorkerError(err) {
 
 function createWorker() {
   if (!tick()) return
-  worker = fork(`${__dirname}/main/worker.js`, ['--color'])
+  worker = fork(`${__dirname}/worker.js`, ['--color'])
   logger.debug(`new chat worker ${worker.pid}`)
   worker.on('message', m => {
     const { key, args, act, error } = m
@@ -293,11 +297,7 @@ function loadSettings(_locals) {
   })
 }
 
-function handleError(err) {
-  electron.dialog.showErrorBox(
-    'A JavaScript error occurred in the main process',
-    err.stack
-  )
+function handleError() {
   if (worker && !worker.killed) {
     worker.on('close', () => {
       process.exit()

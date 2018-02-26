@@ -1,10 +1,9 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable global-require */
-const path = require('path')
+import path from 'path'
+import settings from 'electron-settings'
 
-module.exports = locals => {
-  const settings = require('electron-settings')
-
+export default locals => {
   settings.watch('users', v => {
     locals.users = v
   })

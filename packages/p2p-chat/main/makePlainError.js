@@ -1,4 +1,4 @@
-module.exports = err => {
+export default err => {
   if (!err) return null
   const { message, stack, name } = err
   return { message, stack, name }

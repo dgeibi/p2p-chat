@@ -1,4 +1,4 @@
-const { Menu } = require('electron')
+import { Menu } from 'electron'
 
 const selectionMenu = Menu.buildFromTemplate([{ role: 'copy' }])
 
@@ -13,7 +13,7 @@ const inputMenu = Menu.buildFromTemplate([
   { role: 'selectall' },
 ])
 
-module.exports = window => {
+export default window => {
   window.webContents.on('context-menu', (e, props) => {
     const { selectionText, isEditable } = props
     if (isEditable) {

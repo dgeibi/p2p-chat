@@ -15,9 +15,9 @@
     "socket"
   ],
   "dependencies": {
-    "fs-extra": "^4.0.0",
+    "fs-extra": "^5.0.0",
     "ip": "^1.1.5",
-    "node-machine-id": "^1.1.9",
+    "node-machine-id": "^1.1.10",
     "p2p-chat-logger": "^1.4.5",
     "p2p-chat-utils": "^1.4.3"
   }
