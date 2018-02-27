@@ -1,6 +1,6 @@
 const EventObservable = require('./EventObservable')
+const noop = require('./noop')
 
-const noop = () => {}
 module.exports = ({ emitter, callback, args, disable }) => {
   let on
   let obs

@@ -3,6 +3,7 @@ const net = require('net')
 const { EventEmitter } = require('events')
 const logger = require('p2p-chat-logger')
 const each = require('p2p-chat-utils/each')
+const noop = require('p2p-chat-utils/noop')
 
 const login = require('./login')
 const ensureMergeIPset = require('./ensureMergeIPset')
@@ -11,8 +12,6 @@ const socketHandler = require('./socketHandler')
 const actions = require('./actions')
 const fileInfoPool = require('./fileInfoPool')
 const defaultOpts = require('./defaultOpts')
-
-const noop = () => {}
 
 class Chat extends actions(socketHandler(EventEmitter)) {
   constructor() {

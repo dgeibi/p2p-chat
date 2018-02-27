@@ -2,6 +2,7 @@
 const net = require('net')
 const getNewHost = require('p2p-chat-utils/get-new-address')
 const isIPLarger = require('p2p-chat-utils/is-ip-larger')
+const noop = require('p2p-chat-utils/noop')
 
 function connectScatter(opts, fallbackHost) {
   if (opts.connects) {
@@ -14,7 +15,6 @@ function connectScatter(opts, fallbackHost) {
   }
 }
 
-const noop = () => {}
 function connectIPset(ipset, handler) {
   ipset.forEach((host, port) => {
     net.connect(port, host, handler).on('error', noop)
