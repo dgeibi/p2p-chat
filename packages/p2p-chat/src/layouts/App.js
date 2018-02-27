@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { Row, Col } from 'antd'
 import { Route } from 'react-router-dom'
 import { ConnectedRouter as Router } from 'react-router-redux'
+import { hot } from 'react-hot-loader'
 
 import SettingNav from '../views/Settings'
 import Aside from '../views/Aside'
@@ -12,7 +13,7 @@ import './global.scss'
 
 function getDevTool() {
   if (process.env.NODE_ENV !== 'production') {
-    const DevTools = require('./DevTools').default // eslint-disable-line global-require
+    const DevTools = require('./DevTools').default
     return <DevTools />
   }
   return null
@@ -45,4 +46,4 @@ App.propTypes = {
   history: PropTypes.object.isRequired,
 }
 
-export default App
+export default hot(module)(App)

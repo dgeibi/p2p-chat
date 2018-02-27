@@ -8,7 +8,6 @@ const define = require('wtf-webpack-config/plugins/define')
 
 const devServer = require('./devServer')
 const css = require('./css')
-const reactHMR = require('./react-hmr')
 const depExternals = require('./dep-externals')
 const analyzer = require('./analyzer')
 const generateScopedName = require('./generateScopedName')
@@ -185,7 +184,6 @@ module.exports = (env = {}) => {
       },
     ])
     .plugin(webpack.NamedModulesPlugin, null, isDev)
-    .use(reactHMR('app'), isDev)
     .use(
       devServer({
         contentBase: OUTPUT_DIR,

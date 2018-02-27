@@ -1,17 +1,29 @@
-import subscribes from '../effects/subscribes'
+import subscribeDialog from '../components/Chatting/Dialog/subscribe'
+import hot from '../utils/hot'
 
-export default store => {
+const subscribes = [subscribeDialog]
+
+let replace
+const makeReplace = (unsubscribe, store) => {
+  replace = subscribe => {
+    unsubscribe()
+    replace = null
+    subscribe(store)
+  }
+}
+
+const subscribe = store => {
   const listener = () => {
     const state = store.getState()
     subscribes.forEach(x => x && x(state))
   }
-
-  let unsubscribe = store.subscribe(listener)
-
-  if (module.hot) {
-    module.hot.accept('../effects/subscribes', () => {
-      unsubscribe()
-      unsubscribe = store.subscribe(listener)
-    })
-  }
+  makeReplace(store.subscribe(listener), store)
 }
+
+hot({
+  sourceModule: module,
+  replaceGetter: () => replace,
+  args: [subscribe],
+})
+
+export default subscribe

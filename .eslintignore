@@ -2,3 +2,5 @@ node_modules/
 dist/
 assets/
 public/
+/packages/p2p-chat/index.js*
+/packages/p2p-chat/worker.js*
