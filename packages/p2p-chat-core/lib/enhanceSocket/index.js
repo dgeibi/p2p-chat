@@ -9,18 +9,15 @@ const msgSocket = {
 
 const enhance = opts => {
   const { socket, mixins } = opts
-  if (opts.parse) {
-    const parse = new Parse(opts)
-    socket.on('data', chunk => {
-      try {
-        parse.transform(chunk)
-      } catch (e) {
-        parse.destory()
-        socket.emit('error', e)
-        socket.destory()
-      }
-    })
+  const parse = new Parse(opts)
+  socket.on('data', chunk => {
+    parse.transform(chunk)
+  })
+  const done = () => {
+    parse.destory()
   }
+  socket.on('close', done)
+  socket.on('error', done)
   Object.assign(socket, msgSocket, mixins)
   return socket
 }

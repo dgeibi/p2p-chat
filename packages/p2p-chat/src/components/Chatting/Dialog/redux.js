@@ -18,6 +18,7 @@ const TYPES = {
   SEND_FILES: '',
   FILE_SENT: '',
   FILE_SEND_ERROR: '',
+  SOCKET_ERROR: '',
   ADD_FILE: '',
   REMOVE_FILE: '',
   SET_TEXT: '',
@@ -42,6 +43,7 @@ const reducerMap = {
   [TYPES.FILE_SEND_ERROR]: updateMessage,
   [TYPES.MESSAGE_SENT]: updateMessage,
   [TYPES.NEW_MESSAGE]: updateMessage,
+  [TYPES.SOCKET_ERROR]: updateMessage,
   [TYPES.ADD_FILE](state, action) {
     const { type, key } = action.id
     const newState = getNewState(state, type, key)
@@ -160,6 +162,23 @@ export const fileSendError = info => {
   }
   return {
     type: TYPES.FILE_SEND_ERROR,
+    payload,
+  }
+}
+
+export const socketError = info => {
+  const { filename, tag, error } = info
+  const message = `Something Wrong with the socket`
+  const description = error.message
+  const payload = {
+    ...info,
+    uid: filename + tag + Date.now(),
+    alert: 'error',
+    message,
+    description,
+  }
+  return {
+    type: TYPES.SOCKET_ERROR,
     payload,
   }
 }

@@ -39,8 +39,15 @@ class Parse extends EventEmitter {
     this.bodyLeft = 0
   }
 
+  emitError(error) {
+    this.socket.emit('error', error)
+  }
+
   submitMsg(reset = true) {
-    if (!this.msg) throw Error('message not found')
+    if (!this.msg) {
+      this.emitError(Error('message not found'))
+      return
+    }
     this.socket.emit('message', this.msg)
     if (reset) this.msg = null
   }
@@ -72,10 +79,14 @@ class Parse extends EventEmitter {
   }
 
   processStart() {
-    const pathname = ensureUniqueFile(resolve(this.opts.dirname, this.msg.filename))
-    this.submitFileMsg(pathname)
-    this.createWriteStream(pathname)
-    this.openSpeedMeter()
+    try {
+      const pathname = ensureUniqueFile(resolve(this.opts.dirname, this.msg.filename))
+      this.submitFileMsg(pathname)
+      this.createWriteStream(pathname)
+      this.openSpeedMeter()
+    } catch (e) {
+      this.emitError(e)
+    }
   }
 
   createWriteStream(pathname) {
@@ -83,6 +94,9 @@ class Parse extends EventEmitter {
     const writeStream = createWriteStream(pathname)
     writeStream.once('close', () => {
       socket.emit('file-close', checksum)
+    })
+    writeStream.on('error', e => {
+      socket.emit('error', e)
     })
     this.writeStream = writeStream
   }
@@ -148,7 +162,10 @@ class Parse extends EventEmitter {
     const headData = chunk.slice(0, index)
     this.headCaches.push(headData)
     this.msg = parseChunks(this.headCaches)
-    if (!this.msg) throw Error('fail to parse chunks')
+    if (!this.msg) {
+      this.emitError(Error('fail to parse chunks'))
+      return
+    }
 
     this.headCaches = [] // empty cache
     this.bodyLeft = this.msg.bodyLength || 0

@@ -46,6 +46,10 @@ function listeners(on, dispatch) {
     showError(error)
   })
 
+  on('chatError', (event, error) => {
+    showError(error)
+  })
+
   on('text', (event, message) => {
     dispatch(dialogActions.newMessage(message))
   })
@@ -90,5 +94,11 @@ function listeners(on, dispatch) {
 
   on('file-receiced', (event, message) => {
     dispatch(filePanelActions.fileReceived(message))
+  })
+
+  on('logout', (event, message) => {
+    if (message.error) {
+      dispatch(dialogActions.socketError(message))
+    }
   })
 }

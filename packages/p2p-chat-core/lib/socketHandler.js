@@ -27,8 +27,8 @@ module.exports = superClass =>
       const handleLogout = this.handleLogout.bind(this)
 
       this.socketMixins = {
-        logout() {
-          handleLogout(this)
+        logout(error) {
+          handleLogout(this, error)
         },
       }
     }
@@ -42,7 +42,6 @@ module.exports = superClass =>
 
       enhanceSocket({
         socket,
-        parse: true,
         dirname: path.resolve(this.downloadDir, this.username),
         mixins: this.socketMixins,
       })
@@ -53,12 +52,17 @@ module.exports = superClass =>
       // 连接出错，进行下线处理
       socket.on('error', e => {
         this.emit('error', e)
-        socket.logout()
+        socket.logout(e)
+        this.handleError(socket, e)
       })
 
       // 收到第一个报文，一个会话开始
       socket.once('message', session => {
         const { tag, type } = session
+        socket.type = type
+        socket.isFileSocket = function isFileSocket() {
+          return this.type === msgTypes.FILE
+        }
 
         // 对发送文件的socket特殊处理
         if (
@@ -95,6 +99,8 @@ module.exports = superClass =>
       const { id, tag, username, filepath, channel, size } = message
       const filename = path.basename(filepath)
       message.filename = filename
+      this._saveInfo(socket, message)
+
       this.emit('file-process-start', {
         id,
         tag,
@@ -124,11 +130,15 @@ module.exports = superClass =>
       })
     }
 
+    _saveInfo(socket, session) {
+      socket.info = Object.assign({ localTag: this.tag }, session)
+    }
+
     _bindSocket(socket, session) {
       const { username, tag } = session
 
       // 添加信息，存入 clients
-      socket.info = Object.assign({ localTag: this.tag }, session)
+      this._saveInfo(socket, session)
 
       // 已登录的提示
       if (!this.clients[tag]) {
@@ -148,21 +158,49 @@ module.exports = superClass =>
      * 连接断开/出错 | 下线
      * @param {{info: {localTag: string, tag: string, username: string}}} socket
      */
-    handleLogout(socket) {
-      const { username, tag, localTag } = socket.info || {}
-      if (localTag === this.tag) {
-        if (this.clients[tag] && this.clients[tag].destroyed === false) {
+    handleLogout(socket, error) {
+      if (!socket) return
+      if (!socket.info || typeof socket.isFileSocket !== 'function') {
+        if (typeof socket.destroy === 'function') socket.destroy()
+        return
+      }
+      const { username, tag, localTag } = socket.info
+      if (localTag === this.tag && !socket.isFileSocket()) {
+        if (this.clients[tag] && !this.clients[tag].destroyed) {
           this.clients[tag].destroy()
         }
         this.clients[tag] = undefined
         logger.verbose(`${username}[${tag}] logout.`)
-        this.emit('logout', { tag, username })
-      } else if (
-        socket &&
-        socket.destroyed === false &&
-        typeof socket.destroy === 'function'
-      ) {
+        this.emit('logout', { tag, username, error })
+      }
+      if (!socket.destroyed) {
         socket.destroy()
+      }
+    }
+
+    handleError(socket, error) {
+      if (error) {
+        logger.error(error)
+      }
+      if (!socket) return
+      if (!socket.info || typeof socket.isFileSocket !== 'function') {
+        if (typeof socket.destroy === 'function') socket.destroy()
+        return
+      }
+      const { localTag } = socket.info
+      if (!socket.destroyed) {
+        socket.destroy()
+      }
+      if (localTag !== this.tag) return
+      // file socket error
+      if (socket.isFileSocket()) {
+        if (error) {
+          fileHanderMakers.fileReceiveError({
+            chat: this,
+            error,
+            info: socket.info,
+          })
+        }
       }
     }
 
@@ -175,7 +213,10 @@ module.exports = superClass =>
 
     handleFileAccept(message) {
       const { checksum, port, host, id } = message
+      let done = false
       fileInfoPool.send(checksum, { id }, { port, host }, (error, filename) => {
+        if (done) return
+        done = true
         const payload = Object.assign({}, message)
         payload.filename = filename
 
