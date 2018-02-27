@@ -8,6 +8,10 @@ const send = (key, ...args) => {
   })
 }
 
+process.on('exit', () => {
+  if (chat.active) chat.exit()
+})
+
 process.on('uncaughtException', err => {
   process.send({ act: 'suicide', error: makePlainError(err) })
 

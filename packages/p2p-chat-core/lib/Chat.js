@@ -12,6 +12,8 @@ const actions = require('./actions')
 const fileInfoPool = require('./fileInfoPool')
 const defaultOpts = require('./defaultOpts')
 
+const noop = () => {}
+
 class Chat extends actions(socketHandler(EventEmitter)) {
   constructor() {
     super()
@@ -103,7 +105,7 @@ class Chat extends actions(socketHandler(EventEmitter)) {
     }
   }
 
-  destory(callback) {
+  destory(callback = noop) {
     this.files.destory()
     fileInfoPool.destory()
 
@@ -122,7 +124,7 @@ class Chat extends actions(socketHandler(EventEmitter)) {
     })
   }
 
-  exit(callback) {
+  exit(callback = noop) {
     if (this.active) {
       this.destory(callback)
     } else {

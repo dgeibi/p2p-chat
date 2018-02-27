@@ -47,7 +47,7 @@ function listeners(on, dispatch) {
   })
 
   on('chatError', (event, error) => {
-    showError(error)
+    console.error(error.stack) // eslint-disable-line
   })
 
   on('text', (event, message) => {
@@ -97,7 +97,7 @@ function listeners(on, dispatch) {
   })
 
   on('logout', (event, message) => {
-    if (message.error) {
+    if (message.error && message.error.code !== 'ECONNRESET') {
       dispatch(dialogActions.socketError(message))
     }
   })
