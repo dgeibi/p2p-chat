@@ -2,7 +2,7 @@
 import './handleError'
 import path from 'path'
 import url from 'url'
-import { fork } from 'child_process'
+import cp from 'child_process'
 import EventEmitter from 'events'
 import logger from 'p2p-chat-logger'
 import electron from 'electron'
@@ -10,27 +10,25 @@ import IPset from 'p2p-chat-utils/ipset'
 import count from './count'
 import './menu'
 import pkg from '../package.json'
+import each from 'p2p-chat-utils/each'
+import md5 from 'p2p-chat-utils/md5'
+import pickByMap from 'p2p-chat-utils/pickByMap'
+import getDir from './getDir'
+import initSettings, { settings } from './initSettings'
+import setContextMenu from './setContextMenu'
+import makePlainError from './makePlainError'
 
 process.on('uncaughtException', handleError)
 
 const tick = count()
 
-import each from 'p2p-chat-utils/each'
-import md5 from 'p2p-chat-utils/md5'
-import pickByMap from 'p2p-chat-utils/pickByMap'
-
-import getDir from './getDir'
-import Settings from './Settings'
-import setContextMenu from './setContextMenu'
-import makePlainError from './makePlainError'
-
 const { app, BrowserWindow, ipcMain } = electron
 
-const workerEE = new EventEmitter()
+const chatProxy = new EventEmitter()
+/** @type {BrowserWindow} */
 let win
+/** @type {cp.ChildProcess} */
 let worker
-let settings
-let setWrap
 
 const locals = {
   users: null,
@@ -130,7 +128,7 @@ ipcMain.on('logout', () => {
 })
 
 // worker events
-workerEE.on('setup-reply', ({ error, id }) => {
+chatProxy.on('setup-reply', ({ error, id }) => {
   if (!error) {
     const { username, address, port, host, tag } = id
     locals.host = host || address
@@ -143,13 +141,13 @@ workerEE.on('setup-reply', ({ error, id }) => {
   }
 })
 
-workerEE.on('logout-reply', ({ error }) => {
+chatProxy.on('logout-reply', ({ error }) => {
   if (error) {
     logger.err('logout failed\n', error)
   }
 })
 
-workerEE.on('login', ({ tag, username, host, port }) => {
+chatProxy.on('login', ({ tag, username, host, port }) => {
   settings.set(`users.${tag}`, {
     tag,
     username,
@@ -158,7 +156,7 @@ workerEE.on('login', ({ tag, username, host, port }) => {
   })
 })
 
-workerEE.on('channel-create', ({ key, channel }) => {
+chatProxy.on('channel-create', ({ key, channel }) => {
   settings.set(`channels.${key}`, channel)
 })
 
@@ -195,12 +193,12 @@ function handleWorkerError(err) {
 
 function createWorker() {
   if (!tick()) return
-  worker = fork(`${__dirname}/worker.js`, ['--color'])
+  worker = cp.fork(`${__dirname}/worker.js`, ['--color'])
   logger.debug(`new chat worker ${worker.pid}`)
   worker.on('message', m => {
     const { key, args, act, error } = m
     if (key) {
-      workerEE.emit(key, ...args)
+      chatProxy.emit(key, ...args)
       win.webContents.send(key, ...args)
     } else if (act === 'suicide') {
       handleWorkerError(error)
@@ -278,10 +276,7 @@ function getUserFullInfos(tags) {
 }
 
 function loadSettings(_locals) {
-  setWrap = Settings(_locals)
-  settings = setWrap.getSettings()
-  setWrap.setPath()
-  setWrap.sync()
+  initSettings(_locals)
 
   const { users, channels } = _locals
 
@@ -300,10 +295,10 @@ function loadSettings(_locals) {
 function handleError() {
   if (worker && !worker.killed) {
     worker.on('close', () => {
-      process.exit()
+      process.exit(1)
     })
     worker.kill()
   } else {
-    process.exit()
+    process.exit(1)
   }
 }
