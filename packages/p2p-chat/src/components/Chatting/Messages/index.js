@@ -16,6 +16,7 @@ class Messages extends Component {
   }
 
   scrollToBottom() {
+    if (!this.messageList) return
     const { scrollHeight } = this.messageList
     const height = this.messageList.clientHeight
     const maxScrollTop = scrollHeight - height
