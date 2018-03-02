@@ -13,10 +13,17 @@ const createConfig = arch =>
           arch,
           target: 'portable',
         },
+        {
+          arch,
+          target: 'nsis',
+        },
       ],
     },
     portable: {
       artifactName: `\${productName}-portable-win-\${version}-${arch}.\${ext}`,
+    },
+    nsis: {
+      artifactName: `\${productName}-win-installer-\${version}-${arch}.\${ext}`,
     },
   })
 
