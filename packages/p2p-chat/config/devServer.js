@@ -7,9 +7,14 @@ class StartElectron {
     compiler.plugin('done', () => {
       if (this.started) return
       this.started = true
-      spawn('electron', ['.', '--devServer', '--port', compiler.options.devServer.port], {
+      spawn('electron .', {
         shell: true,
-        env: process.env,
+        env: Object.assign(
+          {
+            DEV_PORT: compiler.options.devServer.port,
+          },
+          process.env
+        ),
         stdio: 'inherit',
       })
         .on('close', () => process.exit(0))

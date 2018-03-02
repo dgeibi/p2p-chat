@@ -7,14 +7,15 @@ import EventEmitter from 'events'
 import logger from 'p2p-chat-logger'
 import electron from 'electron'
 import IPset from 'p2p-chat-utils/ipset'
+import { ensureDirSync } from 'fs-extra'
+
 import count from './count'
 import './menu'
 import pkg from '../package.json'
 import each from 'p2p-chat-utils/each'
 import md5 from 'p2p-chat-utils/md5'
 import pickByMap from 'p2p-chat-utils/pickByMap'
-import getDir from './getDir'
-import initSettings, { settings } from './initSettings'
+import loadUserConf from './loadUserConf'
 import setContextMenu from './setContextMenu'
 import makePlainError from './makePlainError'
 
@@ -37,19 +38,14 @@ const locals = {
   tag: null,
   host: null,
   port: null,
-  settingsDir: null,
   downloadDir: null,
-  devPort: null,
+  settingsDir: null,
+  devPort: Math.floor(process.env.DEV_PORT),
+  userConf: null,
+  appName: null,
 }
 
 // webpack-dev-server port
-if (process.argv.indexOf('--devServer') !== -1) {
-  const devPort = Math.floor(process.argv[process.argv.indexOf('--port') + 1])
-  if (devPort) {
-    locals.devPort = devPort
-  }
-}
-
 createWorker()
 
 function getIPsetStore(users) {
@@ -100,7 +96,7 @@ ipcMain.on('create-channel', (event, opts) => {
   opts.payload = Object.assign({}, opts.payload, { channel, key })
 
   // store
-  settings.set(`channels.${key}`, channel)
+  locals.userConf.set(`channels.${key}`, channel)
 
   // to renderer
   event.sender.send('channel-create', { channel, key })
@@ -118,12 +114,15 @@ bypassRendererToWorker('local-text')
 bypassRendererToWorker('accept-file')
 
 ipcMain.on('logout', () => {
-  locals.username = null
-  locals.channels = null
-  locals.users = null
-  locals.host = null
-  locals.port = null
-  locals.tag = null
+  Object.assign(locals, {
+    username: null,
+    channels: null,
+    users: null,
+    host: null,
+    port: null,
+    tag: null,
+    userConf: null,
+  })
   win.setTitle(pkg.name)
 })
 
@@ -148,7 +147,7 @@ chatProxy.on('logout-reply', ({ error }) => {
 })
 
 chatProxy.on('login', ({ tag, username, host, port }) => {
-  settings.set(`users.${tag}`, {
+  locals.userConf.set(`users.${tag}`, {
     tag,
     username,
     host,
@@ -157,7 +156,7 @@ chatProxy.on('login', ({ tag, username, host, port }) => {
 })
 
 chatProxy.on('channel-create', ({ key, channel }) => {
-  settings.set(`channels.${key}`, channel)
+  locals.userConf.set(`channels.${key}`, channel)
 })
 
 // exit worker
@@ -166,10 +165,17 @@ process.on('exit', () => {
 })
 
 app.on('ready', () => {
+  const appName = app.getName()
+  const settingsDir = path.join(app.getPath('appData'), appName, 'ChatSettings')
+  ensureDirSync(settingsDir)
+  const downloadDir = path.join(app.getPath('downloads'), appName)
+  ensureDirSync(downloadDir)
+  Object.assign(locals, {
+    downloadDir,
+    settingsDir,
+  })
+
   createWindow()
-  const { settingsDir, downloadDir } = getDir()
-  locals.settingsDir = settingsDir
-  locals.downloadDir = downloadDir
 })
 
 app.on('window-all-closed', () => {
@@ -213,25 +219,19 @@ function createWorker() {
 }
 
 function createWindow() {
-  const { scaleFactor: zoomFactor } = electron.screen.getPrimaryDisplay()
-
   win = new BrowserWindow({
     minWidth: 800,
     minHeight: 600,
     width: 800,
     height: 600,
     title: pkg.name,
-    webPreferences: {
-      zoomFactor,
-      nodeIntegrationInWorker: true,
-    },
   })
 
   const urlObj = Object.assign(
     {
       slashes: true,
     },
-    locals.devPort
+    locals.devPort > 2000
       ? {
           protocol: 'http:',
           host: `localhost:${locals.devPort}`,
@@ -276,8 +276,7 @@ function getUserFullInfos(tags) {
 }
 
 function loadSettings(_locals) {
-  initSettings(_locals)
-
+  loadUserConf(_locals)
   const { users, channels } = _locals
 
   const payload = {
