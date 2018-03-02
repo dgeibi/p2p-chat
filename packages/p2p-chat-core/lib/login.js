@@ -1,6 +1,10 @@
-const getTag = require('./getTag')
+const internalIP = require('internal-ip')
 const getPort = require('p2p-chat-utils/get-port')
-const ip = require('ip')
+const getTag = require('./getTag')
+
+function getInternalIP() {
+  return internalIP.v4.sync() || internalIP.v6.sync()
+}
 
 /**
  * get tag, address, port
@@ -12,7 +16,7 @@ function login(opts, callback) {
     if (!e) {
       const id = Object.assign({}, opts)
       id.port = port
-      id.address = opts.host || ip.address() // lan ip address
+      id.address = opts.host || getInternalIP() // lan ip address
       id.tag = getTag(port, opts.username)
       callback(null, id)
     } else {
