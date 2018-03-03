@@ -42,12 +42,12 @@ function listeners(on, dispatch) {
     }
   })
 
-  on('bg-err', (event, { error }) => {
+  on('worker-err', (event, { error }) => {
     showError(error)
   })
 
-  on('chatError', (event, error) => {
-    console.error(error.stack) // eslint-disable-line
+  on('chat-error', (event, { error }) => {
+    console.error(error.stack)
   })
 
   on('text', (event, message) => {

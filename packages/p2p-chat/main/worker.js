@@ -1,10 +1,10 @@
 import chat from 'p2p-chat-core'
 import makePlainError from './makePlainError'
 
-const send = (key, ...args) => {
+const postToMain = (key, payload) => {
   process.send({
     key,
-    args,
+    payload,
   })
 }
 
@@ -24,41 +24,39 @@ process.on('uncaughtException', err => {
   }, 5000)
 })
 
-// front to back
 process.on('message', message => {
-  const { key, args } = message
-  const [opts] = args
+  const { key, payload } = message
   switch (key) {
     case 'change-setting': {
-      chat.connectServers(opts)
+      chat.connectServers(payload)
       break
     }
     case 'setup': {
-      chat.setup(opts, (err, id) => {
-        send('setup-reply', { error: makePlainError(err), id })
+      chat.setup(payload, (err, id) => {
+        postToMain('setup-reply', { error: makePlainError(err), id })
       })
       break
     }
     case 'logout': {
       chat.exit(err => {
-        send('logout-reply', { error: makePlainError(err) })
+        postToMain('logout-reply', { error: makePlainError(err) })
       })
       break
     }
     case 'local-text': {
-      chat.textToUsers(opts)
+      chat.textToUsers(payload)
       break
     }
     case 'local-file': {
-      chat.sendFileToUsers(opts)
+      chat.sendFileToUsers(payload)
       break
     }
     case 'accept-file': {
-      chat.acceptFile(opts)
+      chat.acceptFile(payload)
       break
     }
     case 'create-channel': {
-      chat.createChannel(opts)
+      chat.createChannel(payload)
       break
     }
     default:
@@ -66,31 +64,33 @@ process.on('message', message => {
   }
 })
 
-const bypassChatToMain = key => {
-  chat.on(key, (payload, ...rest) => {
+const C2M = key => {
+  chat.on(key, payload => {
     if (payload && typeof payload === 'object' && payload.error) {
       // eslint-disable-next-line no-param-reassign
       payload.error = makePlainError(payload.error)
     }
-    send(key, payload, ...rest)
+    postToMain(key, payload)
   })
 }
 
 chat.on('error', e => {
-  send('chatError', makePlainError(e))
+  postToMain('chat-error', {
+    error: makePlainError(e),
+  })
 })
 
-bypassChatToMain('logout')
-bypassChatToMain('login')
-bypassChatToMain('text')
-bypassChatToMain('text-sent')
-bypassChatToMain('fileinfo')
-bypassChatToMain('file-receiced')
-bypassChatToMain('file-receive-fail')
-bypassChatToMain('file-sent')
-bypassChatToMain('file-send-fail')
-bypassChatToMain('file-unable-to-send')
-bypassChatToMain('file-process-start')
-bypassChatToMain('file-processing')
-bypassChatToMain('file-process-done')
-bypassChatToMain('channel-create')
+C2M('logout')
+C2M('login')
+C2M('text')
+C2M('text-sent')
+C2M('fileinfo')
+C2M('file-receiced')
+C2M('file-receive-fail')
+C2M('file-sent')
+C2M('file-send-fail')
+C2M('file-unable-to-send')
+C2M('file-process-start')
+C2M('file-processing')
+C2M('file-process-done')
+C2M('channel-create')

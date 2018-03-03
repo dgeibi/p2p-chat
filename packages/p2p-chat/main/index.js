@@ -7,19 +7,20 @@ import EventEmitter from 'events'
 import logger from 'p2p-chat-logger'
 import electron from 'electron'
 import IPset from 'p2p-chat-utils/ipset'
-import { ensureDirSync } from 'fs-extra'
-
-import count from './count'
-import './menu'
-import pkg from '../package.json'
+import noop from 'p2p-chat-utils/noop'
 import each from 'p2p-chat-utils/each'
 import md5 from 'p2p-chat-utils/md5'
 import pickByMap from 'p2p-chat-utils/pickByMap'
+import { ensureDirSync } from 'fs-extra'
+import count from './count'
+import pkg from '../package.json'
 import loadUserConf from './loadUserConf'
 import setContextMenu from './setContextMenu'
 import makePlainError from './makePlainError'
+import './menu'
 
-process.on('uncaughtException', handleError)
+/** @type {cp.ChildProcess} */
+let worker
 
 const tick = count()
 
@@ -28,8 +29,20 @@ const { app, BrowserWindow, ipcMain } = electron
 const chatProxy = new EventEmitter()
 /** @type {BrowserWindow} */
 let win
-/** @type {cp.ChildProcess} */
-let worker
+
+process.on('uncaughtException', killWorkerAndExit)
+process.on('exit', () => {
+  if (worker && !worker.killed) {
+    worker.kill()
+  }
+})
+
+const postToWorker = (key, payload) => {
+  worker.send({
+    key,
+    payload,
+  })
+}
 
 const locals = {
   users: null,
@@ -45,40 +58,19 @@ const locals = {
   appName: null,
 }
 
-// webpack-dev-server port
 createWorker()
 
-function getIPsetStore(users) {
-  const ipset = IPset()
-  each(users, ({ host, port }) => {
-    ipset.add(host, port)
-  })
-  return ipset.getStore()
-}
-
-// renderer events
-ipcMain.on('setup', (event, opts) => {
+R2W('setup', opts => {
   locals.username = opts.username || 'anonymous'
   opts.username = locals.username
   opts.downloadDir = locals.downloadDir
-
-  worker.send({
-    key: 'setup',
-    args: [opts],
-  })
 })
 
-ipcMain.on('change-setting', (event, payload) => {
+R2W('change-setting', payload => {
   payload.ipsetStore = getIPsetStore(locals.users || {})
-
-  // to worker
-  worker.send({
-    key: 'change-setting',
-    args: [payload],
-  })
 })
 
-ipcMain.on('create-channel', (event, opts) => {
+R2W('create-channel', (opts, event) => {
   const { tags } = opts
   opts.name = opts.name || 'default'
   const key = md5.dataSync(opts.name + Math.random())
@@ -94,26 +86,10 @@ ipcMain.on('create-channel', (event, opts) => {
     name: opts.name,
   }
   opts.payload = Object.assign({}, opts.payload, { channel, key })
-
-  // store
   locals.userConf.set(`channels.${key}`, channel)
-
-  // to renderer
   event.sender.send('channel-create', { channel, key })
-
-  // to worker
-  worker.send({
-    key: 'create-channel',
-    args: [opts],
-  })
 })
-
-bypassRendererToWorker('local-file')
-bypassRendererToWorker('logout')
-bypassRendererToWorker('local-text')
-bypassRendererToWorker('accept-file')
-
-ipcMain.on('logout', () => {
+R2W('logout', () => {
   Object.assign(locals, {
     username: null,
     channels: null,
@@ -125,8 +101,10 @@ ipcMain.on('logout', () => {
   })
   win.setTitle(pkg.name)
 })
+R2W('local-file')
+R2W('local-text')
+R2W('accept-file')
 
-// worker events
 chatProxy.on('setup-reply', ({ error, id }) => {
   if (!error) {
     const { username, address, port, host, tag } = id
@@ -159,11 +137,6 @@ chatProxy.on('channel-create', ({ key, channel }) => {
   locals.userConf.set(`channels.${key}`, channel)
 })
 
-// exit worker
-process.on('exit', () => {
-  worker.kill()
-})
-
 app.on('ready', () => {
   const appName = app.getName()
   const settingsDir = path.join(app.getPath('appData'), appName, 'ChatSettings')
@@ -191,7 +164,7 @@ app.on('activate', () => {
 })
 
 function handleWorkerError(err) {
-  win.webContents.send('bg-err', { error: makePlainError(err) })
+  win.webContents.send('worker-err', { error: makePlainError(err) })
   logger.error(err)
   if (worker && !worker.killed) worker.kill()
   createWorker()
@@ -202,10 +175,10 @@ function createWorker() {
   worker = cp.fork(`${__dirname}/worker.js`, ['--color'])
   logger.debug(`new chat worker ${worker.pid}`)
   worker.on('message', m => {
-    const { key, args, act, error } = m
+    const { key, payload, act, error } = m
     if (key) {
-      chatProxy.emit(key, ...args)
-      win.webContents.send(key, ...args)
+      chatProxy.emit(key, payload)
+      win.webContents.send(key, payload)
     } else if (act === 'suicide') {
       handleWorkerError(error)
     }
@@ -254,12 +227,10 @@ function createWindow() {
   setContextMenu(win)
 }
 
-function bypassRendererToWorker(key) {
-  ipcMain.on(key, (event, ...args) => {
-    worker.send({
-      key,
-      args,
-    })
+function R2W(key, beforePost = noop) {
+  ipcMain.on(key, (event, payload) => {
+    beforePost(payload, event)
+    postToWorker(key, payload)
   })
 }
 
@@ -284,14 +255,18 @@ function loadSettings(_locals) {
   }
 
   win.webContents.send('after-setup', { users, channels })
-
-  worker.send({
-    key: 'change-setting',
-    args: [payload],
-  })
+  postToWorker('change-setting', payload)
 }
 
-function handleError() {
+function getIPsetStore(users) {
+  const ipset = IPset()
+  each(users, ({ host, port }) => {
+    ipset.add(host, port)
+  })
+  return ipset.getStore()
+}
+
+function killWorkerAndExit() {
   if (worker && !worker.killed) {
     worker.on('close', () => {
       process.exit(1)
