@@ -1,20 +1,16 @@
 const path = require('path')
 const Config = require('wtf-webpack-config')
-const webpack = require('webpack')
-const define = require('wtf-webpack-config/plugins/define')
 const depExternals = require('./dep-externals')
 const analyzer = require('./analyzer')
 const pkg = require('../package.json')
 
 module.exports = (env = {}) => {
   const isProduction = env.production === true
-  const isDev = !isProduction
 
   const PUBLIC_PATH = isProduction ? '' : '/'
   const SRC_DIR = path.join(__dirname, '../main')
   const OUTPUT_DIR = path.join(__dirname, '..')
   const defaultInclude = [SRC_DIR]
-  const NODE_ENV = isDev ? 'developement' : 'production'
 
   const config = new Config({
     devtool: isProduction ? 'source-map' : 'cheap-module-source-map',
@@ -39,11 +35,6 @@ module.exports = (env = {}) => {
     },
     externals: [depExternals(pkg.dependencies)],
   })
-    .use(
-      define({
-        'process.env.NODE_ENV': JSON.stringify(NODE_ENV),
-      })
-    )
     .rule({
       test: /\.js$/,
       include: defaultInclude,
@@ -52,20 +43,19 @@ module.exports = (env = {}) => {
         babelrc: false,
         presets: [
           [
-            'env',
+            '@babel/env',
             {
               targets: {
                 electron: '1.8.0',
               },
               modules: false,
-              useBuiltIns: true,
+              useBuiltIns: 'usage',
+              shippedProposals: true,
             },
           ],
-          'stage-0',
         ],
       },
     })
-    .plugin(webpack.NamedModulesPlugin, null, isDev)
     .use(analyzer, Boolean(env.report))
 
   return config.toConfig()

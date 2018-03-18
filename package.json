@@ -27,9 +27,7 @@
     "lint-staged": "^6.1.0"
   },
   "workspaces": [
-    "packages/p2p-chat-core",
-    "packages/p2p-chat-logger",
-    "packages/p2p-chat-utils"
+    "packages/*"
   ],
   "prettier": {
     "semi": false,

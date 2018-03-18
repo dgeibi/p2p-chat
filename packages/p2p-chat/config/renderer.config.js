@@ -1,10 +1,6 @@
 const path = require('path')
 const Config = require('wtf-webpack-config')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const webpack = require('webpack')
-const Uglifyjs = require('uglifyjs-webpack-plugin')
-
-const define = require('wtf-webpack-config/plugins/define')
 
 const devServer = require('./devServer')
 const css = require('./css')
@@ -25,8 +21,6 @@ module.exports = (env = {}) => {
   const OUTPUT_DIR = path.join(__dirname, '../assets')
   const defaultInclude = [SRC_DIR]
 
-  const NODE_ENV = isDev ? 'developement' : 'production'
-
   const config = new Config({
     devtool: isProduction ? 'source-map' : 'cheap-module-source-map',
     entry: {
@@ -34,7 +28,7 @@ module.exports = (env = {}) => {
     },
     output: {
       path: OUTPUT_DIR,
-      filename: '[name].bundle.js',
+      filename: '[name].js',
       publicPath: PUBLIC_PATH,
     },
     target: 'electron-renderer',
@@ -49,29 +43,6 @@ module.exports = (env = {}) => {
     },
     externals: [depExternals(pkg.dependencies)],
   })
-    .use(
-      define({
-        'process.env.NODE_ENV': JSON.stringify(NODE_ENV),
-      })
-    )
-    .plugin(
-      Uglifyjs,
-      [
-        {
-          parallel: true,
-          uglifyOptions: {
-            ie8: false,
-            ecma: 8,
-            output: {
-              comments: false,
-              beautify: false,
-            },
-            warnings: false,
-          },
-        },
-      ],
-      isProduction
-    )
     .rule({
       test: /\.js$/,
       include: defaultInclude,
@@ -80,20 +51,21 @@ module.exports = (env = {}) => {
         babelrc: false,
         presets: [
           [
-            'env',
+            '@babel/env',
             {
               targets: {
                 electron: '1.8.0',
               },
               modules: false,
-              useBuiltIns: true,
+              useBuiltIns: 'usage',
+              shippedProposals: true,
             },
           ],
-          'stage-0',
-          'react',
+          '@babel/react',
         ],
         plugins: [
           'transform-decorators-legacy',
+          ['@babel/plugin-proposal-class-properties', { loose: true }],
           [
             'react-css-modules',
             {
@@ -183,19 +155,12 @@ module.exports = (env = {}) => {
         filename: 'index.html',
       },
     ])
-    .plugin(webpack.NamedModulesPlugin, null, isDev)
     .use(
       devServer({
         contentBase: OUTPUT_DIR,
       }),
       isDev
     )
-    .plugin(webpack.optimize.CommonsChunkPlugin, [
-      {
-        name: 'vendor',
-        minChunks: module => module.context && module.context.includes('node_modules'),
-      },
-    ])
     .use(analyzer, Boolean(env.report))
 
   return config.toConfig()
