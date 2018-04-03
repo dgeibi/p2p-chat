@@ -3,31 +3,33 @@ import { Button } from 'antd'
 import PropTypes from 'prop-types'
 
 import Card from '../../Common/CustomCard'
-import { formatName, formatSize } from '../../../utils/format'
+import { formatSize } from '../../../utils/format'
 import './FileReceive.scss'
 import { fileLoadStates } from './constants'
 
 const FileInfo = ({ filename, accept, ignore, size, username, status }) => (
   <Card>
-    <span styleName="filename" title={filename}>
-      {formatName(filename)}
-    </span>
-    <br />
-    {formatSize(size)} by {formatName(username)}
-    <br />
-    <br />
-    {fileLoadStates.waitting === status ? (
-      'waiting to receive..'
-    ) : (
-      <span>
-        <Button size="small" type="primary" onClick={accept}>
-          Accept
-        </Button>{' '}
-        <Button size="small" type="danger" onClick={ignore}>
-          Ignore
-        </Button>
-      </span>
-    )}
+    <div styleName="card">
+      <div styleName="filename" title={filename}>
+        {filename}
+      </div>
+      <div>
+        {formatSize(size)} by <span title={username}>{username}</span>
+      </div>
+      {fileLoadStates.waitting === status ? (
+        'waiting to receive..'
+      ) : (
+        <div>
+          <br />
+          <Button size="small" type="primary" onClick={accept}>
+            Accept
+          </Button>{' '}
+          <Button size="small" type="danger" onClick={ignore}>
+            Ignore
+          </Button>
+        </div>
+      )}
+    </div>
   </Card>
 )
 

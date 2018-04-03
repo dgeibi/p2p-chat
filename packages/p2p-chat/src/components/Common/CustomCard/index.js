@@ -1,13 +1,9 @@
 import React from 'react'
 import { Card } from 'antd'
 
-export default props => (
-  <Card
-    bodyStyle={{
-      width: '150px',
-      padding: '8px 12px',
-      overflow: 'hidden',
-    }}
-    {...props}
-  />
-)
+const style = {
+  width: '150px',
+  padding: '8px 10px',
+  overflow: 'hidden',
+}
+export default props => <Card bodyStyle={style} {...props} />

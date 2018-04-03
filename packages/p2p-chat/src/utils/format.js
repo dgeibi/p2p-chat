@@ -17,16 +17,4 @@ export function formatPercent(percent) {
   return Number((percent * 100).toPrecision(3))
 }
 
-export function formatName(str) {
-  // non-ASCII character may be wider
-  // eslint-disable-next-line
-  if (str.length > 14 && /[^\x00-\x7F]/.test(str)) {
-    return `${str.slice(0, 6)}..${str.slice(-7)}`
-  }
-  if (str.length > 22) {
-    return `${str.slice(0, 9)}..${str.slice(-9)}`
-  }
-  return str
-}
-
 export const formatTag = tag => `[${tag.slice(0, 5)}]`

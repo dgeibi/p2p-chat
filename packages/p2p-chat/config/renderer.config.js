@@ -13,16 +13,17 @@ const getLocalIdent = (context, localIdentName, localName) =>
   generateScopedName(localName, context.resourcePath)
 
 module.exports = (env = {}) => {
-  const isProduction = env.production === true
-  const isDev = !isProduction
+  const SERVE = Boolean(env.serve)
+  const PROD = env.production && !SERVE
 
-  const PUBLIC_PATH = isProduction ? '' : '/'
+  const PUBLIC_PATH = PROD ? '' : '/'
   const SRC_DIR = path.join(__dirname, '../src')
   const OUTPUT_DIR = path.join(__dirname, '../assets')
   const defaultInclude = [SRC_DIR]
 
   const config = new Config({
-    devtool: isProduction ? 'source-map' : 'cheap-module-source-map',
+    mode: SERVE || !PROD ? 'development' : 'production',
+    devtool: PROD ? 'source-map' : 'cheap-module-source-map',
     entry: {
       app: `${SRC_DIR}/index.js`,
     },
@@ -70,7 +71,7 @@ module.exports = (env = {}) => {
             'react-css-modules',
             {
               generateScopedName,
-              webpackHotModuleReloading: isDev,
+              webpackHotModuleReloading: SERVE,
               filetypes: {
                 '.scss': {
                   syntax: 'postcss-scss',
@@ -86,8 +87,8 @@ module.exports = (env = {}) => {
               style: true,
             },
           ],
-          isDev && 'react-hot-loader/babel',
-          isProduction && 'transform-react-remove-prop-types',
+          SERVE && 'react-hot-loader/babel',
+          PROD && 'transform-react-remove-prop-types',
         ].filter(Boolean),
       },
     })
@@ -121,7 +122,7 @@ module.exports = (env = {}) => {
             },
           ],
         },
-        extract: isProduction,
+        extract: PROD,
         extractOptions: 'antd.css',
       })
     )
@@ -144,7 +145,7 @@ module.exports = (env = {}) => {
             { loader: 'postcss-loader', options: { sourceMap: true } },
           ],
         },
-        extract: isProduction,
+        extract: PROD,
         extractOptions: 'main.css',
       })
     )
@@ -159,7 +160,7 @@ module.exports = (env = {}) => {
       devServer({
         contentBase: OUTPUT_DIR,
       }),
-      isDev
+      SERVE
     )
     .use(analyzer, Boolean(env.report))
 

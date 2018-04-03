@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 
 import Card from '../../Common/CustomCard'
 import { fileLoadStates } from './constants'
-import { formatName, formatSize, formatSpeed, formatPercent } from '../../../utils/format'
+import { formatSize, formatSpeed, formatPercent } from '../../../utils/format'
 import './FileReceive.scss'
 
 const openFile = filepath => () => {
@@ -25,30 +25,29 @@ const FileReceive = ({
   percent,
   status,
   filepath,
-}) => {
-  const name = formatName(filename)
-  return (
-    <Card>
-      <span styleName="filename" title={filename}>
-        {status === success ? <a onClick={openFile(filepath)}>{name}</a> : name}
-      </span>
-      <br />
-      {formatSize(size)} by {formatName(username)}
-      <br />
-      {status === active && <span>{formatSpeed(speed)}</span>}
+}) => (
+  <Card>
+    <div styleName="card">
+      <div styleName="filename" title={filename}>
+        {status === success ? <a onClick={openFile(filepath)}>{filename}</a> : filename}
+      </div>
+      <div>
+        {formatSize(size)} by <span title={username}>{username}</span>
+      </div>
+      {status === active && <div>{formatSpeed(speed)}</div>}
       {status === exception && <div>{error.message}</div>}
-      <br />
       {status !== success && (
         <Progress percent={formatPercent(percent)} status={status} />
       )}
       {status === success && (
         <div>
+          <br />
           <a onClick={openDir(filepath)}>Show in folder</a>
         </div>
       )}
-    </Card>
-  )
-}
+    </div>
+  </Card>
+)
 
 FileReceive.propTypes = {
   username: PropTypes.string.isRequired,

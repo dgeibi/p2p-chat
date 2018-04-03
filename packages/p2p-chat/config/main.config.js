@@ -5,15 +5,19 @@ const analyzer = require('./analyzer')
 const pkg = require('../package.json')
 
 module.exports = (env = {}) => {
-  const isProduction = env.production === true
-
-  const PUBLIC_PATH = isProduction ? '' : '/'
+  const PROD = env.production === true
+  const mode = PROD ? 'production' : 'development'
+  const PUBLIC_PATH = PROD ? '' : '/'
   const SRC_DIR = path.join(__dirname, '../main')
   const OUTPUT_DIR = path.join(__dirname, '..')
   const defaultInclude = [SRC_DIR]
 
   const config = new Config({
-    devtool: isProduction ? 'source-map' : 'cheap-module-source-map',
+    optimization: {
+      minimize: false,
+    },
+    devtool: env.debug ? 'eval' : 'source-map',
+    mode,
     entry: {
       index: `${SRC_DIR}/index.js`,
       worker: `${SRC_DIR}/worker.js`,
