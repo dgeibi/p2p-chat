@@ -48,6 +48,8 @@ class Parse extends EventEmitter {
       this.emitError(Error('message not found'))
       return
     }
+    this.msg.realHost = this.msg.host
+    this.msg.host = this.socket.remoteAddress
     this.socket.emit('message', this.msg)
     if (reset) this.msg = null
   }
