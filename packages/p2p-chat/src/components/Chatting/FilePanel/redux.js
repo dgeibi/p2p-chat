@@ -5,6 +5,13 @@ import createReducer from '../../../utils/createReducer'
 
 import { fileLoadStates, cardTypes } from './constants'
 
+function findPos({ tag, channel, id }) {
+  if (channel) {
+    return { type: 'channel', key: channel, id }
+  }
+  return { type: 'user', key: tag, id }
+}
+
 const initialState = {
   user: {},
   channel: {},
@@ -155,10 +162,3 @@ export const clearPanel = ({ type, key }) => ({
   type: TYPES.CLEAR_PANEL,
   payload: { type, key },
 })
-
-function findPos({ tag, channel, id }) {
-  if (channel) {
-    return { type: 'channel', key: channel, id }
-  }
-  return { type: 'user', key: tag, id }
-}

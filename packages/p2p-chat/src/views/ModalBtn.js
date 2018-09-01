@@ -12,7 +12,7 @@ import { modalBtnActions, selectVisible } from './ModalBtnRedux'
     hide: () => dispatch(modalBtnActions.hide(ownProp.id)),
   })
 )
-export default class ModalBtn extends Component {
+class ModalBtn extends Component {
   static propTypes = {
     show: PropTypes.func.isRequired,
     hide: PropTypes.func.isRequired,
@@ -25,3 +25,5 @@ export default class ModalBtn extends Component {
     return children({ show, hide, visible })
   }
 }
+
+export default ModalBtn

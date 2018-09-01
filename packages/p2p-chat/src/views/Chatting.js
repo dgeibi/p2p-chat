@@ -91,6 +91,7 @@ class Chatting extends Component {
     id: PropTypes.object.isRequired,
     dialogProps: PropTypes.object.isRequired,
   }
+
   render() {
     const { dialogActions, files, filePanelActions, id, dialogProps } = this.props
     return (

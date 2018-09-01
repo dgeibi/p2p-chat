@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const commonConfig = require('../package').build
 const builder = require('electron-builder')
+const commonConfig = require('../package').build
 
 const { Platform } = builder
 

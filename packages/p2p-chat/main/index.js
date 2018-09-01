@@ -30,6 +30,8 @@ const chatProxy = new EventEmitter()
 /** @type {BrowserWindow} */
 let win
 
+/* eslint-disable no-use-before-define */
+
 process.on('uncaughtException', killWorkerAndExit)
 process.on('exit', () => {
   if (worker && !worker.killed) {
@@ -246,6 +248,14 @@ function getUserFullInfos(tags) {
   )
 }
 
+function getIPsetStore(users) {
+  const ipset = IPset()
+  each(users, ({ host, port }) => {
+    ipset.add(host, port)
+  })
+  return ipset.getStore()
+}
+
 function loadSettings(_locals) {
   loadUserConf(_locals)
   const { users, channels } = _locals
@@ -256,14 +266,6 @@ function loadSettings(_locals) {
 
   win.webContents.send('after-setup', { users, channels })
   postToWorker('change-setting', payload)
-}
-
-function getIPsetStore(users) {
-  const ipset = IPset()
-  each(users, ({ host, port }) => {
-    ipset.add(host, port)
-  })
-  return ipset.getStore()
 }
 
 function killWorkerAndExit() {

@@ -1,5 +1,13 @@
 /* eslint-disable no-param-reassign */
 
+function getValue(object, props) {
+  if (!object) return null
+  if (!Array.isArray(props)) return object[props]
+  const [first, ...rest] = props
+  if (!first) return object
+  return getValue(object[first], rest)
+}
+
 module.exports = function pickByMap(object, props, keys) {
   if (!keys) keys = Object.keys(object)
   return keys.reduce((obj, key) => {
@@ -11,12 +19,4 @@ module.exports = function pickByMap(object, props, keys) {
     })
     return obj
   }, {})
-}
-
-function getValue(object, props) {
-  if (!object) return null
-  if (!Array.isArray(props)) return object[props]
-  const [first, ...rest] = props
-  if (!first) return object
-  return getValue(object[first], rest)
 }

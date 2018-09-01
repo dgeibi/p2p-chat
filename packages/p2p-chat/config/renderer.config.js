@@ -23,7 +23,7 @@ module.exports = (env = {}) => {
 
   const config = new Config({
     mode: SERVE || !PROD ? 'development' : 'production',
-    devtool: PROD ? 'source-map' : 'cheap-module-source-map',
+    devtool: PROD ? '' : 'cheap-module-source-map',
     entry: {
       app: `${SRC_DIR}/index.js`,
     },
@@ -52,43 +52,35 @@ module.exports = (env = {}) => {
         babelrc: false,
         presets: [
           [
-            '@babel/env',
+            '@dgeibi/babel-preset-react-app',
             {
               targets: {
-                electron: '1.8.0',
+                electron: '3.0.0',
               },
-              modules: false,
               useBuiltIns: 'usage',
               shippedProposals: true,
             },
           ],
-          '@babel/react',
         ],
         plugins: [
-          'transform-decorators-legacy',
-          ['@babel/plugin-proposal-class-properties', { loose: true }],
-          [
-            'react-css-modules',
-            {
-              generateScopedName,
-              webpackHotModuleReloading: SERVE,
-              filetypes: {
-                '.scss': {
-                  syntax: 'postcss-scss',
-                  plugins: ['postcss-nested'],
-                },
-              },
-            },
-          ],
           [
             'import',
             {
               libraryName: 'antd',
               style: true,
             },
+            'antd-import',
+          ],
+          [
+            'import',
+            {
+              libraryName: 'lodash',
+              libraryDirectory: '',
+              camel2DashComponentName: false,
+            },
+            'lodash-import',
           ],
           SERVE && 'react-hot-loader/babel',
-          PROD && 'transform-react-remove-prop-types',
         ].filter(Boolean),
       },
     })
@@ -113,6 +105,7 @@ module.exports = (env = {}) => {
             {
               loader: 'less-loader',
               options: {
+                javascriptEnabled: true,
                 modifyVars: {
                   'icon-url': require('./fromAntdStyle')(
                     `${__dirname}/../public/fonts/iconfont`
@@ -123,7 +116,6 @@ module.exports = (env = {}) => {
           ],
         },
         extract: PROD,
-        extractOptions: 'antd.css',
       })
     )
     .use(
@@ -146,7 +138,6 @@ module.exports = (env = {}) => {
           ],
         },
         extract: PROD,
-        extractOptions: 'main.css',
       })
     )
     .plugin(HtmlWebpackPlugin, [
@@ -163,6 +154,7 @@ module.exports = (env = {}) => {
       SERVE
     )
     .use(analyzer, Boolean(env.report))
+    .plugin(require('mini-css-extract-plugin'), [], PROD)
 
   return config.toConfig()
 }

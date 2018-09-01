@@ -15,7 +15,7 @@ import CreateChannel from '../components/Settings/CreateChannel'
 import ModalBtn from './ModalBtn'
 
 import { formatTag } from '../utils/format'
-import './Settings.scss'
+import styles from './Settings.scss'
 
 const selectUsers = state => state.aside.chatList.users
 
@@ -38,7 +38,7 @@ const selectOnlineUsers = createSelector(selectUsers, users =>
     loginActions: bindActionCreators(loginActions, dispatch),
   })
 )
-export default class Settings extends Component {
+class Settings extends Component {
   static propTypes = {
     loginActions: PropTypes.shape({
       logout: PropTypes.func.isRequired,
@@ -55,6 +55,7 @@ export default class Settings extends Component {
       logined: PropTypes.bool.isRequired,
     }).isRequired,
   }
+
   logout = () => {
     this.props.loginActions.logout()
     this.props.resetChatList()
@@ -65,7 +66,7 @@ export default class Settings extends Component {
     const { onlineUsers, login } = this.props
     const { logined } = login
     return (
-      <div styleName="settings">
+      <div className={styles.settings}>
         {!logined && (
           <ModalBtn id="login" visibleDefault>
             {({ hide, visible }) => (
@@ -121,3 +122,5 @@ export default class Settings extends Component {
     )
   }
 }
+
+export default Settings

@@ -4,13 +4,13 @@ import PropTypes from 'prop-types'
 
 import Card from '../../Common/CustomCard'
 import { formatSize } from '../../../utils/format'
-import './FileReceive.scss'
+import styles from './FileReceive.scss'
 import { fileLoadStates } from './constants'
 
 const FileInfo = ({ filename, accept, ignore, size, username, status }) => (
   <Card>
-    <div styleName="card">
-      <div styleName="filename" title={filename}>
+    <div className={styles.card}>
+      <div className={styles.filename} title={filename}>
         {filename}
       </div>
       <div>

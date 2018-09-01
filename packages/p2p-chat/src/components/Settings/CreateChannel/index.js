@@ -25,14 +25,16 @@ const validForm = (form, callback) => {
 }
 
 @Form.create()
-export default class CreateChannel extends Component {
+class CreateChannel extends Component {
   static checkboxsField = 'tags'
+
   static propTypes = {
     hide: PropTypes.func.isRequired,
     form: PropTypes.object.isRequired,
     visible: PropTypes.bool.isRequired,
     onlineUsers: PropTypes.arrayOf(PropTypes.object).isRequired,
   }
+
   state = {
     indeterminate: false,
     checkAll: false,
@@ -144,3 +146,5 @@ export default class CreateChannel extends Component {
     )
   }
 }
+
+export default CreateChannel

@@ -26,7 +26,7 @@ const validForm = (form, callback) => {
 }
 
 @Form.create()
-export default class Login extends Component {
+class Login extends Component {
   static propTypes = {
     hide: PropTypes.func.isRequired,
     visible: PropTypes.bool.isRequired,
@@ -98,3 +98,5 @@ export default class Login extends Component {
     )
   }
 }
+
+export default Login

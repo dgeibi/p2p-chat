@@ -4,13 +4,17 @@ import PropTypes from 'prop-types'
 
 import { formatTag } from '../../../utils/format'
 
-import './Text.scss'
+import styles from './Text.scss'
 
 const Text = ({ username, text, myName, self, date, tag }) => (
-  <div styleName="text">
-    <header styleName="text__header">{self ? myName : username + formatTag(tag)}</header>
-    <main styleName="text__main">{text}</main>
-    <footer styleName="text__footer">{dateFormat(date, 'yyyy-mm-dd HH:MM')}</footer>
+  <div className={styles.text}>
+    <header className={styles.text__header}>
+      {self ? myName : username + formatTag(tag)}
+    </header>
+    <main className={styles.text__main}>{text}</main>
+    <footer className={styles.text__footer}>
+      {dateFormat(date, 'yyyy-mm-dd HH:MM')}
+    </footer>
   </div>
 )
 

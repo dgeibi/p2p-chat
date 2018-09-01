@@ -2,12 +2,19 @@ import React, { PureComponent } from 'react'
 import { Menu } from 'antd'
 import { ipcRenderer } from 'electron'
 import PropTypes from 'prop-types'
-import isEqual from 'lodash.isequal'
+import { isEqual } from 'lodash'
 import EventObservable from 'p2p-chat-utils/EventObservable'
 import { formatTag } from '../../../utils/format'
 import ListItem from '../ListItem'
 import DialogType from './DialogType'
-import './ChatList.scss'
+import styles from './ChatList.scss'
+
+function idOf(tag, channel) {
+  if (channel) {
+    return { type: 'channel', key: channel }
+  }
+  return { type: 'user', key: tag }
+}
 
 class ChatList extends PureComponent {
   static propTypes = {
@@ -99,7 +106,7 @@ class ChatList extends PureComponent {
         defaultOpenKeys={[DialogType.CHANNEL, DialogType.USER]}
         onClick={this.handleClick}
         selectedKeys={[this.props.current.key]}
-        styleName="menu"
+        className={styles.menu}
       >
         <Menu.SubMenu key={DialogType.CHANNEL} title="Channels">
           {channels.map(({ key, name, badge, online }) => (
@@ -129,10 +136,3 @@ class ChatList extends PureComponent {
 }
 
 export default ChatList
-
-function idOf(tag, channel) {
-  if (channel) {
-    return { type: 'channel', key: channel }
-  }
-  return { type: 'user', key: tag }
-}

@@ -33,7 +33,7 @@ const validForm = (form, callback) => {
 }
 
 @Form.create()
-export default class Connect extends Component {
+class Connect extends Component {
   static propTypes = {
     hide: PropTypes.func.isRequired,
     visible: PropTypes.bool.isRequired,
@@ -148,3 +148,5 @@ export default class Connect extends Component {
     )
   }
 }
+
+export default Connect

@@ -2,11 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { formatTag } from '../../../utils/format'
-import './MyInfo.scss'
+import styles from './MyInfo.scss'
 
 const MyInfo = ({ logined, tag, address, port, username }) =>
   logined ? (
-    <p styleName="my-info">
+    <p className={styles['my-info']}>
       {username}
       {formatTag(tag)}
       <br />

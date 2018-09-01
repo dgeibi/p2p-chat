@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { createSelector } from 'reselect'
 import { matchPath } from 'react-router-dom'
-import sortBy from 'lodash.sortby'
+import { sortBy } from 'lodash'
 import { getInfo } from '../selectors/chatInfo'
 
 import ChatList from '../components/Aside/ChatList'
@@ -56,6 +56,7 @@ class Aside extends Component {
     chatList: PropTypes.object.isRequired,
     chatListActions: PropTypes.object.isRequired,
   }
+
   render() {
     const { chatList, chatListActions: actions } = this.props
     return (

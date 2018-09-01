@@ -1,4 +1,4 @@
-import throttle from 'lodash.throttle'
+import { throttle } from 'lodash'
 
 import watchState from '../../../utils/watchState'
 import storage from '../../../utils/storage'

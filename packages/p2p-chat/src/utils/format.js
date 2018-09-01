@@ -1,3 +1,7 @@
+function toFixed(num) {
+  return num.toFixed(2)
+}
+
 export function formatSize(size) {
   if (size > 1e9) return `${toFixed(size / 1e9)} GB`
   else if (size > 1e6) return `${toFixed(size / 1e6)} MB`
@@ -7,10 +11,6 @@ export function formatSize(size) {
 
 export function formatSpeed(speed) {
   return `${formatSize(speed)}/s`
-}
-
-function toFixed(num) {
-  return num.toFixed(2)
 }
 
 export function formatPercent(percent) {

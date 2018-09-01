@@ -4,6 +4,19 @@ const getNewHost = require('p2p-chat-utils/get-new-address')
 const isIPLarger = require('p2p-chat-utils/is-ip-larger')
 const noop = require('p2p-chat-utils/noop')
 
+/**
+ * 将 from ~ to 范围内的地址添加到 ipset
+ * @param {string} from
+ * @param {string} to
+ * @param {number} port
+ * @param {object} ipset
+ */
+function connectHostRange(from, to, port, ipset) {
+  if (isIPLarger(from, to)) return // 超过范围
+  ipset.add(from, port)
+  connectHostRange(getNewHost(from), to, port, ipset)
+}
+
 function connectScatter(opts, fallbackHost) {
   if (opts.connects) {
     opts.connects.forEach(conn => {
@@ -17,7 +30,13 @@ function connectScatter(opts, fallbackHost) {
 
 function connectIPset(ipset, handler) {
   ipset.forEach((host, port) => {
-    net.connect(port, host, handler).on('error', noop)
+    net
+      .connect(
+        port,
+        host,
+        handler
+      )
+      .on('error', noop)
   })
 }
 
@@ -42,19 +61,6 @@ function connectRange(opts, fallbackHost) {
       ipset.add(host, port)
     }
   }
-}
-
-/**
- * 将 from ~ to 范围内的地址添加到 ipset
- * @param {string} from
- * @param {string} to
- * @param {number} port
- * @param {object} ipset
- */
-function connectHostRange(from, to, port, ipset) {
-  if (isIPLarger(from, to)) return // 超过范围
-  ipset.add(from, port)
-  connectHostRange(getNewHost(from), to, port, ipset)
 }
 
 module.exports = {

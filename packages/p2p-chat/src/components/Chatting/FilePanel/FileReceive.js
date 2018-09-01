@@ -7,7 +7,7 @@ import PropTypes from 'prop-types'
 import Card from '../../Common/CustomCard'
 import { fileLoadStates } from './constants'
 import { formatSize, formatSpeed, formatPercent } from '../../../utils/format'
-import './FileReceive.scss'
+import styles from './FileReceive.scss'
 
 const openFile = filepath => () => {
   shell.openItem(filepath)
@@ -27,8 +27,8 @@ const FileReceive = ({
   filepath,
 }) => (
   <Card>
-    <div styleName="card">
-      <div styleName="filename" title={filename}>
+    <div className={styles.card}>
+      <div className={styles.filename} title={filename}>
         {status === success ? <a onClick={openFile(filepath)}>{filename}</a> : filename}
       </div>
       <div>

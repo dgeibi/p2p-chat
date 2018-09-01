@@ -50,7 +50,7 @@ module.exports = (env = {}) => {
             '@babel/env',
             {
               targets: {
-                electron: '1.8.0',
+                electron: '3.0.0',
               },
               modules: false,
               useBuiltIns: 'usage',

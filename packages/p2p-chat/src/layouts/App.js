@@ -9,7 +9,7 @@ import { hot } from 'react-hot-loader'
 import SettingNav from '../views/Settings'
 import Aside from '../views/Aside'
 import Chatting from '../views/Chatting'
-import './global.scss'
+import styles from './global.scss'
 
 function getDevTool() {
   if (process.env.NODE_ENV !== 'production') {
@@ -22,21 +22,19 @@ function getDevTool() {
 const App = ({ store, history }) => (
   <Provider store={store}>
     <Router history={history}>
-      <main>
-        <Row>
-          <Col span={6} styleName="col col-1">
-            <SettingNav />
-            <Aside />
-          </Col>
-          <Col span={18} styleName="col">
-            <Route
-              path="/chat/:type/:key"
-              render={({ component: Component, ...rest }) => <Chatting {...rest} />}
-            />
-            {getDevTool()}
-          </Col>
-        </Row>
-      </main>
+      <Row>
+        <Col span={6} className={`${styles.col} ${styles['col-1']}`}>
+          <SettingNav />
+          <Aside />
+        </Col>
+        <Col span={18} className={styles.col}>
+          <Route
+            path="/chat/:type/:key"
+            render={({ component: Component, ...rest }) => <Chatting {...rest} />}
+          />
+          {getDevTool()}
+        </Col>
+      </Row>
     </Router>
   </Provider>
 )

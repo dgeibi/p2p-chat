@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Input, Button, Form, Upload, Collapse } from 'antd'
 import Messages from '../Messages'
 import { formatTag } from '../../../utils/format'
-import './Dialog.scss'
+import styles from './Dialog.scss'
 
 const { TextArea } = Input
 const { Panel } = Collapse
@@ -66,30 +66,33 @@ class Dialog extends Component {
   render() {
     const { messages, username, fileList, text, info } = this.props
     return (
-      <div styleName="dialog">
+      <div className={styles.dialog}>
         {info.name && (
           <Collapse bordered={false}>
             <Panel
               header={`${info.name} (${info.onlineCount + 1}/${info.totalCount + 1})`}
             >
-              <p>
-                onlines: <span>{username}[me]</span>{' '}
-                {Object.values(info.users)
-                  .filter(x => x.online)
-                  .map(x => (
-                    <span key={x.tag}>
-                      {x.username}
-                      {formatTag(x.tag)}{' '}
-                    </span>
-                  ))}
-              </p>
+              onlines:{' '}
+              <span>
+                {username}
+                [me]
+              </span>{' '}
+              {Object.values(info.users)
+                .filter(x => x.online)
+                .map(x => (
+                  <span key={x.tag}>
+                    {x.username}
+                    {formatTag(x.tag)}{' '}
+                  </span>
+                ))}
             </Panel>
           </Collapse>
         )}
         {info.username && (
-          <section styleName="user-info">
+          <section className={styles['user-info']}>
             {info.username}
-            {formatTag(info.tag)} ({info.online ? `${info.host}:${info.port}` : 'Offline'})
+            {formatTag(info.tag)} ({info.online ? `${info.host}:${info.port}` : 'Offline'}
+            )
           </section>
         )}
         <Messages messages={messages} username={username} />
@@ -107,9 +110,9 @@ class Dialog extends Component {
             rows={4}
             value={text}
             onChange={this.handleTextChange}
-            styleName="text"
+            className={styles.text}
           />
-          <div styleName="send-btn-div">
+          <div className={styles['send-btn-div']}>
             <Button
               type="primary"
               htmlType="submit"

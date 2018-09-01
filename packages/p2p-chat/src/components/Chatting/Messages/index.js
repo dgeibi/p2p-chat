@@ -3,7 +3,7 @@ import { Alert } from 'antd'
 import PropTypes from 'prop-types'
 
 import Text from './Text'
-import './Messages.scss'
+import styles from './Messages.scss'
 
 class Messages extends Component {
   static propTypes = {
@@ -38,14 +38,14 @@ class Messages extends Component {
   render() {
     const { messages, username } = this.props
     return (
-      <div styleName="messages" ref={this.saveMessageList}>
+      <div className={styles.messages} ref={this.saveMessageList}>
         {messages.map(msg => {
           const props = { key: msg.uid }
           if (msg.alert) {
             const { message, description, alert } = msg
             return (
               <Alert
-                styleName="alert"
+                className={styles.alert}
                 message={message}
                 description={description}
                 type={alert}

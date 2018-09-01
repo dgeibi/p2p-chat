@@ -6,22 +6,6 @@ import { dialogActions, filePanelActions } from '../views/ChattingRedux'
 import { showError, showInfo } from '../utils/message'
 import hot from '../utils/hot'
 
-let replace
-export default (...args) => {
-  replace = replaceable({
-    args,
-    emitter: ipcRenderer,
-    callback: listeners,
-    disable: !module.hot,
-  })
-}
-
-hot({
-  sourceModule: module,
-  replaceGetter: () => replace,
-  args: [listeners],
-})
-
 function listeners(on, dispatch) {
   on('setup-reply', (event, { error, id }) => {
     if (!error) {
@@ -102,3 +86,20 @@ function listeners(on, dispatch) {
     }
   })
 }
+
+let replace
+
+export default (...args) => {
+  replace = replaceable({
+    args,
+    emitter: ipcRenderer,
+    callback: listeners,
+    disable: !module.hot,
+  })
+}
+
+hot({
+  sourceModule: module,
+  replaceGetter: () => replace,
+  args: [listeners],
+})
