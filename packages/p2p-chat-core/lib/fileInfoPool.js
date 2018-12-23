@@ -58,35 +58,42 @@ function send(checksum, payload, options, callback) {
   }
   const fileMsg = Object.assign({}, payload, messages[checksum])
   const { filepath, filename } = fileMsg
-  fs.stat(filepath, err => {
+  fs.stat(filepath, (err, stats) => {
     if (err) {
       callback(Error(`fail to read file ${filepath}`), filename)
       return
     }
-    delete fileMsg.filepath
-    net
-      .connect(
-        options,
-        function handler() {
-          const socket = this
 
-          enhanceSocket({ socket })
-          fileMsg.bodyLength = fileMsg.size
-          socket.send(fileMsg)
+    const { size } = stats
+    if (size === 0) {
+      callback(Error(`${filepath} is empty file`), filename)
+    } else if (size !== fileMsg.size) {
+      callback(Error(`${filepath} size changed`), filename)
+    } else {
+      delete fileMsg.filepath
 
-          const readStream = fs.createReadStream(filepath)
-          readStream.pipe(socket)
-          readStream.once('end', () => {
-            socket.end()
-            socket.once('close', () => {
-              callback(null, filename)
+      net
+        .connect(
+          options,
+          function handler() {
+            const socket = this
+            enhanceSocket({ socket })
+            fileMsg.bodyLength = fileMsg.size
+            socket.send(fileMsg)
+            const readStream = fs.createReadStream(filepath)
+            readStream.pipe(socket)
+            readStream.once('end', () => {
+              socket.end()
+              socket.once('close', () => {
+                callback(null, filename)
+              })
             })
-          })
-        }
-      )
-      .on('error', e => {
-        callback(e, filename)
-      })
+          }
+        )
+        .on('error', e => {
+          callback(e, filename)
+        })
+    }
   })
 }
 
