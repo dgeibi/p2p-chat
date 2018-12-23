@@ -55,7 +55,7 @@ module.exports = (env = {}) => {
             '@dgeibi/babel-preset-react-app',
             {
               targets: {
-                electron: '3.0.0',
+                electron: '4.0.0',
               },
               useBuiltIns: 'usage',
               shippedProposals: true,
@@ -67,7 +67,8 @@ module.exports = (env = {}) => {
             'import',
             {
               libraryName: 'antd',
-              style: true,
+              libraryDirectory: 'es',
+              style: 'css',
             },
             'antd-import',
           ],
@@ -94,25 +95,16 @@ module.exports = (env = {}) => {
     .use(
       css({
         rule: {
-          test: /\.less$/,
+          test: /\.css$/,
           use: [
             {
               loader: 'css-loader',
               options: {
-                minimize: true,
+                importLoaders: 1,
+                sourceMap: false,
               },
             },
-            {
-              loader: 'less-loader',
-              options: {
-                javascriptEnabled: true,
-                modifyVars: {
-                  'icon-url': require('./fromAntdStyle')(
-                    `${__dirname}/../public/fonts/iconfont`
-                  ),
-                },
-              },
-            },
+            { loader: 'postcss-loader', options: { sourceMap: false } },
           ],
         },
         extract: PROD,
@@ -122,7 +114,6 @@ module.exports = (env = {}) => {
       css({
         rule: {
           test: /\.scss$/,
-          include: defaultInclude,
           use: [
             {
               loader: 'css-loader',
@@ -130,11 +121,10 @@ module.exports = (env = {}) => {
                 getLocalIdent,
                 modules: true,
                 importLoaders: 1,
-                minimize: true,
-                sourceMap: true,
+                sourceMap: false,
               },
             },
-            { loader: 'postcss-loader', options: { sourceMap: true } },
+            { loader: 'postcss-loader', options: { sourceMap: false } },
           ],
         },
         extract: PROD,

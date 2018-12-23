@@ -48,7 +48,7 @@ $ yarn
 Run the current application in development mode
 
 ```
-$ yarn app start
+$ yarn app dev
 ```
 
 Create packages

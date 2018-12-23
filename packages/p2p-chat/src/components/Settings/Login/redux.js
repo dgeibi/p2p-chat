@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron'
-import { push } from 'react-router-redux'
+import { push } from 'connected-react-router'
 
 import createReducer from '../../../utils/createReducer'
 import getConstants from '../../../utils/constants'

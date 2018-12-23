@@ -1,4 +1,4 @@
-import { push } from 'react-router-redux'
+import { push } from 'connected-react-router'
 
 import { configureStore, history } from './global/redux'
 import ipc from './global/ipc'

@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Row, Col } from 'antd'
 import { Route } from 'react-router-dom'
-import { ConnectedRouter as Router } from 'react-router-redux'
+import { ConnectedRouter as Router } from 'connected-react-router'
 import { hot } from 'react-hot-loader'
 
 import SettingNav from '../views/Settings'

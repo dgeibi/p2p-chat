@@ -28,7 +28,7 @@ const selectSortedUsers = createSelector([selectUsers], users =>
   sortBy(Object.values(users), byOnline('username'))
 )
 
-const selectLocation = state => state.routing.location
+const selectLocation = state => state.router.location
 const selectCurrent = createSelector([selectLocation], location => {
   if (!location) return {}
   const match = matchPath(location.pathname, {

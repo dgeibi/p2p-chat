@@ -4,7 +4,7 @@ const logger = require('p2p-chat-logger')
 
 class StartElectron {
   apply(compiler) {
-    compiler.plugin('done', () => {
+    compiler.hooks.done.tap('selfdone', () => {
       if (this.started) return
       this.started = true
       spawn('electron .', {
@@ -30,6 +30,7 @@ module.exports = options => wtf => {
   wtf.config.devServer = Object.assign(
     wtf.config.devServer,
     {
+      disableHostCheck: true,
       hot: true,
       stats: {
         colors: true,
