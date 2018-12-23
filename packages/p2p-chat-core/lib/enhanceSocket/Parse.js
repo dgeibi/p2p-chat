@@ -2,7 +2,9 @@
 
 const parseChunks = require('p2p-chat-utils/parse-chunks')
 const ensureUniqueFile = require('p2p-chat-utils/ensure-unique-file')
+const eventAll = require('p2p-chat-utils/event-all')
 const { createWriteStream } = require('fs')
+const crypto = require('crypto')
 const { EventEmitter } = require('events')
 const { resolve } = require('path')
 
@@ -35,6 +37,7 @@ class Parse extends EventEmitter {
   resetState() {
     this.writeStream = null
     this.interval = null
+    this.hasher = null
     this.msg = null
     this.bodyLeft = 0
   }
@@ -61,6 +64,7 @@ class Parse extends EventEmitter {
         this.socket.resume()
       })
     }
+    this.hasher.write(data)
   }
 
   transformBody(buffer) {
@@ -97,13 +101,20 @@ class Parse extends EventEmitter {
       msg: { checksum },
     } = this
     const writeStream = createWriteStream(pathname)
-    writeStream.once('close', () => {
-      socket.emit('file-close', checksum)
+    const hasher = crypto.createHash('md5').setEncoding('hex')
+
+    eventAll([[hasher, 'finish'], [writeStream, 'close']], () => {
+      socket.emit('file-close', checksum, hasher.read())
+    })
+
+    hasher.on('error', e => {
+      socket.emit('error', e)
     })
     writeStream.on('error', e => {
       socket.emit('error', e)
     })
     this.writeStream = writeStream
+    this.hasher = hasher
   }
 
   submitFileMsg(pathname) {
@@ -147,6 +158,7 @@ class Parse extends EventEmitter {
   processDone() {
     // write and emit event
     this.writeStream.end()
+    this.hasher.end()
     this.socket.emit('file-done', this.msg.checksum)
 
     // reset state
@@ -201,6 +213,10 @@ class Parse extends EventEmitter {
     if (this.writeStream) {
       this.writeStream.removeAllListeners()
       this.writeStream.destroy()
+    }
+    if (this.hasher) {
+      this.hasher.removeAllListeners()
+      this.hasher.end()
     }
   }
 }

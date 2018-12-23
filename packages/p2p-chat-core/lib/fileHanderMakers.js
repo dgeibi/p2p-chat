@@ -1,5 +1,4 @@
 const logger = require('p2p-chat-logger')
-const md5 = require('p2p-chat-utils/md5')
 
 const fileReceiveError = ({
   chat,
@@ -62,27 +61,24 @@ const makeDone = (chat, socket, { checksum, id, tag, channel }, { processing }) 
 
 const makeClose = (chat, socket, info) => {
   const { checksum, filepath, filename, id } = info
-  const close = currentChecksum => {
+  const close = (currentChecksum, realChecksum) => {
     if (currentChecksum !== checksum) return
     socket.removeListener('file-close', close)
-    md5.file(filepath, false, (md5Err, realChecksum) => {
-      // 检查checksum
-      if (md5Err || realChecksum !== checksum) {
-        const error = md5Err || Error(`\`${filename}\` validation fail`)
-        fileReceiveError({
-          chat,
-          error,
-          info,
-        })
-        return
-      }
+    if (realChecksum !== checksum) {
+      const error = Error(`\`${filename}\` validation fail`)
+      fileReceiveError({
+        chat,
+        error,
+        info,
+      })
+    } else {
       fileReceived({
         chat,
         info,
       })
       logger.verbose('file receiced', filepath)
       chat.confirmFileReceived(id)
-    })
+    }
   }
   return close
 }
