@@ -1,11 +1,11 @@
 {
   "name": "p2p-chat",
-  "version": "1.5.5",
+  "version": "1.6.0",
   "license": "MIT",
   "description": "a P2P LAN chatting and file sharing tool",
   "main": "index.js",
   "output": "assets",
-  "author": "dgeibi <png.inside@gmail.com> (blog.dgeibi.xyz)",
+  "author": "dgeibi <png.inside@gmail.com>",
   "private": true,
   "homepage": "https://github.com/dgeibi/p2p-chat",
   "scripts": {
