@@ -202,7 +202,7 @@ function createWindow() {
     title: pkg.name,
     webPreferences: {
       nodeIntegration: true,
-    }
+    },
   })
 
   const urlObj = Object.assign(

@@ -92,7 +92,10 @@ class Parse extends EventEmitter {
   }
 
   createWriteStream(pathname) {
-    const { socket, msg: { checksum } } = this
+    const {
+      socket,
+      msg: { checksum },
+    } = this
     const writeStream = createWriteStream(pathname)
     writeStream.once('close', () => {
       socket.emit('file-close', checksum)
@@ -125,7 +128,10 @@ class Parse extends EventEmitter {
     let pass = process.uptime()
     const fn = () => {
       const now = process.uptime()
-      const { bodyLeft, msg: { bodyLength, checksum } } = this
+      const {
+        bodyLeft,
+        msg: { bodyLength, checksum },
+      } = this
 
       const percent = (bodyLength - bodyLeft) / bodyLength
       const speed = (lastLeft - bodyLeft) / (now - pass)

@@ -22,8 +22,7 @@ const file = (filepath, strict, callback) => {
     }
   }
 
-  fs
-    .createReadStream(filepath)
+  fs.createReadStream(filepath)
     .pipe(crypto.createHash('md5').setEncoding('hex'))
     .on('finish', function finished() {
       callback(null, this.read())

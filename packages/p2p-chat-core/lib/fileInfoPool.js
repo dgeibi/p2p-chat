@@ -65,22 +65,25 @@ function send(checksum, payload, options, callback) {
     }
     delete fileMsg.filepath
     net
-      .connect(options, function handler() {
-        const socket = this
+      .connect(
+        options,
+        function handler() {
+          const socket = this
 
-        enhanceSocket({ socket })
-        fileMsg.bodyLength = fileMsg.size
-        socket.send(fileMsg)
+          enhanceSocket({ socket })
+          fileMsg.bodyLength = fileMsg.size
+          socket.send(fileMsg)
 
-        const readStream = fs.createReadStream(filepath)
-        readStream.pipe(socket)
-        readStream.once('end', () => {
-          socket.end()
-          socket.once('close', () => {
-            callback(null, filename)
+          const readStream = fs.createReadStream(filepath)
+          readStream.pipe(socket)
+          readStream.once('end', () => {
+            socket.end()
+            socket.once('close', () => {
+              callback(null, filename)
+            })
           })
-        })
-      })
+        }
+      )
       .on('error', e => {
         callback(e, filename)
       })

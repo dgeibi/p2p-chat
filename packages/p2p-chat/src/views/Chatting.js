@@ -58,10 +58,13 @@ const fileMapper = filepath => ({
 
 const selectFilePaths = (state, props) =>
   select(state.chatting.dialog, props, 'filePaths')
-const selectFileList = createSelector([selectFilePaths], filePaths => {
-  if (!filePaths) return emptyArray
-  return filePaths.map(fileMapper)
-})
+const selectFileList = createSelector(
+  [selectFilePaths],
+  filePaths => {
+    if (!filePaths) return emptyArray
+    return filePaths.map(fileMapper)
+  }
+)
 
 @connect(
   (state, ownProps) => {

@@ -24,19 +24,23 @@ const selectSortedChannels = createSelector(
       byOnline('name')
     )
 )
-const selectSortedUsers = createSelector([selectUsers], users =>
-  sortBy(Object.values(users), byOnline('username'))
+const selectSortedUsers = createSelector(
+  [selectUsers],
+  users => sortBy(Object.values(users), byOnline('username'))
 )
 
 const selectLocation = state => state.router.location
-const selectCurrent = createSelector([selectLocation], location => {
-  if (!location) return {}
-  const match = matchPath(location.pathname, {
-    path: '/chat/:type/:key',
-  })
-  if (match) return match.params
-  return {}
-})
+const selectCurrent = createSelector(
+  [selectLocation],
+  location => {
+    if (!location) return {}
+    const match = matchPath(location.pathname, {
+      path: '/chat/:type/:key',
+    })
+    if (match) return match.params
+    return {}
+  }
+)
 
 @connect(
   state => ({

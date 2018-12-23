@@ -19,13 +19,15 @@ import styles from './Settings.scss'
 
 const selectUsers = state => state.aside.chatList.users
 
-const selectOnlineUsers = createSelector(selectUsers, users =>
-  Object.values(users)
-    .filter(({ online }) => Boolean(online))
-    .map(({ tag, username }) => ({
-      label: username + formatTag(tag),
-      value: tag,
-    }))
+const selectOnlineUsers = createSelector(
+  selectUsers,
+  users =>
+    Object.values(users)
+      .filter(({ online }) => Boolean(online))
+      .map(({ tag, username }) => ({
+        label: username + formatTag(tag),
+        value: tag,
+      }))
 )
 
 @connect(
